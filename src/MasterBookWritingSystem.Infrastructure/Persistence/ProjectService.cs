@@ -1,6 +1,7 @@
 using System.Text.Json;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Domain;
+using MasterBookWritingSystem.Infrastructure.Documents;
 using MasterBookWritingSystem.Infrastructure.IO;
 using MasterBookWritingSystem.Infrastructure.Persistence.Entities;
 using MasterBookWritingSystem.Infrastructure.Workflow;
@@ -18,15 +19,18 @@ public sealed class ProjectService : IProjectService
 
     private readonly IApplicationPaths _applicationPaths;
     private readonly IWorkflowDefinitionSource _workflowDefinitionSource;
+    private readonly IDocumentTemplateCatalog _documentTemplateCatalog;
     private readonly object _gate = new();
     private Project? _activeProject;
 
     public ProjectService(
         IApplicationPaths applicationPaths,
-        IWorkflowDefinitionSource workflowDefinitionSource)
+        IWorkflowDefinitionSource workflowDefinitionSource,
+        IDocumentTemplateCatalog documentTemplateCatalog)
     {
         _applicationPaths = applicationPaths;
         _workflowDefinitionSource = workflowDefinitionSource;
+        _documentTemplateCatalog = documentTemplateCatalog;
     }
 
     public Project? ActiveProject
@@ -94,7 +98,7 @@ public sealed class ProjectService : IProjectService
             context.SchemaVersions.Add(new SchemaVersionRecord
             {
                 Version = ProjectSchema.CurrentVersion,
-                Name = ProjectSchema.WorkflowMigrationName,
+                Name = ProjectSchema.DocumentsMigrationName,
                 AppliedUtc = now,
             });
 
@@ -103,6 +107,19 @@ public sealed class ProjectService : IProjectService
                 .ConfigureAwait(false);
             await WorkflowDefinitionImporter
                 .ImportAsync(context, record.Id, definitions, cancellationToken)
+                .ConfigureAwait(false);
+
+            var documentTemplates = await _documentTemplateCatalog
+                .GetAllAsync(cancellationToken)
+                .ConfigureAwait(false);
+            await DocumentSeeder
+                .SeedAsync(
+                    context,
+                    record.Id,
+                    rootPath,
+                    documentTemplates,
+                    DocumentSeeder.FindSeedRoot(),
+                    cancellationToken)
                 .ConfigureAwait(false);
 
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -138,11 +155,37 @@ public sealed class ProjectService : IProjectService
             await context.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
 
             record = await context.Projects
-                .AsNoTracking()
                 .OrderBy(project => project.Id)
                 .FirstOrDefaultAsync(cancellationToken)
                 .ConfigureAwait(false)
                 ?? throw new ProjectNotFoundException($"No project record was found in '{databasePath}'.");
+
+            // Projects created before Milestone 5 need the 24 structured documents after schema migration.
+            var documentTemplates = await _documentTemplateCatalog
+                .GetAllAsync(cancellationToken)
+                .ConfigureAwait(false);
+            await DocumentSeeder
+                .SeedAsync(
+                    context,
+                    record.Id,
+                    rootPath,
+                    documentTemplates,
+                    DocumentSeeder.FindSeedRoot(),
+                    cancellationToken)
+                .ConfigureAwait(false);
+
+            if (!await context.SchemaVersions
+                    .AnyAsync(item => item.Version == ProjectSchema.CurrentVersion, cancellationToken)
+                    .ConfigureAwait(false))
+            {
+                context.SchemaVersions.Add(new SchemaVersionRecord
+                {
+                    Version = ProjectSchema.CurrentVersion,
+                    Name = ProjectSchema.DocumentsMigrationName,
+                    AppliedUtc = DateTimeOffset.UtcNow,
+                });
+                await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
         }
 
         SqliteConnection.ClearAllPools();

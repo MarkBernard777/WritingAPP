@@ -24,6 +24,10 @@ public sealed class ProjectDbContext : DbContext
 
     public DbSet<PhaseGateRecord> PhaseGates => Set<PhaseGateRecord>();
 
+    public DbSet<DocumentRecord> Documents => Set<DocumentRecord>();
+
+    public DbSet<DocumentFieldRecord> DocumentFields => Set<DocumentFieldRecord>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ProjectRecord>(entity =>
@@ -111,6 +115,32 @@ public sealed class ProjectDbContext : DbContext
             entity.Property(gate => gate.Notes).HasMaxLength(4000);
             entity.Property(gate => gate.OverrideReason).HasMaxLength(2000);
             entity.HasIndex(gate => new { gate.ProjectId, gate.PhaseId }).IsUnique();
+        });
+
+        modelBuilder.Entity<DocumentRecord>(entity =>
+        {
+            entity.ToTable("Documents");
+            entity.HasKey(document => document.Id);
+            entity.Property(document => document.Title).HasMaxLength(500).IsRequired();
+            entity.Property(document => document.Notes).HasMaxLength(8000);
+            entity.Property(document => document.RelativeMarkdownPath).HasMaxLength(1000).IsRequired();
+            entity.Property(document => document.TemplatePath).HasMaxLength(500);
+            entity.Property(document => document.DocumentType).HasConversion<int>();
+            entity.HasIndex(document => new { document.ProjectId, document.DocumentType }).IsUnique();
+        });
+
+        modelBuilder.Entity<DocumentFieldRecord>(entity =>
+        {
+            entity.ToTable("DocumentFields");
+            entity.HasKey(field => field.Id);
+            entity.Property(field => field.Key).HasMaxLength(200).IsRequired();
+            entity.Property(field => field.Label).HasMaxLength(500).IsRequired();
+            entity.Property(field => field.Value).HasMaxLength(8000);
+            entity.HasIndex(field => new { field.DocumentId, field.Key }).IsUnique();
+            entity.HasOne(field => field.Document)
+                .WithMany(document => document.Fields)
+                .HasForeignKey(field => field.DocumentId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

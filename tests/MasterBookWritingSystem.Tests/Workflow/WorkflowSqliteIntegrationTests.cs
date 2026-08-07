@@ -1,5 +1,6 @@
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Domain;
+using MasterBookWritingSystem.Core.Domain.Documents;
 using MasterBookWritingSystem.Core.Domain.Workflow;
 using MasterBookWritingSystem.Core.Workflow;
 using MasterBookWritingSystem.Infrastructure.DependencyInjection;
@@ -110,12 +111,21 @@ public sealed class WorkflowSqliteIntegrationTests : IDisposable
     {
         var project = await CreateProjectAsync("Gate Rules");
         var phase = (await _workflow.GetAllPhasesAsync(project.Id)).Single(item => item.Id == "4");
+        var documents = _provider.GetRequiredService<IDocumentService>();
 
         Assert.False(await _workflow.CanPassGateAsync(project.Id, phase.Id));
 
         foreach (var step in phase.Steps)
         {
             await _workflow.CompleteStepAsync(project.Id, phase.Id, step.Number);
+        }
+
+        Assert.False(await _workflow.CanPassGateAsync(project.Id, phase.Id));
+
+        var themeMap = await documents.GetAsync(project.Id, DocumentType.ThemeMap);
+        foreach (var field in themeMap.Fields.Where(item => item.IsRequired))
+        {
+            await documents.UpdateFieldAsync(project.Id, themeMap.Id, field.Key, "Ready");
         }
 
         Assert.True(await _workflow.CanPassGateAsync(project.Id, phase.Id));

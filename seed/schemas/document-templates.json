@@ -1,0 +1,3571 @@
+{
+  "schemaVersion": 1,
+  "documents": [
+    {
+      "documentType": 1,
+      "title": "Project Definition",
+      "templateFile": "templates/core/01_Project_Definition.md",
+      "relativeFolder": "01 Project Definition",
+      "relativeMarkdownPath": "01 Project Definition/01_Project_Definition.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "WHY_THIS_BOOK_MUST_BE_WRITTEN",
+          "label": "Why This Book Must Be Written",
+          "required": true
+        },
+        {
+          "key": "DESIRED_READER_EXPERIENCE",
+          "label": "Desired Reader Experience",
+          "required": true
+        },
+        {
+          "key": "INTENDED_READER",
+          "label": "Intended Reader",
+          "required": true
+        },
+        {
+          "key": "ENTERTAINMENT___EXPLORATION___INSTRUCTION___PERSUASION",
+          "label": "Entertainment / Exploration / Instruction / Persuasion",
+          "required": true
+        },
+        {
+          "key": "STANDALONE_OR_SERIES_ROLE",
+          "label": "Standalone Or Series Role",
+          "required": true
+        },
+        {
+          "key": "FICTION_OR_NONFICTION",
+          "label": "Fiction Or Nonfiction",
+          "required": true
+        },
+        {
+          "key": "GENRE",
+          "label": "Genre",
+          "required": true
+        },
+        {
+          "key": "SUBGENRE",
+          "label": "Subgenre",
+          "required": true
+        },
+        {
+          "key": "AUDIENCE",
+          "label": "Audience",
+          "required": true
+        },
+        {
+          "key": "TONE",
+          "label": "Tone",
+          "required": true
+        },
+        {
+          "key": "POINT_OF_VIEW",
+          "label": "Point Of View",
+          "required": true
+        },
+        {
+          "key": "APPROXIMATE_SCALE",
+          "label": "Approximate Scale",
+          "required": true
+        },
+        {
+          "key": "PUBLISHING_INTENTION",
+          "label": "Publishing Intention",
+          "required": true
+        },
+        {
+          "key": "BOOK_ONE_PROMISE",
+          "label": "Book One Promise",
+          "required": true
+        },
+        {
+          "key": "SERIES_PROMISE",
+          "label": "Series Promise",
+          "required": true
+        },
+        {
+          "key": "EXPLAIN_THE_BOOK_IN_UNDER_ONE_MINUTE",
+          "label": "Explain The Book In Under One Minute",
+          "required": true
+        },
+        {
+          "key": "WHAT_IS_ESSENTIAL",
+          "label": "What Is Essential",
+          "required": true
+        },
+        {
+          "key": "WHAT_DOES_NOT_BELONG",
+          "label": "What Does Not Belong",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 2,
+      "title": "Idea Bank",
+      "templateFile": "templates/core/02_Idea_Bank.md",
+      "relativeFolder": "02 Ideas and Research",
+      "relativeMarkdownPath": "02 Ideas and Research/02_Idea_Bank.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "CHARACTER_IDEAS",
+          "label": "Character Ideas",
+          "required": true
+        },
+        {
+          "key": "SITUATION_IDEAS",
+          "label": "Situation Ideas",
+          "required": true
+        },
+        {
+          "key": "WORLD_IDEAS",
+          "label": "World Ideas",
+          "required": true
+        },
+        {
+          "key": "CONFLICT_IDEAS",
+          "label": "Conflict Ideas",
+          "required": true
+        },
+        {
+          "key": "IMAGE_IDEAS",
+          "label": "Image Ideas",
+          "required": true
+        },
+        {
+          "key": "PHILOSOPHICAL_IDEAS",
+          "label": "Philosophical Ideas",
+          "required": true
+        },
+        {
+          "key": "CANDIDATE_COMBINATIONS",
+          "label": "Candidate Combinations",
+          "required": true
+        },
+        {
+          "key": "RECURRING_SOURCE_OF_MOVEMENT",
+          "label": "Recurring Source Of Movement",
+          "required": true
+        },
+        {
+          "key": "HOW_IT_ESCALATES",
+          "label": "How It Escalates",
+          "required": true
+        },
+        {
+          "key": "WHY_IT_SUSTAINS_A_NOVEL",
+          "label": "Why It Sustains A Novel",
+          "required": true
+        },
+        {
+          "key": "WINNING_SEED",
+          "label": "Winning Seed",
+          "required": true
+        },
+        {
+          "key": "WHY_IT_WINS",
+          "label": "Why It Wins",
+          "required": true
+        },
+        {
+          "key": "TEN_POSSIBLE_COMPLICATIONS",
+          "label": "Ten Possible Complications",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 3,
+      "title": "Premise Document",
+      "templateFile": "templates/core/03_Premise_Document.md",
+      "relativeFolder": "03 Premise and Theme",
+      "relativeMarkdownPath": "03 Premise and Theme/03_Premise_Document.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "PROTAGONIST",
+          "label": "Protagonist",
+          "required": true
+        },
+        {
+          "key": "DISRUPTION",
+          "label": "Disruption",
+          "required": true
+        },
+        {
+          "key": "GOAL",
+          "label": "Goal",
+          "required": true
+        },
+        {
+          "key": "OPPOSITION",
+          "label": "Opposition",
+          "required": true
+        },
+        {
+          "key": "STAKES",
+          "label": "Stakes",
+          "required": true
+        },
+        {
+          "key": "URGENCY",
+          "label": "Urgency",
+          "required": true
+        },
+        {
+          "key": "TRANSFORMATION",
+          "label": "Transformation",
+          "required": true
+        },
+        {
+          "key": "FINAL_SENTENCE",
+          "label": "Final Sentence",
+          "required": true
+        },
+        {
+          "key": "BEFORE",
+          "label": "Before",
+          "required": true
+        },
+        {
+          "key": "ESCALATION",
+          "label": "Escalation",
+          "required": true
+        },
+        {
+          "key": "REQUIRED_ACTION",
+          "label": "Required Action",
+          "required": true
+        },
+        {
+          "key": "CONCRETE_GOAL",
+          "label": "Concrete Goal",
+          "required": true
+        },
+        {
+          "key": "RECOGNISABLE_OUTCOME",
+          "label": "Recognisable Outcome",
+          "required": true
+        },
+        {
+          "key": "CREDIBLE_OPPOSITION",
+          "label": "Credible Opposition",
+          "required": true
+        },
+        {
+          "key": "DIFFICULT_CHOICES",
+          "label": "Difficult Choices",
+          "required": true
+        },
+        {
+          "key": "GENRE_PROMISE",
+          "label": "Genre Promise",
+          "required": true
+        },
+        {
+          "key": "EMOTIONAL_CONFLICT",
+          "label": "Emotional Conflict",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 4,
+      "title": "Theme Map",
+      "templateFile": "templates/core/04_Theme_Map.md",
+      "relativeFolder": "03 Premise and Theme",
+      "relativeMarkdownPath": "03 Premise and Theme/04_Theme_Map.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "WHY_THIS_QUESTION_MATTERS",
+          "label": "Why This Question Matters",
+          "required": true
+        },
+        {
+          "key": "PROTAGONIST",
+          "label": "Protagonist",
+          "required": true
+        },
+        {
+          "key": "MENTOR",
+          "label": "Mentor",
+          "required": true
+        },
+        {
+          "key": "ANTAGONIST",
+          "label": "Antagonist",
+          "required": true
+        },
+        {
+          "key": "ALLY",
+          "label": "Ally",
+          "required": true
+        },
+        {
+          "key": "VICTIM___AFFECTED_GROUP",
+          "label": "Victim / Affected Group",
+          "required": true
+        },
+        {
+          "key": "BEGINNING_ANSWER",
+          "label": "Beginning Answer",
+          "required": true
+        },
+        {
+          "key": "FIRST_TURNING_POINT",
+          "label": "First Turning Point",
+          "required": true
+        },
+        {
+          "key": "MIDPOINT",
+          "label": "Midpoint",
+          "required": true
+        },
+        {
+          "key": "CRISIS",
+          "label": "Crisis",
+          "required": true
+        },
+        {
+          "key": "CLIMACTIC_ANSWER",
+          "label": "Climactic Answer",
+          "required": true
+        },
+        {
+          "key": "CONSEQUENCES",
+          "label": "Consequences",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 5,
+      "title": "Series Architecture",
+      "templateFile": "templates/core/05_Series_Architecture.md",
+      "relativeFolder": "04 Series Architecture",
+      "relativeMarkdownPath": "04 Series Architecture/05_Series_Architecture.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "WHAT_IS_WRONG_INITIALLY",
+          "label": "What Is Wrong Initially",
+          "required": true
+        },
+        {
+          "key": "HIDDEN_TRUTH",
+          "label": "Hidden Truth",
+          "required": true
+        },
+        {
+          "key": "THREATENING_FORCE",
+          "label": "Threatening Force",
+          "required": true
+        },
+        {
+          "key": "BENEFICIARIES",
+          "label": "Beneficiaries",
+          "required": true
+        },
+        {
+          "key": "ULTIMATE_TRANSFORMATION",
+          "label": "Ultimate Transformation",
+          "required": true
+        },
+        {
+          "key": "BOOK_ONE_BEGINNING",
+          "label": "Book One Beginning",
+          "required": true
+        },
+        {
+          "key": "FIRST_TRANSFORMATION",
+          "label": "First Transformation",
+          "required": true
+        },
+        {
+          "key": "LOWEST_POINT",
+          "label": "Lowest Point",
+          "required": true
+        },
+        {
+          "key": "SERIES_CONCLUSION",
+          "label": "Series Conclusion",
+          "required": true
+        },
+        {
+          "key": "OPPOSITION",
+          "label": "Opposition",
+          "required": true
+        },
+        {
+          "key": "COMPLETE_CONFLICT",
+          "label": "Complete Conflict",
+          "required": true
+        },
+        {
+          "key": "EMOTIONAL_MOVEMENT",
+          "label": "Emotional Movement",
+          "required": true
+        },
+        {
+          "key": "CLIMAX",
+          "label": "Climax",
+          "required": true
+        },
+        {
+          "key": "PERMANENT_CONSEQUENCE",
+          "label": "Permanent Consequence",
+          "required": true
+        },
+        {
+          "key": "SERIES_CONTRIBUTION",
+          "label": "Series Contribution",
+          "required": true
+        },
+        {
+          "key": "GEOGRAPHIC",
+          "label": "Geographic",
+          "required": true
+        },
+        {
+          "key": "POLITICAL",
+          "label": "Political",
+          "required": true
+        },
+        {
+          "key": "PERSONAL",
+          "label": "Personal",
+          "required": true
+        },
+        {
+          "key": "MORAL",
+          "label": "Moral",
+          "required": true
+        },
+        {
+          "key": "KNOWLEDGE",
+          "label": "Knowledge",
+          "required": true
+        },
+        {
+          "key": "ENEMY",
+          "label": "Enemy",
+          "required": true
+        },
+        {
+          "key": "MAGIC",
+          "label": "Magic",
+          "required": true
+        },
+        {
+          "key": "RELATIONSHIPS",
+          "label": "Relationships",
+          "required": true
+        },
+        {
+          "key": "RESPONSIBILITY",
+          "label": "Responsibility",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 6,
+      "title": "World Bible",
+      "templateFile": "templates/core/06_World_Bible.md",
+      "relativeFolder": "05 World Bible",
+      "relativeMarkdownPath": "05 World Bible/06_World_Bible.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "LOCATIONS",
+          "label": "Locations",
+          "required": true
+        },
+        {
+          "key": "GOVERNMENTS",
+          "label": "Governments",
+          "required": true
+        },
+        {
+          "key": "INSTITUTIONS",
+          "label": "Institutions",
+          "required": true
+        },
+        {
+          "key": "BELIEFS",
+          "label": "Beliefs",
+          "required": true
+        },
+        {
+          "key": "OCCUPATIONS",
+          "label": "Occupations",
+          "required": true
+        },
+        {
+          "key": "SOCIAL_DIVISIONS",
+          "label": "Social Divisions",
+          "required": true
+        },
+        {
+          "key": "MILITARY",
+          "label": "Military",
+          "required": true
+        },
+        {
+          "key": "TRAVEL",
+          "label": "Travel",
+          "required": true
+        },
+        {
+          "key": "ECONOMY",
+          "label": "Economy",
+          "required": true
+        },
+        {
+          "key": "MAGIC",
+          "label": "Magic",
+          "required": true
+        },
+        {
+          "key": "HISTORICAL_CONFLICT",
+          "label": "Historical Conflict",
+          "required": true
+        },
+        {
+          "key": "GEOGRAPHY",
+          "label": "Geography",
+          "required": true
+        },
+        {
+          "key": "CLIMATE",
+          "label": "Climate",
+          "required": true
+        },
+        {
+          "key": "SEASONS",
+          "label": "Seasons",
+          "required": true
+        },
+        {
+          "key": "RESOURCES",
+          "label": "Resources",
+          "required": true
+        },
+        {
+          "key": "ROADS___WATERWAYS",
+          "label": "Roads / Waterways",
+          "required": true
+        },
+        {
+          "key": "BORDERS",
+          "label": "Borders",
+          "required": true
+        },
+        {
+          "key": "FOOD",
+          "label": "Food",
+          "required": true
+        },
+        {
+          "key": "DANGER",
+          "label": "Danger",
+          "required": true
+        },
+        {
+          "key": "DISTANCES",
+          "label": "Distances",
+          "required": true
+        },
+        {
+          "key": "STRATEGIC_LOCATIONS",
+          "label": "Strategic Locations",
+          "required": true
+        },
+        {
+          "key": "OFFICIAL_RULER",
+          "label": "Official Ruler",
+          "required": true
+        },
+        {
+          "key": "ACTUAL_POWER",
+          "label": "Actual Power",
+          "required": true
+        },
+        {
+          "key": "SUCCESSION",
+          "label": "Succession",
+          "required": true
+        },
+        {
+          "key": "LEGITIMACY",
+          "label": "Legitimacy",
+          "required": true
+        },
+        {
+          "key": "ENFORCEMENT",
+          "label": "Enforcement",
+          "required": true
+        },
+        {
+          "key": "PROTECTED_GROUPS",
+          "label": "Protected Groups",
+          "required": true
+        },
+        {
+          "key": "EXPLOITED_GROUPS",
+          "label": "Exploited Groups",
+          "required": true
+        },
+        {
+          "key": "FACTIONS",
+          "label": "Factions",
+          "required": true
+        },
+        {
+          "key": "COLLAPSE_TRIGGER",
+          "label": "Collapse Trigger",
+          "required": true
+        },
+        {
+          "key": "PRODUCTION",
+          "label": "Production",
+          "required": true
+        },
+        {
+          "key": "TRADE",
+          "label": "Trade",
+          "required": true
+        },
+        {
+          "key": "SCARCITY",
+          "label": "Scarcity",
+          "required": true
+        },
+        {
+          "key": "LAND_OWNERSHIP",
+          "label": "Land Ownership",
+          "required": true
+        },
+        {
+          "key": "TAXES",
+          "label": "Taxes",
+          "required": true
+        },
+        {
+          "key": "ARMY_SUPPLY",
+          "label": "Army Supply",
+          "required": true
+        },
+        {
+          "key": "LIVELIHOODS",
+          "label": "Livelihoods",
+          "required": true
+        },
+        {
+          "key": "MAGIC_AND_WEALTH",
+          "label": "Magic And Wealth",
+          "required": true
+        },
+        {
+          "key": "VALUES",
+          "label": "Values",
+          "required": true
+        },
+        {
+          "key": "FAMILY",
+          "label": "Family",
+          "required": true
+        },
+        {
+          "key": "CLASS",
+          "label": "Class",
+          "required": true
+        },
+        {
+          "key": "CLOTHING",
+          "label": "Clothing",
+          "required": true
+        },
+        {
+          "key": "ARCHITECTURE",
+          "label": "Architecture",
+          "required": true
+        },
+        {
+          "key": "RELIGION",
+          "label": "Religion",
+          "required": true
+        },
+        {
+          "key": "CUSTOMS",
+          "label": "Customs",
+          "required": true
+        },
+        {
+          "key": "OUTSIDERS",
+          "label": "Outsiders",
+          "required": true
+        },
+        {
+          "key": "VIOLENCE",
+          "label": "Violence",
+          "required": true
+        },
+        {
+          "key": "TABOOS",
+          "label": "Taboos",
+          "required": true
+        },
+        {
+          "key": "HUMOUR",
+          "label": "Humour",
+          "required": true
+        },
+        {
+          "key": "LANGUAGE",
+          "label": "Language",
+          "required": true
+        },
+        {
+          "key": "BELIEF",
+          "label": "Belief",
+          "required": true
+        },
+        {
+          "key": "HISTORICAL_TRUTH",
+          "label": "Historical Truth",
+          "required": true
+        },
+        {
+          "key": "INSTITUTIONAL_TEACHING",
+          "label": "Institutional Teaching",
+          "required": true
+        },
+        {
+          "key": "POLITICAL_USE",
+          "label": "Political Use",
+          "required": true
+        },
+        {
+          "key": "DAILY_WORSHIP",
+          "label": "Daily Worship",
+          "required": true
+        },
+        {
+          "key": "LAW___MORALITY",
+          "label": "Law / Morality",
+          "required": true
+        },
+        {
+          "key": "SECTS",
+          "label": "Sects",
+          "required": true
+        },
+        {
+          "key": "PROVABILITY",
+          "label": "Provability",
+          "required": true
+        },
+        {
+          "key": "FAITH_VS_EVIDENCE",
+          "label": "Faith Vs Evidence",
+          "required": true
+        },
+        {
+          "key": "PAST_EVENTS_STILL_AFFECTING_THE_PRESENT",
+          "label": "Past Events Still Affecting The Present",
+          "required": true
+        },
+        {
+          "key": "COMPETING_VERSIONS",
+          "label": "Competing Versions",
+          "required": true
+        },
+        {
+          "key": "DEPTH_2_AUTHOR",
+          "label": "Depth 2 Author",
+          "required": true
+        },
+        {
+          "key": "DEPTH_3_EXPANSION",
+          "label": "Depth 3 Expansion",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 7,
+      "title": "Magic-System Document",
+      "templateFile": "templates/core/07_Magic_System.md",
+      "relativeFolder": "05 World Bible",
+      "relativeMarkdownPath": "05 World Bible/07_Magic_System.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "SOURCE",
+          "label": "Source",
+          "required": true
+        },
+        {
+          "key": "ACCESS",
+          "label": "Access",
+          "required": true
+        },
+        {
+          "key": "METHOD",
+          "label": "Method",
+          "required": true
+        },
+        {
+          "key": "CAPABILITIES",
+          "label": "Capabilities",
+          "required": true
+        },
+        {
+          "key": "LIMITATIONS",
+          "label": "Limitations",
+          "required": true
+        },
+        {
+          "key": "COST",
+          "label": "Cost",
+          "required": true
+        },
+        {
+          "key": "RISKS",
+          "label": "Risks",
+          "required": true
+        },
+        {
+          "key": "RESISTANCE",
+          "label": "Resistance",
+          "required": true
+        },
+        {
+          "key": "FAILURE_MODES",
+          "label": "Failure Modes",
+          "required": true
+        },
+        {
+          "key": "ABSOLUTE_IMPOSSIBILITIES",
+          "label": "Absolute Impossibilities",
+          "required": true
+        },
+        {
+          "key": "SOCIAL",
+          "label": "Social",
+          "required": true
+        },
+        {
+          "key": "MILITARY",
+          "label": "Military",
+          "required": true
+        },
+        {
+          "key": "ECONOMIC",
+          "label": "Economic",
+          "required": true
+        },
+        {
+          "key": "RELIGIOUS",
+          "label": "Religious",
+          "required": true
+        },
+        {
+          "key": "POLITICAL",
+          "label": "Political",
+          "required": true
+        },
+        {
+          "key": "PROBLEMS_MAGIC_CREATES",
+          "label": "Problems Magic Creates",
+          "required": true
+        },
+        {
+          "key": "KNOWN_EXCEPTIONS",
+          "label": "Known Exceptions",
+          "required": true
+        },
+        {
+          "key": "WHO_KNOWS_WHAT",
+          "label": "Who Knows What",
+          "required": true
+        },
+        {
+          "key": "SETUP_AND_PAYOFF_OBLIGATIONS",
+          "label": "Setup And Payoff Obligations",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 8,
+      "title": "Character Bible",
+      "templateFile": "templates/core/08_Character_Bible.md",
+      "relativeFolder": "06 Character Bible",
+      "relativeMarkdownPath": "06 Character Bible/08_Character_Bible.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "CURRENT_SITUATION",
+          "label": "Current Situation",
+          "required": true
+        },
+        {
+          "key": "ROLE",
+          "label": "Role",
+          "required": true
+        },
+        {
+          "key": "GOAL",
+          "label": "Goal",
+          "required": true
+        },
+        {
+          "key": "REASON",
+          "label": "Reason",
+          "required": true
+        },
+        {
+          "key": "OPPOSITION",
+          "label": "Opposition",
+          "required": true
+        },
+        {
+          "key": "STAKES",
+          "label": "Stakes",
+          "required": true
+        },
+        {
+          "key": "SKILLS",
+          "label": "Skills",
+          "required": true
+        },
+        {
+          "key": "WEAKNESSES",
+          "label": "Weaknesses",
+          "required": true
+        },
+        {
+          "key": "RESOURCES",
+          "label": "Resources",
+          "required": true
+        },
+        {
+          "key": "RELATIONSHIPS",
+          "label": "Relationships",
+          "required": true
+        },
+        {
+          "key": "WOUND",
+          "label": "Wound",
+          "required": true
+        },
+        {
+          "key": "FEAR",
+          "label": "Fear",
+          "required": true
+        },
+        {
+          "key": "FALSE_BELIEF",
+          "label": "False Belief",
+          "required": true
+        },
+        {
+          "key": "DEFENCE",
+          "label": "Defence",
+          "required": true
+        },
+        {
+          "key": "HIDDEN_DESIRE",
+          "label": "Hidden Desire",
+          "required": true
+        },
+        {
+          "key": "MORAL_BOUNDARY",
+          "label": "Moral Boundary",
+          "required": true
+        },
+        {
+          "key": "CONTRADICTION",
+          "label": "Contradiction",
+          "required": true
+        },
+        {
+          "key": "NEED",
+          "label": "Need",
+          "required": true
+        },
+        {
+          "key": "RESISTED_TRUTH",
+          "label": "Resisted Truth",
+          "required": true
+        },
+        {
+          "key": "POSSIBLE_SELF",
+          "label": "Possible Self",
+          "required": true
+        },
+        {
+          "key": "UNIQUE_DECISIONS",
+          "label": "Unique Decisions",
+          "required": true
+        },
+        {
+          "key": "COSTLY_MISTAKES",
+          "label": "Costly Mistakes",
+          "required": true
+        },
+        {
+          "key": "ACCEPTED_RISKS",
+          "label": "Accepted Risks",
+          "required": true
+        },
+        {
+          "key": "EFFECT_ON_ANTAGONIST",
+          "label": "Effect On Antagonist",
+          "required": true
+        },
+        {
+          "key": "BEGINNING_BELIEF",
+          "label": "Beginning Belief",
+          "required": true
+        },
+        {
+          "key": "PROTECTION_IT_PROVIDES",
+          "label": "Protection It Provides",
+          "required": true
+        },
+        {
+          "key": "LIMIT_EXPOSED",
+          "label": "Limit Exposed",
+          "required": true
+        },
+        {
+          "key": "RESISTANCE",
+          "label": "Resistance",
+          "required": true
+        },
+        {
+          "key": "LOSS",
+          "label": "Loss",
+          "required": true
+        },
+        {
+          "key": "RECOGNISED_TRUTH",
+          "label": "Recognised Truth",
+          "required": true
+        },
+        {
+          "key": "CLIMACTIC_ACTION",
+          "label": "Climactic Action",
+          "required": true
+        },
+        {
+          "key": "ENDING_COST___RESULT",
+          "label": "Ending Cost / Result",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 9,
+      "title": "Relationship Map",
+      "templateFile": "templates/core/09_Relationship_Map.md",
+      "relativeFolder": "06 Character Bible",
+      "relativeMarkdownPath": "06 Character Bible/09_Relationship_Map.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "PEOPLE",
+          "label": "People",
+          "required": true
+        },
+        {
+          "key": "STARTING_CONDITION",
+          "label": "Starting Condition",
+          "required": true
+        },
+        {
+          "key": "WHAT_EACH_WANTS",
+          "label": "What Each Wants",
+          "required": true
+        },
+        {
+          "key": "TRUST_SOURCE",
+          "label": "Trust Source",
+          "required": true
+        },
+        {
+          "key": "TENSION_SOURCE",
+          "label": "Tension Source",
+          "required": true
+        },
+        {
+          "key": "UNSPOKEN_TRUTH",
+          "label": "Unspoken Truth",
+          "required": true
+        },
+        {
+          "key": "POINT_OF_CHANGE",
+          "label": "Point Of Change",
+          "required": true
+        },
+        {
+          "key": "BETRAYAL___SACRIFICE",
+          "label": "Betrayal / Sacrifice",
+          "required": true
+        },
+        {
+          "key": "ENDING_CONDITION",
+          "label": "Ending Condition",
+          "required": true
+        },
+        {
+          "key": "ALLIANCES",
+          "label": "Alliances",
+          "required": true
+        },
+        {
+          "key": "RIVALRIES",
+          "label": "Rivalries",
+          "required": true
+        },
+        {
+          "key": "POWER_IMBALANCES",
+          "label": "Power Imbalances",
+          "required": true
+        },
+        {
+          "key": "SECRETS_BETWEEN_PEOPLE",
+          "label": "Secrets Between People",
+          "required": true
+        },
+        {
+          "key": "RELATIONSHIPS_AFFECTING_CLIMAX",
+          "label": "Relationships Affecting Climax",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 10,
+      "title": "Beat Sheet",
+      "templateFile": "templates/core/10_Beat_Sheet.md",
+      "relativeFolder": "07 Plot and Beats",
+      "relativeMarkdownPath": "07 Plot and Beats/10_Beat_Sheet.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "FINAL_CONFRONTATION",
+          "label": "Final Confrontation",
+          "required": true
+        },
+        {
+          "key": "INTERNAL_DECISION",
+          "label": "Internal Decision",
+          "required": true
+        },
+        {
+          "key": "SUCCESS",
+          "label": "Success",
+          "required": true
+        },
+        {
+          "key": "FAILURE_COST",
+          "label": "Failure Cost",
+          "required": true
+        },
+        {
+          "key": "PERMANENT_CHANGE",
+          "label": "Permanent Change",
+          "required": true
+        },
+        {
+          "key": "ANSWERED_QUESTION",
+          "label": "Answered Question",
+          "required": true
+        },
+        {
+          "key": "SERIES_REMAINDER",
+          "label": "Series Remainder",
+          "required": true
+        },
+        {
+          "key": "BEGINNING",
+          "label": "Beginning",
+          "required": true
+        },
+        {
+          "key": "FIRST_TURNING_POINT",
+          "label": "First Turning Point",
+          "required": true
+        },
+        {
+          "key": "MIDPOINT",
+          "label": "Midpoint",
+          "required": true
+        },
+        {
+          "key": "SECOND_TURNING_POINT",
+          "label": "Second Turning Point",
+          "required": true
+        },
+        {
+          "key": "CRISIS",
+          "label": "Crisis",
+          "required": true
+        },
+        {
+          "key": "CLIMAX",
+          "label": "Climax",
+          "required": true
+        },
+        {
+          "key": "RESOLUTION",
+          "label": "Resolution",
+          "required": true
+        },
+        {
+          "key": "BEAT_1",
+          "label": "Beat 1",
+          "required": true
+        },
+        {
+          "key": "BEAT_2",
+          "label": "Beat 2",
+          "required": true
+        },
+        {
+          "key": "BEAT_3",
+          "label": "Beat 3",
+          "required": true
+        },
+        {
+          "key": "BEAT_4",
+          "label": "Beat 4",
+          "required": true
+        },
+        {
+          "key": "BEAT_5",
+          "label": "Beat 5",
+          "required": true
+        },
+        {
+          "key": "BEAT_6",
+          "label": "Beat 6",
+          "required": true
+        },
+        {
+          "key": "BEAT_7",
+          "label": "Beat 7",
+          "required": true
+        },
+        {
+          "key": "BEAT_8",
+          "label": "Beat 8",
+          "required": true
+        },
+        {
+          "key": "BEAT_9",
+          "label": "Beat 9",
+          "required": true
+        },
+        {
+          "key": "BEAT_10",
+          "label": "Beat 10",
+          "required": true
+        },
+        {
+          "key": "BEAT_11",
+          "label": "Beat 11",
+          "required": true
+        },
+        {
+          "key": "BEAT_12",
+          "label": "Beat 12",
+          "required": true
+        },
+        {
+          "key": "BEAT_13",
+          "label": "Beat 13",
+          "required": true
+        },
+        {
+          "key": "BEAT_14",
+          "label": "Beat 14",
+          "required": true
+        },
+        {
+          "key": "BEAT_15",
+          "label": "Beat 15",
+          "required": true
+        },
+        {
+          "key": "BEAT_16",
+          "label": "Beat 16",
+          "required": true
+        },
+        {
+          "key": "BEAT_17",
+          "label": "Beat 17",
+          "required": true
+        },
+        {
+          "key": "BEAT_18",
+          "label": "Beat 18",
+          "required": true
+        },
+        {
+          "key": "BEAT_19",
+          "label": "Beat 19",
+          "required": true
+        },
+        {
+          "key": "BEAT_20",
+          "label": "Beat 20",
+          "required": true
+        },
+        {
+          "key": "BEAT_21",
+          "label": "Beat 21",
+          "required": true
+        },
+        {
+          "key": "BEAT_22",
+          "label": "Beat 22",
+          "required": true
+        },
+        {
+          "key": "BEAT_23",
+          "label": "Beat 23",
+          "required": true
+        },
+        {
+          "key": "BEAT_24",
+          "label": "Beat 24",
+          "required": true
+        },
+        {
+          "key": "BEAT_25",
+          "label": "Beat 25",
+          "required": true
+        },
+        {
+          "key": "BEAT_26",
+          "label": "Beat 26",
+          "required": true
+        },
+        {
+          "key": "BEAT_27",
+          "label": "Beat 27",
+          "required": true
+        },
+        {
+          "key": "BEAT_28",
+          "label": "Beat 28",
+          "required": true
+        },
+        {
+          "key": "BEAT_29",
+          "label": "Beat 29",
+          "required": true
+        },
+        {
+          "key": "THEREFORE___BUT___BECAUSE_CHAIN",
+          "label": "Therefore / But / Because Chain",
+          "required": true
+        },
+        {
+          "key": "COINCIDENCES_THAT_CREATE_TROUBLE",
+          "label": "Coincidences That Create Trouble",
+          "required": true
+        },
+        {
+          "key": "COINCIDENCES_THAT_MUST_NOT_SOLVE_TROUBLE",
+          "label": "Coincidences That Must Not Solve Trouble",
+          "required": true
+        },
+        {
+          "key": "TIME",
+          "label": "Time",
+          "required": true
+        },
+        {
+          "key": "RESOURCES",
+          "label": "Resources",
+          "required": true
+        },
+        {
+          "key": "OPPOSITION",
+          "label": "Opposition",
+          "required": true
+        },
+        {
+          "key": "PUBLIC_CONSEQUENCES",
+          "label": "Public Consequences",
+          "required": true
+        },
+        {
+          "key": "PERSONAL_COST",
+          "label": "Personal Cost",
+          "required": true
+        },
+        {
+          "key": "LOYALTIES",
+          "label": "Loyalties",
+          "required": true
+        },
+        {
+          "key": "INFORMATION",
+          "label": "Information",
+          "required": true
+        },
+        {
+          "key": "IRREVERSIBILITY",
+          "label": "Irreversibility",
+          "required": true
+        },
+        {
+          "key": "MORAL_COMPROMISE",
+          "label": "Moral Compromise",
+          "required": true
+        },
+        {
+          "key": "RELATIONSHIPS",
+          "label": "Relationships",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 11,
+      "title": "Subplot Map",
+      "templateFile": "templates/core/11_Subplot_Map.md",
+      "relativeFolder": "07 Plot and Beats",
+      "relativeMarkdownPath": "07 Plot and Beats/11_Subplot_Map.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "CENTRAL_CHARACTER",
+          "label": "Central Character",
+          "required": true
+        },
+        {
+          "key": "GOAL",
+          "label": "Goal",
+          "required": true
+        },
+        {
+          "key": "CONFLICT",
+          "label": "Conflict",
+          "required": true
+        },
+        {
+          "key": "THEMATIC_PURPOSE",
+          "label": "Thematic Purpose",
+          "required": true
+        },
+        {
+          "key": "TURNING_POINTS",
+          "label": "Turning Points",
+          "required": true
+        },
+        {
+          "key": "EFFECT_ON_CLIMAX",
+          "label": "Effect On Climax",
+          "required": true
+        },
+        {
+          "key": "RESOLUTION",
+          "label": "Resolution",
+          "required": true
+        },
+        {
+          "key": "DEVELOPS_CHARACTER",
+          "label": "Develops Character",
+          "required": true
+        },
+        {
+          "key": "COMPLICATES_OBJECTIVE",
+          "label": "Complicates Objective",
+          "required": true
+        },
+        {
+          "key": "EXPLORES_THEME",
+          "label": "Explores Theme",
+          "required": true
+        },
+        {
+          "key": "CREATES_DECISION",
+          "label": "Creates Decision",
+          "required": true
+        },
+        {
+          "key": "AFFECTS_OUTCOME",
+          "label": "Affects Outcome",
+          "required": true
+        },
+        {
+          "key": "NO_DUPLICATION",
+          "label": "No Duplication",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 12,
+      "title": "Scene List",
+      "templateFile": "templates/core/12_Scene_List.md",
+      "relativeFolder": "08 Scene Outline",
+      "relativeMarkdownPath": "08 Scene Outline/12_Scene_List.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "SCENE_NUMBER",
+          "label": "Scene Number",
+          "required": true
+        },
+        {
+          "key": "CHAPTER",
+          "label": "Chapter",
+          "required": true
+        },
+        {
+          "key": "POV",
+          "label": "Pov",
+          "required": true
+        },
+        {
+          "key": "LOCATION",
+          "label": "Location",
+          "required": true
+        },
+        {
+          "key": "TIME",
+          "label": "Time",
+          "required": true
+        },
+        {
+          "key": "GOAL",
+          "label": "Goal",
+          "required": true
+        },
+        {
+          "key": "OPPOSITION",
+          "label": "Opposition",
+          "required": true
+        },
+        {
+          "key": "STAKES",
+          "label": "Stakes",
+          "required": true
+        },
+        {
+          "key": "MAIN_EVENT",
+          "label": "Main Event",
+          "required": true
+        },
+        {
+          "key": "REVELATION",
+          "label": "Revelation",
+          "required": true
+        },
+        {
+          "key": "EMOTIONAL_TURN",
+          "label": "Emotional Turn",
+          "required": true
+        },
+        {
+          "key": "OUTCOME",
+          "label": "Outcome",
+          "required": true
+        },
+        {
+          "key": "NECESSARY",
+          "label": "Necessary",
+          "required": true
+        },
+        {
+          "key": "HAPPENS_NOW",
+          "label": "Happens Now",
+          "required": true
+        },
+        {
+          "key": "CORRECT_VIEWPOINT",
+          "label": "Correct Viewpoint",
+          "required": true
+        },
+        {
+          "key": "LOSS_IF_REMOVED",
+          "label": "Loss If Removed",
+          "required": true
+        },
+        {
+          "key": "QUESTION_CREATED___ANSWERED",
+          "label": "Question Created / Answered",
+          "required": true
+        },
+        {
+          "key": "CAUSAL_LINK",
+          "label": "Causal Link",
+          "required": true
+        },
+        {
+          "key": "CONFLICT",
+          "label": "Conflict",
+          "required": true
+        },
+        {
+          "key": "ENDING_DIFFERS",
+          "label": "Ending Differs",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 13,
+      "title": "Narrative and Style Guide",
+      "templateFile": "templates/core/13_Narrative_Style_Guide.md",
+      "relativeFolder": "08 Scene Outline",
+      "relativeMarkdownPath": "08 Scene Outline/13_Narrative_Style_Guide.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "POINT_OF_VIEW",
+          "label": "Point Of View",
+          "required": true
+        },
+        {
+          "key": "TENSE",
+          "label": "Tense",
+          "required": true
+        },
+        {
+          "key": "NARRATIVE_DISTANCE",
+          "label": "Narrative Distance",
+          "required": true
+        },
+        {
+          "key": "VIEWPOINT_ROSTER",
+          "label": "Viewpoint Roster",
+          "required": true
+        },
+        {
+          "key": "INFORMATION_ACCESS",
+          "label": "Information Access",
+          "required": true
+        },
+        {
+          "key": "SENTENCE_DENSITY",
+          "label": "Sentence Density",
+          "required": true
+        },
+        {
+          "key": "DESCRIPTION",
+          "label": "Description",
+          "required": true
+        },
+        {
+          "key": "DIALOGUE",
+          "label": "Dialogue",
+          "required": true
+        },
+        {
+          "key": "INTERNAL_THOUGHT",
+          "label": "Internal Thought",
+          "required": true
+        },
+        {
+          "key": "VIOLENCE",
+          "label": "Violence",
+          "required": true
+        },
+        {
+          "key": "HUMOUR",
+          "label": "Humour",
+          "required": true
+        },
+        {
+          "key": "PROFANITY",
+          "label": "Profanity",
+          "required": true
+        },
+        {
+          "key": "TERMINOLOGY",
+          "label": "Terminology",
+          "required": true
+        },
+        {
+          "key": "CAPITALISATION",
+          "label": "Capitalisation",
+          "required": true
+        },
+        {
+          "key": "TITLES",
+          "label": "Titles",
+          "required": true
+        },
+        {
+          "key": "NUMBERS",
+          "label": "Numbers",
+          "required": true
+        },
+        {
+          "key": "DATES",
+          "label": "Dates",
+          "required": true
+        },
+        {
+          "key": "SPELLING_CONVENTION",
+          "label": "Spelling Convention",
+          "required": true
+        },
+        {
+          "key": "NEED",
+          "label": "Need",
+          "required": true
+        },
+        {
+          "key": "DECISION_IMPACT",
+          "label": "Decision Impact",
+          "required": true
+        },
+        {
+          "key": "TENSION",
+          "label": "Tension",
+          "required": true
+        },
+        {
+          "key": "ACTIVE_QUESTION",
+          "label": "Active Question",
+          "required": true
+        },
+        {
+          "key": "READER_COMPREHENSION",
+          "label": "Reader Comprehension",
+          "required": true
+        },
+        {
+          "key": "FORBIDDEN_LECTURE_PATTERNS",
+          "label": "Forbidden Lecture Patterns",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 14,
+      "title": "First Draft Control",
+      "templateFile": "templates/core/14_First_Draft_Control.md",
+      "relativeFolder": "09 Draft",
+      "relativeMarkdownPath": "09 Draft/14_First_Draft_Control.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "APPROXIMATE_MANUSCRIPT_LENGTH",
+          "label": "Approximate Manuscript Length",
+          "required": true
+        },
+        {
+          "key": "CHAPTERS",
+          "label": "Chapters",
+          "required": true
+        },
+        {
+          "key": "SESSIONS_PER_WEEK",
+          "label": "Sessions Per Week",
+          "required": true
+        },
+        {
+          "key": "MINIMUM_SESSION_TARGET",
+          "label": "Minimum Session Target",
+          "required": true
+        },
+        {
+          "key": "COMPLETION_WINDOW",
+          "label": "Completion Window",
+          "required": true
+        },
+        {
+          "key": "SESSION_DATE",
+          "label": "Session Date",
+          "required": true
+        },
+        {
+          "key": "WRITTEN",
+          "label": "Written",
+          "required": true
+        },
+        {
+          "key": "OUTLINE_CHANGES",
+          "label": "Outline Changes",
+          "required": true
+        },
+        {
+          "key": "NEW_CONTINUITY_FACTS",
+          "label": "New Continuity Facts",
+          "required": true
+        },
+        {
+          "key": "LATER_PROBLEMS",
+          "label": "Later Problems",
+          "required": true
+        },
+        {
+          "key": "NEXT_STARTING_POINT",
+          "label": "Next Starting Point",
+          "required": true
+        },
+        {
+          "key": "USE_BRACKETED_NOTES",
+          "label": "Use Bracketed Notes",
+          "required": true
+        },
+        {
+          "key": "UPDATE_STRUCTURAL_DISCOVERIES",
+          "label": "Update Structural Discoveries",
+          "required": true
+        },
+        {
+          "key": "FINISH_ALL_SECTIONS_BEFORE_POLISHING",
+          "label": "Finish All Sections Before Polishing",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 15,
+      "title": "Revision Diagnosis",
+      "templateFile": "templates/core/15_Revision_Diagnosis.md",
+      "relativeFolder": "10 Revision",
+      "relativeMarkdownPath": "10 Revision/15_Revision_Diagnosis.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "CONFUSING",
+          "label": "Confusing",
+          "required": true
+        },
+        {
+          "key": "SLOW",
+          "label": "Slow",
+          "required": true
+        },
+        {
+          "key": "REPETITIVE",
+          "label": "Repetitive",
+          "required": true
+        },
+        {
+          "key": "UNBELIEVABLE",
+          "label": "Unbelievable",
+          "required": true
+        },
+        {
+          "key": "EMOTIONALLY_WEAK",
+          "label": "Emotionally Weak",
+          "required": true
+        },
+        {
+          "key": "STRONG",
+          "label": "Strong",
+          "required": true
+        },
+        {
+          "key": "MISSING_SETUP",
+          "label": "Missing Setup",
+          "required": true
+        },
+        {
+          "key": "PREDICTABLE",
+          "label": "Predictable",
+          "required": true
+        },
+        {
+          "key": "UNRESOLVED",
+          "label": "Unresolved",
+          "required": true
+        },
+        {
+          "key": "INCONSISTENT",
+          "label": "Inconsistent",
+          "required": true
+        },
+        {
+          "key": "STORY_AS_WRITTEN",
+          "label": "Story As Written",
+          "required": true
+        },
+        {
+          "key": "STORY_INTENDED",
+          "label": "Story Intended",
+          "required": true
+        },
+        {
+          "key": "WHAT_WORKS",
+          "label": "What Works",
+          "required": true
+        },
+        {
+          "key": "WHAT_FAILS",
+          "label": "What Fails",
+          "required": true
+        },
+        {
+          "key": "FIVE_LARGEST_PROBLEMS",
+          "label": "Five Largest Problems",
+          "required": true
+        },
+        {
+          "key": "ROOT_CAUSES",
+          "label": "Root Causes",
+          "required": true
+        },
+        {
+          "key": "WHAT_TO_PROTECT",
+          "label": "What To Protect",
+          "required": true
+        },
+        {
+          "key": "PREMISE",
+          "label": "Premise",
+          "required": true
+        },
+        {
+          "key": "GOAL___MOTIVATION",
+          "label": "Goal / Motivation",
+          "required": true
+        },
+        {
+          "key": "STRUCTURE",
+          "label": "Structure",
+          "required": true
+        },
+        {
+          "key": "ENDING",
+          "label": "Ending",
+          "required": true
+        },
+        {
+          "key": "ANTAGONIST",
+          "label": "Antagonist",
+          "required": true
+        },
+        {
+          "key": "WORLD_LOGIC",
+          "label": "World Logic",
+          "required": true
+        },
+        {
+          "key": "SUBPLOTS",
+          "label": "Subplots",
+          "required": true
+        },
+        {
+          "key": "SCENE_ORDER",
+          "label": "Scene Order",
+          "required": true
+        },
+        {
+          "key": "SCENES",
+          "label": "Scenes",
+          "required": true
+        },
+        {
+          "key": "PROSE",
+          "label": "Prose",
+          "required": true
+        },
+        {
+          "key": "GRAMMAR",
+          "label": "Grammar",
+          "required": true
+        },
+        {
+          "key": "PROOFREADING",
+          "label": "Proofreading",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 16,
+      "title": "Revised Manuscript Control",
+      "templateFile": "templates/core/16_Revised_Manuscript_Control.md",
+      "relativeFolder": "10 Revision",
+      "relativeMarkdownPath": "10 Revision/16_Revised_Manuscript_Control.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "PROTAGONIST_ARC",
+          "label": "Protagonist Arc",
+          "required": true
+        },
+        {
+          "key": "ANTAGONIST",
+          "label": "Antagonist",
+          "required": true
+        },
+        {
+          "key": "PLOT",
+          "label": "Plot",
+          "required": true
+        },
+        {
+          "key": "WORLDBUILDING",
+          "label": "Worldbuilding",
+          "required": true
+        },
+        {
+          "key": "SUBPLOTS",
+          "label": "Subplots",
+          "required": true
+        },
+        {
+          "key": "BEGINNING___ENDING_ALIGNMENT",
+          "label": "Beginning / Ending Alignment",
+          "required": true
+        },
+        {
+          "key": "VIEWPOINT",
+          "label": "Viewpoint",
+          "required": true
+        },
+        {
+          "key": "GOAL",
+          "label": "Goal",
+          "required": true
+        },
+        {
+          "key": "CONFLICT",
+          "label": "Conflict",
+          "required": true
+        },
+        {
+          "key": "STAKES",
+          "label": "Stakes",
+          "required": true
+        },
+        {
+          "key": "TURN",
+          "label": "Turn",
+          "required": true
+        },
+        {
+          "key": "OUTCOME",
+          "label": "Outcome",
+          "required": true
+        },
+        {
+          "key": "EMOTION",
+          "label": "Emotion",
+          "required": true
+        },
+        {
+          "key": "FUNCTION",
+          "label": "Function",
+          "required": true
+        },
+        {
+          "key": "ENTRY",
+          "label": "Entry",
+          "required": true
+        },
+        {
+          "key": "EXIT",
+          "label": "Exit",
+          "required": true
+        },
+        {
+          "key": "CHANGE",
+          "label": "Change",
+          "required": true
+        },
+        {
+          "key": "REASON",
+          "label": "Reason",
+          "required": true
+        },
+        {
+          "key": "AFFECTED_CHAPTERS",
+          "label": "Affected Chapters",
+          "required": true
+        },
+        {
+          "key": "DOWNSTREAM_CONTINUITY",
+          "label": "Downstream Continuity",
+          "required": true
+        },
+        {
+          "key": "VERIFIED",
+          "label": "Verified",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 17,
+      "title": "Beta Feedback Register",
+      "templateFile": "templates/core/17_Beta_Feedback_Register.md",
+      "relativeFolder": "10 Revision",
+      "relativeMarkdownPath": "10 Revision/17_Beta_Feedback_Register.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "GENRE_READER",
+          "label": "Genre Reader",
+          "required": true
+        },
+        {
+          "key": "GENERAL_STORY_READER",
+          "label": "General Story Reader",
+          "required": true
+        },
+        {
+          "key": "CONTINUITY_READER",
+          "label": "Continuity Reader",
+          "required": true
+        },
+        {
+          "key": "SUBJECT_SPECIALIST",
+          "label": "Subject Specialist",
+          "required": true
+        },
+        {
+          "key": "HONEST_CRITIC",
+          "label": "Honest Critic",
+          "required": true
+        },
+        {
+          "key": "ENGAGEMENT",
+          "label": "Engagement",
+          "required": true
+        },
+        {
+          "key": "ATTENTION_DROP",
+          "label": "Attention Drop",
+          "required": true
+        },
+        {
+          "key": "CONFUSION",
+          "label": "Confusion",
+          "required": true
+        },
+        {
+          "key": "CHARACTER_CARE",
+          "label": "Character Care",
+          "required": true
+        },
+        {
+          "key": "WEAK_MOTIVATION",
+          "label": "Weak Motivation",
+          "required": true
+        },
+        {
+          "key": "REPETITION",
+          "label": "Repetition",
+          "required": true
+        },
+        {
+          "key": "SURPRISE",
+          "label": "Surprise",
+          "required": true
+        },
+        {
+          "key": "OBVIOUS_REVEAL",
+          "label": "Obvious Reveal",
+          "required": true
+        },
+        {
+          "key": "CLIMAX_SATISFACTION",
+          "label": "Climax Satisfaction",
+          "required": true
+        },
+        {
+          "key": "MISSING_EXPECTATION",
+          "label": "Missing Expectation",
+          "required": true
+        },
+        {
+          "key": "UNANSWERED_QUESTIONS",
+          "label": "Unanswered Questions",
+          "required": true
+        },
+        {
+          "key": "REPEATED_REACTIONS",
+          "label": "Repeated Reactions",
+          "required": true
+        },
+        {
+          "key": "ISOLATED_PREFERENCES",
+          "label": "Isolated Preferences",
+          "required": true
+        },
+        {
+          "key": "LIKELY_ROOT_CAUSES",
+          "label": "Likely Root Causes",
+          "required": true
+        },
+        {
+          "key": "ACCEPTED_CHANGES",
+          "label": "Accepted Changes",
+          "required": true
+        },
+        {
+          "key": "REJECTED_CHANGES_AND_REASON",
+          "label": "Rejected Changes And Reason",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 18,
+      "title": "Continuity Sheet",
+      "templateFile": "templates/core/18_Continuity_Sheet.md",
+      "relativeFolder": "10 Revision",
+      "relativeMarkdownPath": "10 Revision/18_Continuity_Sheet.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "DATE___TIME",
+          "label": "Date / Time",
+          "required": true
+        },
+        {
+          "key": "EVENT",
+          "label": "Event",
+          "required": true
+        },
+        {
+          "key": "CHARACTERS",
+          "label": "Characters",
+          "required": true
+        },
+        {
+          "key": "LOCATION",
+          "label": "Location",
+          "required": true
+        },
+        {
+          "key": "TRAVEL_TIME",
+          "label": "Travel Time",
+          "required": true
+        },
+        {
+          "key": "DEPENDENCIES",
+          "label": "Dependencies",
+          "required": true
+        },
+        {
+          "key": "AGES",
+          "label": "Ages",
+          "required": true
+        },
+        {
+          "key": "GEOGRAPHY",
+          "label": "Geography",
+          "required": true
+        },
+        {
+          "key": "INJURIES",
+          "label": "Injuries",
+          "required": true
+        },
+        {
+          "key": "CLOTHING",
+          "label": "Clothing",
+          "required": true
+        },
+        {
+          "key": "WEATHER",
+          "label": "Weather",
+          "required": true
+        },
+        {
+          "key": "MOON___SEASONS",
+          "label": "Moon / Seasons",
+          "required": true
+        },
+        {
+          "key": "KNOWLEDGE",
+          "label": "Knowledge",
+          "required": true
+        },
+        {
+          "key": "OBJECTS",
+          "label": "Objects",
+          "required": true
+        },
+        {
+          "key": "TITLES___RANKS",
+          "label": "Titles / Ranks",
+          "required": true
+        },
+        {
+          "key": "MAGIC",
+          "label": "Magic",
+          "required": true
+        },
+        {
+          "key": "DEATHS",
+          "label": "Deaths",
+          "required": true
+        },
+        {
+          "key": "RELATIONSHIP_HISTORY",
+          "label": "Relationship History",
+          "required": true
+        },
+        {
+          "key": "ISSUE",
+          "label": "Issue",
+          "required": true
+        },
+        {
+          "key": "LOCATIONS",
+          "label": "Locations",
+          "required": true
+        },
+        {
+          "key": "CANONICAL_ANSWER",
+          "label": "Canonical Answer",
+          "required": true
+        },
+        {
+          "key": "FIX",
+          "label": "Fix",
+          "required": true
+        },
+        {
+          "key": "VERIFIED",
+          "label": "Verified",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 19,
+      "title": "Final Manuscript Control",
+      "templateFile": "templates/core/19_Final_Manuscript_Control.md",
+      "relativeFolder": "10 Revision",
+      "relativeMarkdownPath": "10 Revision/19_Final_Manuscript_Control.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "DEVELOPMENTAL_COMPLETE",
+          "label": "Developmental Complete",
+          "required": true
+        },
+        {
+          "key": "LINE_EDIT_COMPLETE",
+          "label": "Line Edit Complete",
+          "required": true
+        },
+        {
+          "key": "COPYEDIT_COMPLETE",
+          "label": "Copyedit Complete",
+          "required": true
+        },
+        {
+          "key": "PROOFREADING_AFTER_FORMATTING_COMPLETE",
+          "label": "Proofreading After Formatting Complete",
+          "required": true
+        },
+        {
+          "key": "LOCKED_FILENAME",
+          "label": "Locked Filename",
+          "required": true
+        },
+        {
+          "key": "WORD_COUNT",
+          "label": "Word Count",
+          "required": true
+        },
+        {
+          "key": "APPROVED_BY",
+          "label": "Approved By",
+          "required": true
+        },
+        {
+          "key": "CHECKSUM___VERSION",
+          "label": "Checksum / Version",
+          "required": true
+        },
+        {
+          "key": "PERMITTED_LATE_CHANGES",
+          "label": "Permitted Late Changes",
+          "required": true
+        },
+        {
+          "key": "EBOOK",
+          "label": "Ebook",
+          "required": true
+        },
+        {
+          "key": "PAPERBACK",
+          "label": "Paperback",
+          "required": true
+        },
+        {
+          "key": "HARDBACK",
+          "label": "Hardback",
+          "required": true
+        },
+        {
+          "key": "LARGE_PRINT",
+          "label": "Large Print",
+          "required": true
+        },
+        {
+          "key": "AUDIOBOOK_SCRIPT",
+          "label": "Audiobook Script",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 20,
+      "title": "Publishing Plan",
+      "templateFile": "templates/core/20_Publishing_Plan.md",
+      "relativeFolder": "11 Publishing",
+      "relativeMarkdownPath": "11 Publishing/20_Publishing_Plan.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "CREATIVE_CONTROL",
+          "label": "Creative Control",
+          "required": true
+        },
+        {
+          "key": "BUDGET",
+          "label": "Budget",
+          "required": true
+        },
+        {
+          "key": "RELEASE_SPEED",
+          "label": "Release Speed",
+          "required": true
+        },
+        {
+          "key": "PRODUCTION_MANAGEMENT",
+          "label": "Production Management",
+          "required": true
+        },
+        {
+          "key": "SERIES_FREQUENCY",
+          "label": "Series Frequency",
+          "required": true
+        },
+        {
+          "key": "MARKETING_WILLINGNESS",
+          "label": "Marketing Willingness",
+          "required": true
+        },
+        {
+          "key": "PRINT_DISTRIBUTION",
+          "label": "Print Distribution",
+          "required": true
+        },
+        {
+          "key": "RIGHTS",
+          "label": "Rights",
+          "required": true
+        },
+        {
+          "key": "BUSINESS_PLAN",
+          "label": "Business Plan",
+          "required": true
+        },
+        {
+          "key": "SELECTED_ROUTE",
+          "label": "Selected Route",
+          "required": true
+        },
+        {
+          "key": "QUERY_PACKAGE",
+          "label": "Query Package",
+          "required": true
+        },
+        {
+          "key": "REPRESENTATIVE_RESEARCH",
+          "label": "Representative Research",
+          "required": true
+        },
+        {
+          "key": "SUBMISSION_SCHEDULE",
+          "label": "Submission Schedule",
+          "required": true
+        },
+        {
+          "key": "OFFER_EVALUATION",
+          "label": "Offer Evaluation",
+          "required": true
+        },
+        {
+          "key": "PUBLISHER_PRODUCTION",
+          "label": "Publisher Production",
+          "required": true
+        },
+        {
+          "key": "PUBLICATION_DATE",
+          "label": "Publication Date",
+          "required": true
+        },
+        {
+          "key": "CONTRACTORS",
+          "label": "Contractors",
+          "required": true
+        },
+        {
+          "key": "FORMATS",
+          "label": "Formats",
+          "required": true
+        },
+        {
+          "key": "DISTRIBUTION",
+          "label": "Distribution",
+          "required": true
+        },
+        {
+          "key": "MARKETING",
+          "label": "Marketing",
+          "required": true
+        },
+        {
+          "key": "ASSETS",
+          "label": "Assets",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 21,
+      "title": "Metadata Sheet",
+      "templateFile": "templates/core/21_Metadata_Sheet.md",
+      "relativeFolder": "11 Publishing",
+      "relativeMarkdownPath": "11 Publishing/21_Metadata_Sheet.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "TITLE",
+          "label": "Title",
+          "required": true
+        },
+        {
+          "key": "SUBTITLE",
+          "label": "Subtitle",
+          "required": true
+        },
+        {
+          "key": "SERIES",
+          "label": "Series",
+          "required": true
+        },
+        {
+          "key": "SERIES_NUMBER",
+          "label": "Series Number",
+          "required": true
+        },
+        {
+          "key": "DESCRIPTION",
+          "label": "Description",
+          "required": true
+        },
+        {
+          "key": "CATEGORIES",
+          "label": "Categories",
+          "required": true
+        },
+        {
+          "key": "SEARCH_TERMS",
+          "label": "Search Terms",
+          "required": true
+        },
+        {
+          "key": "READER_AGE",
+          "label": "Reader Age",
+          "required": true
+        },
+        {
+          "key": "LANGUAGE",
+          "label": "Language",
+          "required": true
+        },
+        {
+          "key": "PUBLICATION_DATE",
+          "label": "Publication Date",
+          "required": true
+        },
+        {
+          "key": "EDITION",
+          "label": "Edition",
+          "required": true
+        },
+        {
+          "key": "PUBLISHER",
+          "label": "Publisher",
+          "required": true
+        },
+        {
+          "key": "PRICING",
+          "label": "Pricing",
+          "required": true
+        },
+        {
+          "key": "TERRITORY___RIGHTS",
+          "label": "Territory / Rights",
+          "required": true
+        },
+        {
+          "key": "CHARACTER",
+          "label": "Character",
+          "required": true
+        },
+        {
+          "key": "DISRUPTION",
+          "label": "Disruption",
+          "required": true
+        },
+        {
+          "key": "OBJECTIVE",
+          "label": "Objective",
+          "required": true
+        },
+        {
+          "key": "OPPOSITION",
+          "label": "Opposition",
+          "required": true
+        },
+        {
+          "key": "STAKES",
+          "label": "Stakes",
+          "required": true
+        },
+        {
+          "key": "FINAL_TENSION",
+          "label": "Final Tension",
+          "required": true
+        },
+        {
+          "key": "ISBN",
+          "label": "Isbn",
+          "required": true
+        },
+        {
+          "key": "FORMAT",
+          "label": "Format",
+          "required": true
+        },
+        {
+          "key": "TRIM___FILE_SPEC",
+          "label": "Trim / File Spec",
+          "required": true
+        },
+        {
+          "key": "PRICE",
+          "label": "Price",
+          "required": true
+        },
+        {
+          "key": "DISTRIBUTOR",
+          "label": "Distributor",
+          "required": true
+        },
+        {
+          "key": "PUBLICATION_STATUS",
+          "label": "Publication Status",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 22,
+      "title": "Launch Plan",
+      "templateFile": "templates/core/22_Launch_Plan.md",
+      "relativeFolder": "12 Marketing",
+      "relativeMarkdownPath": "12 Marketing/22_Launch_Plan.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "IDEAL_READER",
+          "label": "Ideal Reader",
+          "required": true
+        },
+        {
+          "key": "FAMILIAR_EXPERIENCE",
+          "label": "Familiar Experience",
+          "required": true
+        },
+        {
+          "key": "DISTINCTIVE_COMBINATION",
+          "label": "Distinctive Combination",
+          "required": true
+        },
+        {
+          "key": "EMOTIONAL_PROMISE",
+          "label": "Emotional Promise",
+          "required": true
+        },
+        {
+          "key": "MARKETABLE_THEMES___ELEMENTS",
+          "label": "Marketable Themes / Elements",
+          "required": true
+        },
+        {
+          "key": "BIOGRAPHY",
+          "label": "Biography",
+          "required": true
+        },
+        {
+          "key": "PHOTO",
+          "label": "Photo",
+          "required": true
+        },
+        {
+          "key": "WEBSITE",
+          "label": "Website",
+          "required": true
+        },
+        {
+          "key": "MAILING_LIST",
+          "label": "Mailing List",
+          "required": true
+        },
+        {
+          "key": "DESCRIPTION",
+          "label": "Description",
+          "required": true
+        },
+        {
+          "key": "COVER_IMAGES",
+          "label": "Cover Images",
+          "required": true
+        },
+        {
+          "key": "RETAIL_GRAPHICS",
+          "label": "Retail Graphics",
+          "required": true
+        },
+        {
+          "key": "SAMPLE",
+          "label": "Sample",
+          "required": true
+        },
+        {
+          "key": "MEDIA_SHEET",
+          "label": "Media Sheet",
+          "required": true
+        },
+        {
+          "key": "CONTACT",
+          "label": "Contact",
+          "required": true
+        },
+        {
+          "key": "SOCIAL_PROFILES",
+          "label": "Social Profiles",
+          "required": true
+        },
+        {
+          "key": "CORRECT_EDITION",
+          "label": "Correct Edition",
+          "required": true
+        },
+        {
+          "key": "PUBLICATION_DATE",
+          "label": "Publication Date",
+          "required": true
+        },
+        {
+          "key": "REVIEW_GUIDANCE",
+          "label": "Review Guidance",
+          "required": true
+        },
+        {
+          "key": "DISCLOSURE",
+          "label": "Disclosure",
+          "required": true
+        },
+        {
+          "key": "LINKS",
+          "label": "Links",
+          "required": true
+        },
+        {
+          "key": "REMINDER",
+          "label": "Reminder",
+          "required": true
+        },
+        {
+          "key": "ANNOUNCEMENT",
+          "label": "Announcement",
+          "required": true
+        },
+        {
+          "key": "COVER_REVEAL",
+          "label": "Cover Reveal",
+          "required": true
+        },
+        {
+          "key": "PREMISE",
+          "label": "Premise",
+          "required": true
+        },
+        {
+          "key": "CHARACTER",
+          "label": "Character",
+          "required": true
+        },
+        {
+          "key": "WORLDBUILDING",
+          "label": "Worldbuilding",
+          "required": true
+        },
+        {
+          "key": "PASSAGE",
+          "label": "Passage",
+          "required": true
+        },
+        {
+          "key": "LAUNCH_DAY",
+          "label": "Launch Day",
+          "required": true
+        },
+        {
+          "key": "DISCUSSION_QUESTIONS",
+          "label": "Discussion Questions",
+          "required": true
+        },
+        {
+          "key": "BEHIND_THE_SCENES",
+          "label": "Behind The Scenes",
+          "required": true
+        },
+        {
+          "key": "EMAILS",
+          "label": "Emails",
+          "required": true
+        },
+        {
+          "key": "BEFORE_LAUNCH",
+          "label": "Before Launch",
+          "required": true
+        },
+        {
+          "key": "LAUNCH_WEEK",
+          "label": "Launch Week",
+          "required": true
+        },
+        {
+          "key": "AFTER_LAUNCH",
+          "label": "After Launch",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 23,
+      "title": "Rights and Contracts Register",
+      "templateFile": "templates/core/23_Rights_Contracts_Register.md",
+      "relativeFolder": "11 Publishing",
+      "relativeMarkdownPath": "11 Publishing/23_Rights_Contracts_Register.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "WORK",
+          "label": "Work",
+          "required": true
+        },
+        {
+          "key": "RIGHT",
+          "label": "Right",
+          "required": true
+        },
+        {
+          "key": "TERRITORY",
+          "label": "Territory",
+          "required": true
+        },
+        {
+          "key": "LANGUAGE",
+          "label": "Language",
+          "required": true
+        },
+        {
+          "key": "FORMAT",
+          "label": "Format",
+          "required": true
+        },
+        {
+          "key": "HOLDER",
+          "label": "Holder",
+          "required": true
+        },
+        {
+          "key": "GRANTED_TO",
+          "label": "Granted To",
+          "required": true
+        },
+        {
+          "key": "START",
+          "label": "Start",
+          "required": true
+        },
+        {
+          "key": "END___REVERSION",
+          "label": "End / Reversion",
+          "required": true
+        },
+        {
+          "key": "RESTRICTIONS",
+          "label": "Restrictions",
+          "required": true
+        },
+        {
+          "key": "PARTY",
+          "label": "Party",
+          "required": true
+        },
+        {
+          "key": "PURPOSE",
+          "label": "Purpose",
+          "required": true
+        },
+        {
+          "key": "SIGNED_DATE",
+          "label": "Signed Date",
+          "required": true
+        },
+        {
+          "key": "FEE___ROYALTY",
+          "label": "Fee / Royalty",
+          "required": true
+        },
+        {
+          "key": "DELIVERABLES",
+          "label": "Deliverables",
+          "required": true
+        },
+        {
+          "key": "RIGHTS",
+          "label": "Rights",
+          "required": true
+        },
+        {
+          "key": "DEADLINE",
+          "label": "Deadline",
+          "required": true
+        },
+        {
+          "key": "TERMINATION",
+          "label": "Termination",
+          "required": true
+        },
+        {
+          "key": "FILE_LOCATION",
+          "label": "File Location",
+          "required": true
+        },
+        {
+          "key": "ADVICE_OBTAINED",
+          "label": "Advice Obtained",
+          "required": true
+        },
+        {
+          "key": "MATERIAL",
+          "label": "Material",
+          "required": true
+        },
+        {
+          "key": "OWNER",
+          "label": "Owner",
+          "required": true
+        },
+        {
+          "key": "PERMISSION_SCOPE",
+          "label": "Permission Scope",
+          "required": true
+        },
+        {
+          "key": "EVIDENCE",
+          "label": "Evidence",
+          "required": true
+        },
+        {
+          "key": "CREDIT_LINE",
+          "label": "Credit Line",
+          "required": true
+        },
+        {
+          "key": "EXPIRY",
+          "label": "Expiry",
+          "required": true
+        }
+      ]
+    },
+    {
+      "documentType": 24,
+      "title": "Series Continuity Ledger",
+      "templateFile": "templates/core/24_Series_Continuity_Ledger.md",
+      "relativeFolder": "04 Series Architecture",
+      "relativeMarkdownPath": "04 Series Architecture/24_Series_Continuity_Ledger.md",
+      "fields": [
+        {
+          "key": "BOOK_TITLE",
+          "label": "Book Title",
+          "required": false
+        },
+        {
+          "key": "AUTHOR",
+          "label": "Author",
+          "required": false
+        },
+        {
+          "key": "VERSION",
+          "label": "Version",
+          "required": false
+        },
+        {
+          "key": "DATE",
+          "label": "Date",
+          "required": false
+        },
+        {
+          "key": "CHARACTER_STATES",
+          "label": "Character States",
+          "required": true
+        },
+        {
+          "key": "TIMELINE",
+          "label": "Timeline",
+          "required": true
+        },
+        {
+          "key": "WORLD_CHANGES",
+          "label": "World Changes",
+          "required": true
+        },
+        {
+          "key": "POLITICAL_CHANGES",
+          "label": "Political Changes",
+          "required": true
+        },
+        {
+          "key": "MAGIC_CHANGES",
+          "label": "Magic Changes",
+          "required": true
+        },
+        {
+          "key": "OPEN_MYSTERIES",
+          "label": "Open Mysteries",
+          "required": true
+        },
+        {
+          "key": "READER_PROMISES",
+          "label": "Reader Promises",
+          "required": true
+        },
+        {
+          "key": "BOOK_CONSEQUENCES",
+          "label": "Book Consequences",
+          "required": true
+        },
+        {
+          "key": "ELEMENT",
+          "label": "Element",
+          "required": true
+        },
+        {
+          "key": "INTRODUCED",
+          "label": "Introduced",
+          "required": true
+        },
+        {
+          "key": "DEVELOPED",
+          "label": "Developed",
+          "required": true
+        },
+        {
+          "key": "RESOLVED",
+          "label": "Resolved",
+          "required": true
+        },
+        {
+          "key": "STATUS",
+          "label": "Status",
+          "required": true
+        },
+        {
+          "key": "TRUTH",
+          "label": "Truth",
+          "required": true
+        },
+        {
+          "key": "READER_KNOWS",
+          "label": "Reader Knows",
+          "required": true
+        },
+        {
+          "key": "PROTAGONIST_KNOWS",
+          "label": "Protagonist Knows",
+          "required": true
+        },
+        {
+          "key": "ANTAGONIST_KNOWS",
+          "label": "Antagonist Knows",
+          "required": true
+        },
+        {
+          "key": "FALSE_BELIEF",
+          "label": "False Belief",
+          "required": true
+        },
+        {
+          "key": "REVEAL_POINT",
+          "label": "Reveal Point",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

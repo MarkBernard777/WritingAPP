@@ -15,6 +15,7 @@ public class StoryDataTests
             ProjectId = Guid.NewGuid(),
             DocumentType = DocumentType.ProjectDefinition,
             Title = "Project Definition",
+            RelativeMarkdownPath = "01 Project Definition/01_Project_Definition.md",
             CompletionPercentage = 25,
         };
 

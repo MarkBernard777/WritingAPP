@@ -1,5 +1,6 @@
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Domain;
+using MasterBookWritingSystem.Core.Domain.Documents;
 using MasterBookWritingSystem.Infrastructure.DependencyInjection;
 using MasterBookWritingSystem.Infrastructure.Workflow;
 using Microsoft.Data.Sqlite;
@@ -100,6 +101,13 @@ public sealed class DashboardServiceTests : IDisposable
         foreach (var step in phase.Steps)
         {
             await _workflow.CompleteStepAsync(project.Id, phase.Id, step.Number);
+        }
+
+        var documents = _provider.GetRequiredService<IDocumentService>();
+        var definition = await documents.GetAsync(project.Id, DocumentType.ProjectDefinition);
+        foreach (var field in definition.Fields.Where(item => item.IsRequired))
+        {
+            await documents.UpdateFieldAsync(project.Id, definition.Id, field.Key, "Ready");
         }
 
         await _workflow.PassGateAsync(project.Id, new Core.Workflow.PhaseGateCompletion

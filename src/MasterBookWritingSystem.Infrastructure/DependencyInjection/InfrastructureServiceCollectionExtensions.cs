@@ -1,5 +1,6 @@
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Infrastructure.Dashboard;
+using MasterBookWritingSystem.Infrastructure.Documents;
 using MasterBookWritingSystem.Infrastructure.Paths;
 using MasterBookWritingSystem.Infrastructure.Persistence;
 using MasterBookWritingSystem.Infrastructure.Workflow;
@@ -14,8 +15,10 @@ public static class InfrastructureServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
         services.AddSingleton<IApplicationPaths, LocalApplicationPaths>();
         services.AddSingleton<IWorkflowDefinitionSource, EmbeddedOrSeedWorkflowDefinitionSource>();
+        services.AddSingleton<IDocumentTemplateCatalog, SeedDocumentTemplateCatalog>();
         services.AddSingleton<IProjectService, ProjectService>();
         services.AddSingleton<IChapterFileStore, ChapterFileStore>();
+        services.AddSingleton<IDocumentService, DocumentService>();
         services.AddSingleton<IWorkflowService, WorkflowService>();
         services.AddSingleton<IDashboardService, DashboardService>();
         return services;

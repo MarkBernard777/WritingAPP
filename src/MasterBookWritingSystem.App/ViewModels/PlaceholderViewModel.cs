@@ -15,9 +15,6 @@ public abstract partial class PlaceholderViewModel : ObservableObject
     public string Description { get; }
 }
 
-public sealed class DocumentsViewModel()
-    : PlaceholderViewModel("Documents", "The 24 structured working documents will appear here.");
-
 public sealed class ManuscriptViewModel()
     : PlaceholderViewModel("Manuscript", "Chapter editor and compilation tools will appear here.");
 

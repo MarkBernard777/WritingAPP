@@ -1,5 +1,6 @@
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Domain;
+using MasterBookWritingSystem.Core.Domain.Documents;
 using MasterBookWritingSystem.Core.Domain.Workflow;
 using MasterBookWritingSystem.Core.Workflow;
 using MasterBookWritingSystem.Infrastructure.Persistence;
@@ -13,11 +14,19 @@ public sealed class WorkflowService : IWorkflowService
 {
     private readonly IProjectService _projectService;
     private readonly IWorkflowDefinitionSource _definitionSource;
+    private readonly IDocumentTemplateCatalog _documentTemplateCatalog;
+    private readonly IDocumentService _documentService;
 
-    public WorkflowService(IProjectService projectService, IWorkflowDefinitionSource definitionSource)
+    public WorkflowService(
+        IProjectService projectService,
+        IWorkflowDefinitionSource definitionSource,
+        IDocumentTemplateCatalog documentTemplateCatalog,
+        IDocumentService documentService)
     {
         _projectService = projectService;
         _definitionSource = definitionSource;
+        _documentTemplateCatalog = documentTemplateCatalog;
+        _documentService = documentService;
     }
 
     public async Task ImportDefinitionsAsync(Guid projectId, CancellationToken cancellationToken = default)
@@ -251,18 +260,18 @@ public sealed class WorkflowService : IWorkflowService
 
         SqliteConnection.ClearAllPools();
 
-        var domainProgress = progress.Select(item => new StepProgress
-        {
-            Id = item.Id,
-            ProjectId = item.ProjectId,
-            PhaseId = item.PhaseId,
-            StepNumber = item.StepNumber,
-            Status = item.Status,
-            Notes = item.Notes,
-            CompletedUtc = item.CompletedUtc,
-        });
+        var domainProgress = progress.Select(ToDomainProgress);
 
-        return PhaseGateRules.CanPass(phase, domainProgress);
+        WorkingDocument? requiredDocument = null;
+        var mappedType = _documentTemplateCatalog.ResolveDocumentType(phase.TemplatePath);
+        if (mappedType is not null)
+        {
+            requiredDocument = await _documentService
+                .GetAsync(projectId, mappedType.Value, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        return PhaseGateRules.CanPass(phase, domainProgress, requiredDocument);
     }
 
     public async Task<PhaseGate> PassGateAsync(

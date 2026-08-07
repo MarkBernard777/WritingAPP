@@ -186,7 +186,7 @@ public partial class WorkflowViewModel : ObservableObject
         var phase = phaseItem.Phase;
         GateStatement = phase.GateStatement;
         Deliverable = phase.Deliverable;
-        TemplatePath = phase.TemplatePath ?? "(document link available in Milestone 5)";
+                TemplatePath = phase.TemplatePath ?? string.Empty;
 
         var progress = await _workflowService
             .GetPhaseStepProgressAsync(project.Id, phase.Id)

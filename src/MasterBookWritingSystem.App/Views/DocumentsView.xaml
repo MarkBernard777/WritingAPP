@@ -1,6 +1,115 @@
 <UserControl x:Class="MasterBookWritingSystem.App.Views.DocumentsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:views="clr-namespace:MasterBookWritingSystem.App.Views">
-    <views:PlaceholderView />
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,12">
+            <Button DockPanel.Dock="Right"
+                    Content="Refresh"
+                    Width="90"
+                    Command="{Binding RefreshCommand}" />
+            <TextBlock Text="Working Documents"
+                       FontSize="26"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center" />
+        </DockPanel>
+
+        <TextBlock Grid.Row="1"
+                   Text="{Binding StatusMessage}"
+                   Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
+                   TextWrapping="Wrap" />
+
+        <Grid Grid.Row="1" Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="#F7FAFC"
+                    Padding="8"
+                    Margin="0,0,12,0"
+                    CornerRadius="6">
+                <ListBox ItemsSource="{Binding Documents}"
+                         SelectedItem="{Binding SelectedDocument}"
+                         BorderThickness="0"
+                         Background="Transparent">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,4">
+                                <TextBlock Text="{Binding Title}" TextWrapping="Wrap" />
+                                <TextBlock Opacity="0.7" FontSize="11">
+                                    <Run Text="{Binding CompletionPercentage, Mode=OneWay}" />
+                                    <Run Text="% complete" />
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="{Binding SelectedDocument.Title}"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Margin="0,0,0,8" />
+                    <TextBlock Text="{Binding ValidationMessage}"
+                               Margin="0,0,0,12"
+                               Opacity="0.8" />
+
+                    <TextBlock Text="Structured fields" FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <ItemsControl ItemsSource="{Binding Fields}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="0,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                            <TextBlock Text="{Binding Label}" FontWeight="SemiBold" />
+                                            <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                                                     Margin="0,6,0,0"
+                                                     MinHeight="40"
+                                                     TextWrapping="Wrap"
+                                                     AcceptsReturn="True" />
+                                        </StackPanel>
+                                        <Button Grid.Column="1"
+                                                Content="Save"
+                                                VerticalAlignment="Center"
+                                                Padding="10,4"
+                                                Command="{Binding DataContext.SaveFieldCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="Markdown notes" FontWeight="SemiBold" Margin="0,20,0,8" />
+                    <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
+                             Height="100"
+                             TextWrapping="Wrap"
+                             AcceptsReturn="True"
+                             VerticalScrollBarVisibility="Auto" />
+                    <Button Content="Save notes"
+                            HorizontalAlignment="Left"
+                            Margin="0,8,0,0"
+                            Padding="12,6"
+                            Command="{Binding SaveNotesCommand}" />
+
+                    <TextBlock Text="{Binding StatusMessage}"
+                               Foreground="#276749"
+                               Margin="0,12,0,0"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
 </UserControl>
