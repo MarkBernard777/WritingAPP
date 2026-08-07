@@ -41,6 +41,10 @@
                             Margin="0,0,8,4"
                             Padding="10,4"
                             Command="{Binding OpenPublishingPlanCommand}" />
+                    <Button Content="Metadata Sheet (21)"
+                            Margin="0,0,8,4"
+                            Padding="10,4"
+                            Command="{Binding OpenMetadataSheetCommand}" />
                     <Button Content="Launch Plan (22)"
                             Margin="0,0,8,4"
                             Padding="10,4"
@@ -268,6 +272,249 @@
                                     HorizontalAlignment="Left"
                                     Padding="12,6"
                                     Command="{Binding DataContext.SaveRightsContractCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Formats">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                            <TextBlock Text="Filter by status" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding PublicationStatusFilterOptions}"
+                                      SelectedItem="{Binding SelectedFormatStatusFilter}"
+                                      Margin="0,4,0,8" />
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Add" Width="70" Command="{Binding AddFormatCommand}" Margin="0,0,8,0" />
+                            <Button Content="Delete" Width="70" Command="{Binding DeleteFormatCommand}" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding Formats}"
+                                 SelectedItem="{Binding SelectedFormat}"
+                                 DisplayMemberPath="DisplayName" />
+                    </DockPanel>
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                                  DataContext="{Binding FormatEditor}">
+                        <StackPanel>
+                            <TextBlock Text="Name *" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Format kind" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding DataContext.FormatKindOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      SelectedItem="{Binding FormatKind}"
+                                      Margin="0,4,0,8" />
+                            <TextBlock Text="ISBN / ASIN" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding IsbnOrAsin, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Trim / file spec" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding TrimOrFileSpec, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Price" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding PriceText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Distributor" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Distributor, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Publication status" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding DataContext.PublicationStatusOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      SelectedItem="{Binding PublicationStatus}"
+                                      Margin="0,4,0,8" />
+                            <TextBlock Text="Asset link (project-relative)" FontWeight="SemiBold" />
+                            <DockPanel Margin="0,4,0,8">
+                                <Button DockPanel.Dock="Right"
+                                        Content="Open"
+                                        Width="70"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding DataContext.OpenFormatAssetCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                                <TextBox Text="{Binding AssetLink, UpdateSourceTrigger=PropertyChanged}" />
+                            </DockPanel>
+                            <TextBlock Text="Notes" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                            <Button Content="Save format"
+                                    HorizontalAlignment="Left"
+                                    Padding="12,6"
+                                    Command="{Binding DataContext.SaveFormatCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Metadata">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                            <TextBlock Text="Filter by status" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding PublicationStatusFilterOptions}"
+                                      SelectedItem="{Binding SelectedMetadataStatusFilter}"
+                                      Margin="0,4,0,8" />
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Add" Width="70" Command="{Binding AddMetadataRecordCommand}" Margin="0,0,8,0" />
+                            <Button Content="Delete" Width="70" Command="{Binding DeleteMetadataRecordCommand}" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding MetadataRecords}"
+                                 SelectedItem="{Binding SelectedMetadataRecord}"
+                                 DisplayMemberPath="DisplayName" />
+                    </DockPanel>
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                                  DataContext="{Binding MetadataEditor}">
+                        <StackPanel>
+                            <TextBlock Text="Title *" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Subtitle" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Subtitle, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Series" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Series, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Series number" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding SeriesNumber, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Author" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Description" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60" />
+                            <TextBlock Text="Categories" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Categories, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Search terms" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding SearchTerms, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Reader age" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding ReaderAge, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Language" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Language, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Publication date (yyyy-MM-dd)" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding PublicationDateText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Edition" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Edition, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Publisher" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Publisher, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Pricing notes" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding PricingNotes, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Territory / rights" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding TerritoryRights, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="ISBN" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Isbn, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Format name" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding FormatName, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Publication status" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding DataContext.PublicationStatusOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      SelectedItem="{Binding PublicationStatus}"
+                                      Margin="0,4,0,8" />
+                            <Button Content="Save metadata"
+                                    HorizontalAlignment="Left"
+                                    Padding="12,6"
+                                    Command="{Binding DataContext.SaveMetadataRecordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Performance">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                            <TextBlock Text="Filter by format" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding PerformanceFormatFilter, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <CheckBox Content="Sort by period descending"
+                                      IsChecked="{Binding PerformanceSortDescending}" />
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Add" Width="70" Command="{Binding AddPerformanceRecordCommand}" Margin="0,0,8,0" />
+                            <Button Content="Delete" Width="70" Command="{Binding DeletePerformanceRecordCommand}" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding PerformanceRecords}"
+                                 SelectedItem="{Binding SelectedPerformanceRecord}"
+                                 DisplayMemberPath="DisplayName" />
+                    </DockPanel>
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                                  DataContext="{Binding PerformanceEditor}">
+                        <StackPanel>
+                            <TextBlock Text="Period *" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding PeriodLabel, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Period start (yyyy-MM-dd)" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding PeriodStartText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Period end (yyyy-MM-dd)" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding PeriodEndText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Format" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Format, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Sales" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding SalesText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Read-through" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding ReadThroughText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Mailing list" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding MailingListText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Reviews" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding ReviewsText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Ad cost" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding AdCostText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Availability" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Availability, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Returns or issues" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding ReturnsOrIssues, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                            <TextBlock Text="Notes" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                            <Button Content="Save performance"
+                                    HorizontalAlignment="Left"
+                                    Padding="12,6"
+                                    Command="{Binding DataContext.SavePerformanceRecordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Corrections">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                            <TextBlock Text="Filter by status" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding CorrectionStatusFilterOptions}"
+                                      SelectedItem="{Binding SelectedCorrectionStatusFilter}"
+                                      Margin="0,4,0,8" />
+                            <CheckBox Content="Sort by reported date descending"
+                                      IsChecked="{Binding CorrectionSortDescending}" />
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Add" Width="70" Command="{Binding AddCorrectionCommand}" Margin="0,0,8,0" />
+                            <Button Content="Delete" Width="70" Command="{Binding DeleteCorrectionCommand}" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding Corrections}"
+                                 SelectedItem="{Binding SelectedCorrection}"
+                                 DisplayMemberPath="DisplayName" />
+                    </DockPanel>
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                                  DataContext="{Binding CorrectionEditor}">
+                        <StackPanel>
+                            <TextBlock Text="Error *" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Error, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                            <TextBlock Text="Location" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Location, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Correction *" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding CorrectionText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                            <TextBlock Text="Reported date (yyyy-MM-dd)" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding ReportedDateText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Corrected date (yyyy-MM-dd)" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding CorrectedDateText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Formats updated" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding FormatsUpdated, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="New edition" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding NewEdition, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Status" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding DataContext.CorrectionStatusOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      SelectedItem="{Binding Status}"
+                                      Margin="0,4,0,8" />
+                            <Button Content="Save correction"
+                                    HorizontalAlignment="Left"
+                                    Padding="12,6"
+                                    Command="{Binding DataContext.SaveCorrectionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>

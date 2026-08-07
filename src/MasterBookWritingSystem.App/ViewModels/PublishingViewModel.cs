@@ -34,6 +34,14 @@ public partial class PublishingViewModel : ObservableObject
 
     public ObservableCollection<RightsContractListItemViewModel> RightsContracts { get; } = [];
 
+    public ObservableCollection<PublishingFormatListItemViewModel> Formats { get; } = [];
+
+    public ObservableCollection<MetadataRecordListItemViewModel> MetadataRecords { get; } = [];
+
+    public ObservableCollection<PerformanceRecordListItemViewModel> PerformanceRecords { get; } = [];
+
+    public ObservableCollection<CorrectionListItemViewModel> Corrections { get; } = [];
+
     public IReadOnlyList<SubmissionResponse> ResponseOptions { get; } = Enum.GetValues<SubmissionResponse>();
 
     public IReadOnlyList<SubmissionOutcome> OutcomeOptions { get; } = Enum.GetValues<SubmissionOutcome>();
@@ -41,6 +49,12 @@ public partial class PublishingViewModel : ObservableObject
     public IReadOnlyList<LaunchItemStatus> LaunchStatusOptions { get; } = Enum.GetValues<LaunchItemStatus>();
 
     public IReadOnlyList<RightsContractStatus> RightsStatusOptions { get; } = Enum.GetValues<RightsContractStatus>();
+
+    public IReadOnlyList<PublishingFormatKind> FormatKindOptions { get; } = Enum.GetValues<PublishingFormatKind>();
+
+    public IReadOnlyList<PublicationStatus> PublicationStatusOptions { get; } = Enum.GetValues<PublicationStatus>();
+
+    public IReadOnlyList<CorrectionStatus> CorrectionStatusOptions { get; } = Enum.GetValues<CorrectionStatus>();
 
     public IReadOnlyList<PublishingRoute> RouteOptions { get; } =
     [
@@ -65,6 +79,12 @@ public partial class PublishingViewModel : ObservableObject
 
     public IReadOnlyList<string> RightsStatusFilterOptions { get; } =
         ["(All statuses)", .. Enum.GetNames<RightsContractStatus>()];
+
+    public IReadOnlyList<string> PublicationStatusFilterOptions { get; } =
+        ["(All statuses)", .. Enum.GetNames<PublicationStatus>()];
+
+    public IReadOnlyList<string> CorrectionStatusFilterOptions { get; } =
+        ["(All statuses)", .. Enum.GetNames<CorrectionStatus>()];
 
     [ObservableProperty]
     private bool _hasProject;
@@ -94,6 +114,24 @@ public partial class PublishingViewModel : ObservableObject
     private string _selectedRightsStatusFilter = "(All statuses)";
 
     [ObservableProperty]
+    private string _selectedFormatStatusFilter = "(All statuses)";
+
+    [ObservableProperty]
+    private string _selectedMetadataStatusFilter = "(All statuses)";
+
+    [ObservableProperty]
+    private string _performanceFormatFilter = string.Empty;
+
+    [ObservableProperty]
+    private bool _performanceSortDescending = true;
+
+    [ObservableProperty]
+    private string _selectedCorrectionStatusFilter = "(All statuses)";
+
+    [ObservableProperty]
+    private bool _correctionSortDescending = true;
+
+    [ObservableProperty]
     private bool _showInactiveSubmissions;
 
     [ObservableProperty]
@@ -106,6 +144,18 @@ public partial class PublishingViewModel : ObservableObject
     private RightsContractListItemViewModel? _selectedRightsContract;
 
     [ObservableProperty]
+    private PublishingFormatListItemViewModel? _selectedFormat;
+
+    [ObservableProperty]
+    private MetadataRecordListItemViewModel? _selectedMetadataRecord;
+
+    [ObservableProperty]
+    private PerformanceRecordListItemViewModel? _selectedPerformanceRecord;
+
+    [ObservableProperty]
+    private CorrectionListItemViewModel? _selectedCorrection;
+
+    [ObservableProperty]
     private SubmissionEditorViewModel? _submissionEditor;
 
     [ObservableProperty]
@@ -113,6 +163,18 @@ public partial class PublishingViewModel : ObservableObject
 
     [ObservableProperty]
     private RightsContractEditorViewModel? _rightsEditor;
+
+    [ObservableProperty]
+    private PublishingFormatEditorViewModel? _formatEditor;
+
+    [ObservableProperty]
+    private MetadataRecordEditorViewModel? _metadataEditor;
+
+    [ObservableProperty]
+    private PerformanceRecordEditorViewModel? _performanceEditor;
+
+    [ObservableProperty]
+    private CorrectionEditorViewModel? _correctionEditor;
 
     partial void OnSelectedSubmissionChanged(SubmissionListItemViewModel? value)
         => SubmissionEditor = value is null ? null : SubmissionEditorViewModel.From(value.Source);
@@ -122,6 +184,18 @@ public partial class PublishingViewModel : ObservableObject
 
     partial void OnSelectedRightsContractChanged(RightsContractListItemViewModel? value)
         => RightsEditor = value is null ? null : RightsContractEditorViewModel.From(value.Source);
+
+    partial void OnSelectedFormatChanged(PublishingFormatListItemViewModel? value)
+        => FormatEditor = value is null ? null : PublishingFormatEditorViewModel.From(value.Source);
+
+    partial void OnSelectedMetadataRecordChanged(MetadataRecordListItemViewModel? value)
+        => MetadataEditor = value is null ? null : MetadataRecordEditorViewModel.From(value.Source);
+
+    partial void OnSelectedPerformanceRecordChanged(PerformanceRecordListItemViewModel? value)
+        => PerformanceEditor = value is null ? null : PerformanceRecordEditorViewModel.From(value.Source);
+
+    partial void OnSelectedCorrectionChanged(CorrectionListItemViewModel? value)
+        => CorrectionEditor = value is null ? null : CorrectionEditorViewModel.From(value.Source);
 
     partial void OnSelectedOutcomeFilterChanged(string value) => _ = RefreshSubmissionsAsync();
 
@@ -134,6 +208,18 @@ public partial class PublishingViewModel : ObservableObject
     partial void OnLaunchSortDescendingChanged(bool value) => _ = RefreshLaunchItemsAsync();
 
     partial void OnSelectedRightsStatusFilterChanged(string value) => _ = RefreshRightsAsync();
+
+    partial void OnSelectedFormatStatusFilterChanged(string value) => _ = RefreshFormatsAsync();
+
+    partial void OnSelectedMetadataStatusFilterChanged(string value) => _ = RefreshMetadataAsync();
+
+    partial void OnPerformanceFormatFilterChanged(string value) => _ = RefreshPerformanceAsync();
+
+    partial void OnPerformanceSortDescendingChanged(bool value) => _ = RefreshPerformanceAsync();
+
+    partial void OnSelectedCorrectionStatusFilterChanged(string value) => _ = RefreshCorrectionsAsync();
+
+    partial void OnCorrectionSortDescendingChanged(bool value) => _ = RefreshCorrectionsAsync();
 
     [RelayCommand]
     private async Task RefreshAsync()
@@ -160,7 +246,13 @@ public partial class PublishingViewModel : ObservableObject
             await RefreshSubmissionsAsync().ConfigureAwait(true);
             await RefreshLaunchItemsAsync().ConfigureAwait(true);
             await RefreshRightsAsync().ConfigureAwait(true);
-            StatusMessage = $"Loaded {Submissions.Count} submissions, {LaunchItems.Count} launch items, {RightsContracts.Count} rights/contracts.";
+            await RefreshFormatsAsync().ConfigureAwait(true);
+            await RefreshMetadataAsync().ConfigureAwait(true);
+            await RefreshPerformanceAsync().ConfigureAwait(true);
+            await RefreshCorrectionsAsync().ConfigureAwait(true);
+            StatusMessage =
+                $"Loaded {Submissions.Count} submissions, {LaunchItems.Count} launch items, {RightsContracts.Count} rights/contracts, "
+                + $"{Formats.Count} formats, {MetadataRecords.Count} metadata, {PerformanceRecords.Count} performance, {Corrections.Count} corrections.";
         }
         catch (Exception ex)
         {
@@ -451,6 +543,10 @@ public partial class PublishingViewModel : ObservableObject
         => OpenProjectRelative(ProjectPaths.RightsContractsRegisterRelativePath, isDirectory: false);
 
     [RelayCommand]
+    private void OpenMetadataSheet()
+        => OpenProjectRelative(ProjectPaths.MetadataSheetRelativePath, isDirectory: false);
+
+    [RelayCommand]
     private void OpenSubmissionLink()
     {
         if (SubmissionEditor is null)
@@ -583,12 +679,24 @@ public partial class PublishingViewModel : ObservableObject
         Submissions.Clear();
         LaunchItems.Clear();
         RightsContracts.Clear();
+        Formats.Clear();
+        MetadataRecords.Clear();
+        PerformanceRecords.Clear();
+        Corrections.Clear();
         SelectedSubmission = null;
         SelectedLaunchItem = null;
         SelectedRightsContract = null;
+        SelectedFormat = null;
+        SelectedMetadataRecord = null;
+        SelectedPerformanceRecord = null;
+        SelectedCorrection = null;
         SubmissionEditor = null;
         LaunchEditor = null;
         RightsEditor = null;
+        FormatEditor = null;
+        MetadataEditor = null;
+        PerformanceEditor = null;
+        CorrectionEditor = null;
     }
 
     private void OpenProjectRelative(string? relativePath, bool isDirectory)

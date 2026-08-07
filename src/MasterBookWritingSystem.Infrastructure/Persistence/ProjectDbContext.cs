@@ -46,6 +46,14 @@ public sealed class ProjectDbContext : DbContext
 
     public DbSet<RightsAndContractRecord> RightsAndContracts => Set<RightsAndContractRecord>();
 
+    public DbSet<PublishingFormatRecord> PublishingFormats => Set<PublishingFormatRecord>();
+
+    public DbSet<MetadataRecordEntity> MetadataRecords => Set<MetadataRecordEntity>();
+
+    public DbSet<PerformanceRecordEntity> PerformanceRecords => Set<PerformanceRecordEntity>();
+
+    public DbSet<CorrectionRecord> Corrections => Set<CorrectionRecord>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ProjectRecord>(entity =>
@@ -313,6 +321,78 @@ public sealed class ProjectDbContext : DbContext
             entity.Property(item => item.Status).HasConversion<int>();
             entity.HasIndex(item => new { item.ProjectId, item.Party });
             entity.HasIndex(item => new { item.ProjectId, item.Status });
+        });
+
+        modelBuilder.Entity<PublishingFormatRecord>(entity =>
+        {
+            entity.ToTable("PublishingFormats");
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.Name).HasMaxLength(500).IsRequired();
+            entity.Property(item => item.IsbnOrAsin).HasMaxLength(100);
+            entity.Property(item => item.TrimOrFileSpec).HasMaxLength(500);
+            entity.Property(item => item.Price).HasPrecision(18, 2);
+            entity.Property(item => item.Distributor).HasMaxLength(500);
+            entity.Property(item => item.AssetLink).HasMaxLength(1000);
+            entity.Property(item => item.Notes).HasMaxLength(4000);
+            entity.Property(item => item.FormatKind).HasConversion<int>();
+            entity.Property(item => item.PublicationStatus).HasConversion<int>();
+            entity.HasIndex(item => new { item.ProjectId, item.Name });
+            entity.HasIndex(item => new { item.ProjectId, item.PublicationStatus });
+        });
+
+        modelBuilder.Entity<MetadataRecordEntity>(entity =>
+        {
+            entity.ToTable("MetadataRecords");
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.Title).HasMaxLength(500).IsRequired();
+            entity.Property(item => item.Subtitle).HasMaxLength(500);
+            entity.Property(item => item.Series).HasMaxLength(500);
+            entity.Property(item => item.SeriesNumber).HasMaxLength(50);
+            entity.Property(item => item.Author).HasMaxLength(500);
+            entity.Property(item => item.Description).HasMaxLength(8000);
+            entity.Property(item => item.Categories).HasMaxLength(2000);
+            entity.Property(item => item.SearchTerms).HasMaxLength(2000);
+            entity.Property(item => item.ReaderAge).HasMaxLength(100);
+            entity.Property(item => item.Language).HasMaxLength(100);
+            entity.Property(item => item.Edition).HasMaxLength(200);
+            entity.Property(item => item.Publisher).HasMaxLength(500);
+            entity.Property(item => item.PricingNotes).HasMaxLength(2000);
+            entity.Property(item => item.TerritoryRights).HasMaxLength(2000);
+            entity.Property(item => item.Isbn).HasMaxLength(100);
+            entity.Property(item => item.FormatName).HasMaxLength(200);
+            entity.Property(item => item.PublicationStatus).HasConversion<int>();
+            entity.HasIndex(item => new { item.ProjectId, item.Title });
+            entity.HasIndex(item => new { item.ProjectId, item.PublicationStatus });
+        });
+
+        modelBuilder.Entity<PerformanceRecordEntity>(entity =>
+        {
+            entity.ToTable("PerformanceRecords");
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.PeriodLabel).HasMaxLength(200).IsRequired();
+            entity.Property(item => item.Format).HasMaxLength(200);
+            entity.Property(item => item.Sales).HasPrecision(18, 2);
+            entity.Property(item => item.ReadThrough).HasPrecision(18, 4);
+            entity.Property(item => item.AdCost).HasPrecision(18, 2);
+            entity.Property(item => item.Availability).HasMaxLength(500);
+            entity.Property(item => item.ReturnsOrIssues).HasMaxLength(4000);
+            entity.Property(item => item.Notes).HasMaxLength(4000);
+            entity.HasIndex(item => new { item.ProjectId, item.PeriodStart });
+            entity.HasIndex(item => new { item.ProjectId, item.Format });
+        });
+
+        modelBuilder.Entity<CorrectionRecord>(entity =>
+        {
+            entity.ToTable("Corrections");
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.Error).HasMaxLength(2000).IsRequired();
+            entity.Property(item => item.Location).HasMaxLength(500);
+            entity.Property(item => item.CorrectionText).HasMaxLength(4000).IsRequired();
+            entity.Property(item => item.FormatsUpdated).HasMaxLength(500);
+            entity.Property(item => item.NewEdition).HasMaxLength(200);
+            entity.Property(item => item.Status).HasConversion<int>();
+            entity.HasIndex(item => new { item.ProjectId, item.Status });
+            entity.HasIndex(item => new { item.ProjectId, item.ReportedDate });
         });
     }
 }

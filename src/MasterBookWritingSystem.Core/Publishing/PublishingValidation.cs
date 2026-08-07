@@ -114,6 +114,128 @@ public static class PublishingValidation
         return Result(errors);
     }
 
+    public static PublishingValidationResult Validate(PublishingFormat format)
+    {
+        ArgumentNullException.ThrowIfNull(format);
+        var errors = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(format.Name))
+        {
+            errors.Add("Format name is required.");
+        }
+
+        if (!Enum.IsDefined(format.FormatKind))
+        {
+            errors.Add("Format kind is invalid.");
+        }
+
+        if (!Enum.IsDefined(format.PublicationStatus))
+        {
+            errors.Add("Publication status is invalid.");
+        }
+
+        if (format.Price is { } price && price < 0)
+        {
+            errors.Add("Price cannot be negative.");
+        }
+
+        ValidateOptionalLink(format.AssetLink, "Asset link", errors, allowHttp: false);
+        return Result(errors);
+    }
+
+    public static PublishingValidationResult Validate(MetadataRecord record)
+    {
+        ArgumentNullException.ThrowIfNull(record);
+        var errors = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(record.Title))
+        {
+            errors.Add("Metadata title is required.");
+        }
+
+        if (!Enum.IsDefined(record.PublicationStatus))
+        {
+            errors.Add("Publication status is invalid.");
+        }
+
+        return Result(errors);
+    }
+
+    public static PublishingValidationResult Validate(PerformanceRecord record)
+    {
+        ArgumentNullException.ThrowIfNull(record);
+        var errors = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(record.PeriodLabel))
+        {
+            errors.Add("Performance period is required.");
+        }
+
+        if (record.PeriodStart is { } start
+            && record.PeriodEnd is { } end
+            && end < start)
+        {
+            errors.Add("Period end cannot be earlier than period start.");
+        }
+
+        if (record.Sales is { } sales && sales < 0)
+        {
+            errors.Add("Sales cannot be negative.");
+        }
+
+        if (record.ReadThrough is { } readThrough && readThrough < 0)
+        {
+            errors.Add("Read-through cannot be negative.");
+        }
+
+        if (record.MailingList is { } mailing && mailing < 0)
+        {
+            errors.Add("Mailing list count cannot be negative.");
+        }
+
+        if (record.Reviews is { } reviews && reviews < 0)
+        {
+            errors.Add("Reviews cannot be negative.");
+        }
+
+        if (record.AdCost is { } adCost && adCost < 0)
+        {
+            errors.Add("Ad cost cannot be negative.");
+        }
+
+        return Result(errors);
+    }
+
+    public static PublishingValidationResult Validate(Correction correction)
+    {
+        ArgumentNullException.ThrowIfNull(correction);
+        var errors = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(correction.Error))
+        {
+            errors.Add("Error description is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(correction.CorrectionText))
+        {
+            errors.Add("Correction text is required.");
+        }
+
+        if (!Enum.IsDefined(correction.Status))
+        {
+            errors.Add("Correction status is invalid.");
+        }
+
+        if (correction.ReportedDate is { } reported
+            && correction.CorrectedDate is { } corrected
+            && corrected < reported)
+        {
+            errors.Add("Corrected date cannot be earlier than reported date.");
+        }
+
+        return Result(errors);
+    }
+
     public static bool IsSubmissionActiveForRoute(PublishingRoute activeRoute, PublishingRoute submissionRoute)
     {
         if (activeRoute == PublishingRoute.SelfPublishing)

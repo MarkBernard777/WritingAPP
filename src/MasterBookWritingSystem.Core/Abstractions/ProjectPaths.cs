@@ -14,6 +14,8 @@ public static class ProjectPaths
 
     public const string PublishingPlanRelativePath = "11 Publishing/20_Publishing_Plan.md";
 
+    public const string MetadataSheetRelativePath = "11 Publishing/21_Metadata_Sheet.md";
+
     public const string LaunchPlanRelativePath = "12 Marketing/22_Launch_Plan.md";
 
     public const string RightsContractsRegisterRelativePath = "11 Publishing/23_Rights_Contracts_Register.md";

@@ -62,4 +62,44 @@ public sealed class PublishingValidationTests
             PublishingRoute.Traditional,
             PublishingRoute.Traditional));
     }
+
+    [Fact]
+    public void PerformanceAndCorrection_ValidateRanges()
+    {
+        var performance = PublishingValidation.Validate(new PerformanceRecord
+        {
+            Id = Guid.NewGuid(),
+            ProjectId = Guid.NewGuid(),
+            PeriodLabel = "Q1",
+            PeriodStart = new DateOnly(2026, 3, 1),
+            PeriodEnd = new DateOnly(2026, 1, 1),
+            Sales = -1,
+        });
+        Assert.False(performance.IsValid);
+
+        var correction = PublishingValidation.Validate(new Correction
+        {
+            Id = Guid.NewGuid(),
+            ProjectId = Guid.NewGuid(),
+            Error = "Typo",
+            CorrectionText = "Fix",
+            ReportedDate = new DateOnly(2026, 8, 10),
+            CorrectedDate = new DateOnly(2026, 8, 1),
+        });
+        Assert.False(correction.IsValid);
+    }
+
+    [Fact]
+    public void Format_RequiresNameAndRejectsBadAssetPath()
+    {
+        var result = PublishingValidation.Validate(new PublishingFormat
+        {
+            Id = Guid.NewGuid(),
+            ProjectId = Guid.NewGuid(),
+            Name = " ",
+            AssetLink = "../escape.epub",
+            Price = -1,
+        });
+        Assert.False(result.IsValid);
+    }
 }

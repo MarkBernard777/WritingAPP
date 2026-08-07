@@ -27,6 +27,18 @@ public sealed class PublishingService : IPublishingService
     public PublishingValidationResult ValidateRightsAndContract(RightsAndContract contract)
         => PublishingValidation.Validate(contract);
 
+    public PublishingValidationResult ValidatePublishingFormat(PublishingFormat format)
+        => PublishingValidation.Validate(format);
+
+    public PublishingValidationResult ValidateMetadataRecord(MetadataRecord record)
+        => PublishingValidation.Validate(record);
+
+    public PublishingValidationResult ValidatePerformanceRecord(PerformanceRecord record)
+        => PublishingValidation.Validate(record);
+
+    public PublishingValidationResult ValidateCorrection(Correction correction)
+        => PublishingValidation.Validate(correction);
+
     public async Task<IReadOnlyList<Submission>> GetSubmissionsAsync(
         Guid projectId,
         PublishingRoute? activeRoute = null,
@@ -370,6 +382,440 @@ public sealed class PublishingService : IPublishingService
         SqliteConnection.ClearAllPools();
     }
 
+    public async Task<IReadOnlyList<PublishingFormat>> GetPublishingFormatsAsync(
+        Guid projectId,
+        PublicationStatus? statusFilter = null,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = Open(projectId);
+        var query = context.PublishingFormats
+            .AsNoTracking()
+            .Where(item => item.ProjectId == projectId);
+
+        if (statusFilter is { } status)
+        {
+            query = query.Where(item => item.PublicationStatus == status);
+        }
+
+        var records = await query
+            .OrderBy(item => item.Name)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+        return records.Select(ToDomain).ToList();
+    }
+
+    public async Task<PublishingFormat> GetPublishingFormatAsync(
+        Guid projectId,
+        Guid formatId,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = Open(projectId);
+        var record = await context.PublishingFormats
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.Id == formatId,
+                cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Publishing format '{formatId}' was not found.");
+        SqliteConnection.ClearAllPools();
+        return ToDomain(record);
+    }
+
+    public async Task<PublishingFormat> CreatePublishingFormatAsync(
+        Guid projectId,
+        PublishingFormat format,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(format);
+        EnsureValid(ValidatePublishingFormat(format));
+        NormalizeFormat(format);
+
+        await using var context = Open(projectId);
+        var record = ToRecord(format, projectId);
+        if (record.Id == Guid.Empty)
+        {
+            record.Id = Guid.NewGuid();
+        }
+
+        record.ProjectId = projectId;
+        record.LastEditedUtc = DateTimeOffset.UtcNow;
+        context.PublishingFormats.Add(record);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+        return ToDomain(record);
+    }
+
+    public async Task<PublishingFormat> UpdatePublishingFormatAsync(
+        Guid projectId,
+        PublishingFormat format,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(format);
+        EnsureValid(ValidatePublishingFormat(format));
+        NormalizeFormat(format);
+
+        await using var context = Open(projectId);
+        var record = await context.PublishingFormats
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.Id == format.Id,
+                cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Publishing format '{format.Id}' was not found.");
+
+        Apply(record, format);
+        record.LastEditedUtc = DateTimeOffset.UtcNow;
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+        return ToDomain(record);
+    }
+
+    public async Task DeletePublishingFormatAsync(
+        Guid projectId,
+        Guid formatId,
+        bool confirmed,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureConfirmed(confirmed);
+        await using var context = Open(projectId);
+        var record = await context.PublishingFormats
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.Id == formatId,
+                cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Publishing format '{formatId}' was not found.");
+        context.PublishingFormats.Remove(record);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+    }
+
+    public async Task<IReadOnlyList<MetadataRecord>> GetMetadataRecordsAsync(
+        Guid projectId,
+        PublicationStatus? statusFilter = null,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = Open(projectId);
+        var query = context.MetadataRecords
+            .AsNoTracking()
+            .Where(item => item.ProjectId == projectId);
+
+        if (statusFilter is { } status)
+        {
+            query = query.Where(item => item.PublicationStatus == status);
+        }
+
+        var records = await query
+            .OrderBy(item => item.Title)
+            .ThenBy(item => item.Edition)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+        return records.Select(ToDomain).ToList();
+    }
+
+    public async Task<MetadataRecord> GetMetadataRecordAsync(
+        Guid projectId,
+        Guid metadataId,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = Open(projectId);
+        var record = await context.MetadataRecords
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.Id == metadataId,
+                cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Metadata record '{metadataId}' was not found.");
+        SqliteConnection.ClearAllPools();
+        return ToDomain(record);
+    }
+
+    public async Task<MetadataRecord> CreateMetadataRecordAsync(
+        Guid projectId,
+        MetadataRecord record,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(record);
+        EnsureValid(ValidateMetadataRecord(record));
+        NormalizeMetadata(record);
+
+        await using var context = Open(projectId);
+        var entity = ToRecord(record, projectId);
+        if (entity.Id == Guid.Empty)
+        {
+            entity.Id = Guid.NewGuid();
+        }
+
+        entity.ProjectId = projectId;
+        entity.LastEditedUtc = DateTimeOffset.UtcNow;
+        context.MetadataRecords.Add(entity);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+        return ToDomain(entity);
+    }
+
+    public async Task<MetadataRecord> UpdateMetadataRecordAsync(
+        Guid projectId,
+        MetadataRecord record,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(record);
+        EnsureValid(ValidateMetadataRecord(record));
+        NormalizeMetadata(record);
+
+        await using var context = Open(projectId);
+        var entity = await context.MetadataRecords
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.Id == record.Id,
+                cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Metadata record '{record.Id}' was not found.");
+
+        Apply(entity, record);
+        entity.LastEditedUtc = DateTimeOffset.UtcNow;
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+        return ToDomain(entity);
+    }
+
+    public async Task DeleteMetadataRecordAsync(
+        Guid projectId,
+        Guid metadataId,
+        bool confirmed,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureConfirmed(confirmed);
+        await using var context = Open(projectId);
+        var entity = await context.MetadataRecords
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.Id == metadataId,
+                cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Metadata record '{metadataId}' was not found.");
+        context.MetadataRecords.Remove(entity);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+    }
+
+    public async Task<IReadOnlyList<PerformanceRecord>> GetPerformanceRecordsAsync(
+        Guid projectId,
+        string? formatFilter = null,
+        bool sortByPeriodDescending = true,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = Open(projectId);
+        var query = context.PerformanceRecords
+            .AsNoTracking()
+            .Where(item => item.ProjectId == projectId);
+
+        if (!string.IsNullOrWhiteSpace(formatFilter))
+        {
+            var format = formatFilter.Trim();
+            query = query.Where(item => item.Format == format);
+        }
+
+        query = sortByPeriodDescending
+            ? query.OrderByDescending(item => item.PeriodStart).ThenByDescending(item => item.PeriodLabel)
+            : query.OrderBy(item => item.PeriodStart).ThenBy(item => item.PeriodLabel);
+
+        var records = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+        return records.Select(ToDomain).ToList();
+    }
+
+    public async Task<PerformanceRecord> GetPerformanceRecordAsync(
+        Guid projectId,
+        Guid performanceId,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = Open(projectId);
+        var record = await context.PerformanceRecords
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.Id == performanceId,
+                cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Performance record '{performanceId}' was not found.");
+        SqliteConnection.ClearAllPools();
+        return ToDomain(record);
+    }
+
+    public async Task<PerformanceRecord> CreatePerformanceRecordAsync(
+        Guid projectId,
+        PerformanceRecord record,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(record);
+        EnsureValid(ValidatePerformanceRecord(record));
+        NormalizePerformance(record);
+
+        await using var context = Open(projectId);
+        var entity = ToRecord(record, projectId);
+        if (entity.Id == Guid.Empty)
+        {
+            entity.Id = Guid.NewGuid();
+        }
+
+        entity.ProjectId = projectId;
+        entity.LastEditedUtc = DateTimeOffset.UtcNow;
+        context.PerformanceRecords.Add(entity);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+        return ToDomain(entity);
+    }
+
+    public async Task<PerformanceRecord> UpdatePerformanceRecordAsync(
+        Guid projectId,
+        PerformanceRecord record,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(record);
+        EnsureValid(ValidatePerformanceRecord(record));
+        NormalizePerformance(record);
+
+        await using var context = Open(projectId);
+        var entity = await context.PerformanceRecords
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.Id == record.Id,
+                cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Performance record '{record.Id}' was not found.");
+
+        Apply(entity, record);
+        entity.LastEditedUtc = DateTimeOffset.UtcNow;
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+        return ToDomain(entity);
+    }
+
+    public async Task DeletePerformanceRecordAsync(
+        Guid projectId,
+        Guid performanceId,
+        bool confirmed,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureConfirmed(confirmed);
+        await using var context = Open(projectId);
+        var entity = await context.PerformanceRecords
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.Id == performanceId,
+                cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Performance record '{performanceId}' was not found.");
+        context.PerformanceRecords.Remove(entity);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+    }
+
+    public async Task<IReadOnlyList<Correction>> GetCorrectionsAsync(
+        Guid projectId,
+        CorrectionStatus? statusFilter = null,
+        bool sortByReportedDescending = true,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = Open(projectId);
+        var query = context.Corrections
+            .AsNoTracking()
+            .Where(item => item.ProjectId == projectId);
+
+        if (statusFilter is { } status)
+        {
+            query = query.Where(item => item.Status == status);
+        }
+
+        query = sortByReportedDescending
+            ? query.OrderByDescending(item => item.ReportedDate).ThenBy(item => item.Error)
+            : query.OrderBy(item => item.ReportedDate).ThenBy(item => item.Error);
+
+        var records = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+        return records.Select(ToDomain).ToList();
+    }
+
+    public async Task<Correction> GetCorrectionAsync(
+        Guid projectId,
+        Guid correctionId,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = Open(projectId);
+        var record = await context.Corrections
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.Id == correctionId,
+                cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Correction '{correctionId}' was not found.");
+        SqliteConnection.ClearAllPools();
+        return ToDomain(record);
+    }
+
+    public async Task<Correction> CreateCorrectionAsync(
+        Guid projectId,
+        Correction correction,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(correction);
+        EnsureValid(ValidateCorrection(correction));
+        NormalizeCorrection(correction);
+
+        await using var context = Open(projectId);
+        var record = ToRecord(correction, projectId);
+        if (record.Id == Guid.Empty)
+        {
+            record.Id = Guid.NewGuid();
+        }
+
+        record.ProjectId = projectId;
+        record.LastEditedUtc = DateTimeOffset.UtcNow;
+        context.Corrections.Add(record);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+        return ToDomain(record);
+    }
+
+    public async Task<Correction> UpdateCorrectionAsync(
+        Guid projectId,
+        Correction correction,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(correction);
+        EnsureValid(ValidateCorrection(correction));
+        NormalizeCorrection(correction);
+
+        await using var context = Open(projectId);
+        var record = await context.Corrections
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.Id == correction.Id,
+                cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Correction '{correction.Id}' was not found.");
+
+        Apply(record, correction);
+        record.LastEditedUtc = DateTimeOffset.UtcNow;
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+        return ToDomain(record);
+    }
+
+    public async Task DeleteCorrectionAsync(
+        Guid projectId,
+        Guid correctionId,
+        bool confirmed,
+        CancellationToken cancellationToken = default)
+    {
+        EnsureConfirmed(confirmed);
+        await using var context = Open(projectId);
+        var record = await context.Corrections
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.Id == correctionId,
+                cancellationToken)
+            .ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Correction '{correctionId}' was not found.");
+        context.Corrections.Remove(record);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        SqliteConnection.ClearAllPools();
+    }
+
     public string? ResolveLocalLink(string projectRoot, string? relativeOrUrl, out string? missingMessage)
     {
         missingMessage = null;
@@ -471,6 +917,54 @@ public sealed class PublishingService : IPublishingService
         contract.PaymentNotes = contract.PaymentNotes?.Trim() ?? string.Empty;
         contract.Restrictions = contract.Restrictions?.Trim() ?? string.Empty;
         contract.AgreementFile = NormalizeOptionalPath(contract.AgreementFile);
+    }
+
+    private static void NormalizeFormat(PublishingFormat format)
+    {
+        format.Name = format.Name.Trim();
+        format.IsbnOrAsin = format.IsbnOrAsin?.Trim() ?? string.Empty;
+        format.TrimOrFileSpec = format.TrimOrFileSpec?.Trim() ?? string.Empty;
+        format.Distributor = format.Distributor?.Trim() ?? string.Empty;
+        format.AssetLink = NormalizeOptionalPath(format.AssetLink);
+        format.Notes = format.Notes?.Trim() ?? string.Empty;
+    }
+
+    private static void NormalizeMetadata(MetadataRecord record)
+    {
+        record.Title = record.Title.Trim();
+        record.Subtitle = record.Subtitle?.Trim() ?? string.Empty;
+        record.Series = record.Series?.Trim() ?? string.Empty;
+        record.SeriesNumber = record.SeriesNumber?.Trim() ?? string.Empty;
+        record.Author = record.Author?.Trim() ?? string.Empty;
+        record.Description = record.Description?.Trim() ?? string.Empty;
+        record.Categories = record.Categories?.Trim() ?? string.Empty;
+        record.SearchTerms = record.SearchTerms?.Trim() ?? string.Empty;
+        record.ReaderAge = record.ReaderAge?.Trim() ?? string.Empty;
+        record.Language = record.Language?.Trim() ?? string.Empty;
+        record.Edition = record.Edition?.Trim() ?? string.Empty;
+        record.Publisher = record.Publisher?.Trim() ?? string.Empty;
+        record.PricingNotes = record.PricingNotes?.Trim() ?? string.Empty;
+        record.TerritoryRights = record.TerritoryRights?.Trim() ?? string.Empty;
+        record.Isbn = record.Isbn?.Trim() ?? string.Empty;
+        record.FormatName = record.FormatName?.Trim() ?? string.Empty;
+    }
+
+    private static void NormalizePerformance(PerformanceRecord record)
+    {
+        record.PeriodLabel = record.PeriodLabel.Trim();
+        record.Format = record.Format?.Trim() ?? string.Empty;
+        record.Availability = record.Availability?.Trim() ?? string.Empty;
+        record.ReturnsOrIssues = record.ReturnsOrIssues?.Trim() ?? string.Empty;
+        record.Notes = record.Notes?.Trim() ?? string.Empty;
+    }
+
+    private static void NormalizeCorrection(Correction correction)
+    {
+        correction.Error = correction.Error.Trim();
+        correction.Location = correction.Location?.Trim() ?? string.Empty;
+        correction.CorrectionText = correction.CorrectionText.Trim();
+        correction.FormatsUpdated = correction.FormatsUpdated?.Trim() ?? string.Empty;
+        correction.NewEdition = correction.NewEdition?.Trim() ?? string.Empty;
     }
 
     private static string NormalizeOptionalPath(string? value)
@@ -638,5 +1132,218 @@ public sealed class PublishingService : IPublishingService
         record.Restrictions = contract.Restrictions;
         record.AgreementFile = contract.AgreementFile;
         record.Status = contract.Status;
+    }
+
+    private static PublishingFormat ToDomain(PublishingFormatRecord record) => new()
+    {
+        Id = record.Id,
+        ProjectId = record.ProjectId,
+        Name = record.Name,
+        FormatKind = record.FormatKind,
+        IsbnOrAsin = record.IsbnOrAsin,
+        TrimOrFileSpec = record.TrimOrFileSpec,
+        Price = record.Price,
+        Distributor = record.Distributor,
+        PublicationStatus = record.PublicationStatus,
+        AssetLink = record.AssetLink,
+        Notes = record.Notes,
+        LastEditedUtc = record.LastEditedUtc,
+    };
+
+    private static MetadataRecord ToDomain(MetadataRecordEntity record) => new()
+    {
+        Id = record.Id,
+        ProjectId = record.ProjectId,
+        Title = record.Title,
+        Subtitle = record.Subtitle,
+        Series = record.Series,
+        SeriesNumber = record.SeriesNumber,
+        Author = record.Author,
+        Description = record.Description,
+        Categories = record.Categories,
+        SearchTerms = record.SearchTerms,
+        ReaderAge = record.ReaderAge,
+        Language = record.Language,
+        PublicationDate = record.PublicationDate,
+        Edition = record.Edition,
+        Publisher = record.Publisher,
+        PricingNotes = record.PricingNotes,
+        TerritoryRights = record.TerritoryRights,
+        Isbn = record.Isbn,
+        FormatName = record.FormatName,
+        PublicationStatus = record.PublicationStatus,
+        LastEditedUtc = record.LastEditedUtc,
+    };
+
+    private static PerformanceRecord ToDomain(PerformanceRecordEntity record) => new()
+    {
+        Id = record.Id,
+        ProjectId = record.ProjectId,
+        PeriodLabel = record.PeriodLabel,
+        PeriodStart = record.PeriodStart,
+        PeriodEnd = record.PeriodEnd,
+        Format = record.Format,
+        Sales = record.Sales,
+        ReadThrough = record.ReadThrough,
+        MailingList = record.MailingList,
+        Reviews = record.Reviews,
+        AdCost = record.AdCost,
+        Availability = record.Availability,
+        ReturnsOrIssues = record.ReturnsOrIssues,
+        Notes = record.Notes,
+        LastEditedUtc = record.LastEditedUtc,
+    };
+
+    private static Correction ToDomain(CorrectionRecord record) => new()
+    {
+        Id = record.Id,
+        ProjectId = record.ProjectId,
+        Error = record.Error,
+        Location = record.Location,
+        CorrectionText = record.CorrectionText,
+        ReportedDate = record.ReportedDate,
+        CorrectedDate = record.CorrectedDate,
+        FormatsUpdated = record.FormatsUpdated,
+        NewEdition = record.NewEdition,
+        Status = record.Status,
+        LastEditedUtc = record.LastEditedUtc,
+    };
+
+    private static PublishingFormatRecord ToRecord(PublishingFormat format, Guid projectId) => new()
+    {
+        Id = format.Id,
+        ProjectId = projectId,
+        Name = format.Name,
+        FormatKind = format.FormatKind,
+        IsbnOrAsin = format.IsbnOrAsin,
+        TrimOrFileSpec = format.TrimOrFileSpec,
+        Price = format.Price,
+        Distributor = format.Distributor,
+        PublicationStatus = format.PublicationStatus,
+        AssetLink = format.AssetLink,
+        Notes = format.Notes,
+        LastEditedUtc = format.LastEditedUtc,
+    };
+
+    private static MetadataRecordEntity ToRecord(MetadataRecord record, Guid projectId) => new()
+    {
+        Id = record.Id,
+        ProjectId = projectId,
+        Title = record.Title,
+        Subtitle = record.Subtitle,
+        Series = record.Series,
+        SeriesNumber = record.SeriesNumber,
+        Author = record.Author,
+        Description = record.Description,
+        Categories = record.Categories,
+        SearchTerms = record.SearchTerms,
+        ReaderAge = record.ReaderAge,
+        Language = record.Language,
+        PublicationDate = record.PublicationDate,
+        Edition = record.Edition,
+        Publisher = record.Publisher,
+        PricingNotes = record.PricingNotes,
+        TerritoryRights = record.TerritoryRights,
+        Isbn = record.Isbn,
+        FormatName = record.FormatName,
+        PublicationStatus = record.PublicationStatus,
+        LastEditedUtc = record.LastEditedUtc,
+    };
+
+    private static PerformanceRecordEntity ToRecord(PerformanceRecord record, Guid projectId) => new()
+    {
+        Id = record.Id,
+        ProjectId = projectId,
+        PeriodLabel = record.PeriodLabel,
+        PeriodStart = record.PeriodStart,
+        PeriodEnd = record.PeriodEnd,
+        Format = record.Format,
+        Sales = record.Sales,
+        ReadThrough = record.ReadThrough,
+        MailingList = record.MailingList,
+        Reviews = record.Reviews,
+        AdCost = record.AdCost,
+        Availability = record.Availability,
+        ReturnsOrIssues = record.ReturnsOrIssues,
+        Notes = record.Notes,
+        LastEditedUtc = record.LastEditedUtc,
+    };
+
+    private static CorrectionRecord ToRecord(Correction correction, Guid projectId) => new()
+    {
+        Id = correction.Id,
+        ProjectId = projectId,
+        Error = correction.Error,
+        Location = correction.Location,
+        CorrectionText = correction.CorrectionText,
+        ReportedDate = correction.ReportedDate,
+        CorrectedDate = correction.CorrectedDate,
+        FormatsUpdated = correction.FormatsUpdated,
+        NewEdition = correction.NewEdition,
+        Status = correction.Status,
+        LastEditedUtc = correction.LastEditedUtc,
+    };
+
+    private static void Apply(PublishingFormatRecord record, PublishingFormat format)
+    {
+        record.Name = format.Name;
+        record.FormatKind = format.FormatKind;
+        record.IsbnOrAsin = format.IsbnOrAsin;
+        record.TrimOrFileSpec = format.TrimOrFileSpec;
+        record.Price = format.Price;
+        record.Distributor = format.Distributor;
+        record.PublicationStatus = format.PublicationStatus;
+        record.AssetLink = format.AssetLink;
+        record.Notes = format.Notes;
+    }
+
+    private static void Apply(MetadataRecordEntity entity, MetadataRecord record)
+    {
+        entity.Title = record.Title;
+        entity.Subtitle = record.Subtitle;
+        entity.Series = record.Series;
+        entity.SeriesNumber = record.SeriesNumber;
+        entity.Author = record.Author;
+        entity.Description = record.Description;
+        entity.Categories = record.Categories;
+        entity.SearchTerms = record.SearchTerms;
+        entity.ReaderAge = record.ReaderAge;
+        entity.Language = record.Language;
+        entity.PublicationDate = record.PublicationDate;
+        entity.Edition = record.Edition;
+        entity.Publisher = record.Publisher;
+        entity.PricingNotes = record.PricingNotes;
+        entity.TerritoryRights = record.TerritoryRights;
+        entity.Isbn = record.Isbn;
+        entity.FormatName = record.FormatName;
+        entity.PublicationStatus = record.PublicationStatus;
+    }
+
+    private static void Apply(PerformanceRecordEntity entity, PerformanceRecord record)
+    {
+        entity.PeriodLabel = record.PeriodLabel;
+        entity.PeriodStart = record.PeriodStart;
+        entity.PeriodEnd = record.PeriodEnd;
+        entity.Format = record.Format;
+        entity.Sales = record.Sales;
+        entity.ReadThrough = record.ReadThrough;
+        entity.MailingList = record.MailingList;
+        entity.Reviews = record.Reviews;
+        entity.AdCost = record.AdCost;
+        entity.Availability = record.Availability;
+        entity.ReturnsOrIssues = record.ReturnsOrIssues;
+        entity.Notes = record.Notes;
+    }
+
+    private static void Apply(CorrectionRecord record, Correction correction)
+    {
+        record.Error = correction.Error;
+        record.Location = correction.Location;
+        record.CorrectionText = correction.CorrectionText;
+        record.ReportedDate = correction.ReportedDate;
+        record.CorrectedDate = correction.CorrectedDate;
+        record.FormatsUpdated = correction.FormatsUpdated;
+        record.NewEdition = correction.NewEdition;
+        record.Status = correction.Status;
     }
 }

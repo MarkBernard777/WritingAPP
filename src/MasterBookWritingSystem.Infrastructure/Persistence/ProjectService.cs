@@ -98,7 +98,7 @@ public sealed class ProjectService : IProjectService
             context.SchemaVersions.Add(new SchemaVersionRecord
             {
                 Version = ProjectSchema.CurrentVersion,
-                Name = ProjectSchema.PublishingWorkflowMigrationName,
+                Name = ProjectSchema.PostPublicationTrackingMigrationName,
                 AppliedUtc = now,
             });
 
@@ -181,7 +181,7 @@ public sealed class ProjectService : IProjectService
                 context.SchemaVersions.Add(new SchemaVersionRecord
                 {
                     Version = ProjectSchema.CurrentVersion,
-                    Name = ProjectSchema.PublishingWorkflowMigrationName,
+                    Name = ProjectSchema.PostPublicationTrackingMigrationName,
                     AppliedUtc = DateTimeOffset.UtcNow,
                 });
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
