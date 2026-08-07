@@ -18,4 +18,6 @@ public interface IProjectDialogService
     CreateProjectDialogResult? PromptCreateProject();
 
     void ShowMessage(string message, string caption);
+
+    bool Confirm(string message, string caption);
 }

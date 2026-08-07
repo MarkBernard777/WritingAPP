@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Domain.Manuscript;
+using MasterBookWritingSystem.Core.Manuscript;
 using MasterBookWritingSystem.Infrastructure.IO;
 using MasterBookWritingSystem.Infrastructure.Persistence.Entities;
 using Microsoft.Data.Sqlite;
@@ -34,7 +35,7 @@ public sealed class ChapterFileStore : IChapterFileStore
         await AtomicFileWriter.WriteAllTextAsync(absolutePath, markdownContent, cancellationToken)
             .ConfigureAwait(false);
 
-        var wordCount = CountWords(markdownContent);
+        var wordCount = ManuscriptTextAnalytics.CountWords(markdownContent);
         var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(markdownContent)));
 
         var databasePath = Path.Combine(rootPath, ProjectPaths.DatabaseFileName);
@@ -112,16 +113,4 @@ public sealed class ChapterFileStore : IChapterFileStore
 
     private static string NormalizeRelativePath(string path)
         => path.Replace('\\', '/').TrimStart('/');
-
-    private static int CountWords(string markdown)
-    {
-        if (string.IsNullOrWhiteSpace(markdown))
-        {
-            return 0;
-        }
-
-        return markdown
-            .Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
-            .Length;
-    }
 }

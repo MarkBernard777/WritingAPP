@@ -33,4 +33,12 @@ public sealed class WpfProjectDialogService : IProjectDialogService
             caption,
             MessageBoxButton.OK,
             MessageBoxImage.Information);
+
+    public bool Confirm(string message, string caption)
+        => MessageBox.Show(
+            Application.Current?.MainWindow,
+            message,
+            caption,
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning) == MessageBoxResult.Yes;
 }
