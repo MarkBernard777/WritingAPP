@@ -98,7 +98,7 @@ public sealed class ProjectService : IProjectService
             context.SchemaVersions.Add(new SchemaVersionRecord
             {
                 Version = ProjectSchema.CurrentVersion,
-                Name = ProjectSchema.StoryDataMigrationName,
+                Name = ProjectSchema.IdeaScoringMigrationName,
                 AppliedUtc = now,
             });
 
@@ -181,7 +181,7 @@ public sealed class ProjectService : IProjectService
                 context.SchemaVersions.Add(new SchemaVersionRecord
                 {
                     Version = ProjectSchema.CurrentVersion,
-                    Name = ProjectSchema.StoryDataMigrationName,
+                    Name = ProjectSchema.IdeaScoringMigrationName,
                     AppliedUtc = DateTimeOffset.UtcNow,
                 });
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

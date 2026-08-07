@@ -2,7 +2,7 @@ namespace MasterBookWritingSystem.Core.Abstractions;
 
 public static class ProjectSchema
 {
-    public const int CurrentVersion = 4;
+    public const int CurrentVersion = 5;
 
     public const string InitialMigrationName = "InitialCreate";
 
@@ -11,4 +11,6 @@ public static class ProjectSchema
     public const string DocumentsMigrationName = "AddDocumentTables";
 
     public const string StoryDataMigrationName = "AddCoreStoryData";
+
+    public const string IdeaScoringMigrationName = "AddIdeaScoring";
 }

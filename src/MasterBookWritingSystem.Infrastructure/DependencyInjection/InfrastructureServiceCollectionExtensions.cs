@@ -5,6 +5,7 @@ using MasterBookWritingSystem.Infrastructure.Manuscript;
 using MasterBookWritingSystem.Infrastructure.Paths;
 using MasterBookWritingSystem.Infrastructure.Persistence;
 using MasterBookWritingSystem.Infrastructure.Story;
+using MasterBookWritingSystem.Infrastructure.Tools;
 using MasterBookWritingSystem.Infrastructure.Workflow;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,6 +23,8 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddSingleton<IChapterFileStore, ChapterFileStore>();
         services.AddSingleton<IChapterService, ChapterService>();
         services.AddSingleton<IDocumentService, DocumentService>();
+        services.AddSingleton<IIdeaService, IdeaService>();
+        services.AddSingleton<IToolsReportExporter, ToolsReportExporter>();
         services.AddSingleton<IStoryDataService, StoryDataService>();
         services.AddSingleton<IWorkflowService, WorkflowService>();
         services.AddSingleton<IDashboardService, DashboardService>();

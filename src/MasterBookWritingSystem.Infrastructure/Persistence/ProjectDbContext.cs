@@ -36,6 +36,10 @@ public sealed class ProjectDbContext : DbContext
 
     public DbSet<SceneRecord> Scenes => Set<SceneRecord>();
 
+    public DbSet<IdeaRecord> Ideas => Set<IdeaRecord>();
+
+    public DbSet<IdeaScoreRecord> IdeaScores => Set<IdeaScoreRecord>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ProjectRecord>(entity =>
@@ -228,6 +232,29 @@ public sealed class ProjectDbContext : DbContext
             entity.Property(scene => scene.PayoffObligations).HasMaxLength(8000);
             entity.Property(scene => scene.Status).HasConversion<int>();
             entity.HasIndex(scene => new { scene.ProjectId, scene.SequenceNumber }).IsUnique();
+        });
+
+        modelBuilder.Entity<IdeaRecord>(entity =>
+        {
+            entity.ToTable("Ideas");
+            entity.HasKey(idea => idea.Id);
+            entity.Property(idea => idea.Title).HasMaxLength(500).IsRequired();
+            entity.Property(idea => idea.Notes).HasMaxLength(8000);
+            entity.Property(idea => idea.Decision).HasMaxLength(100);
+            entity.HasIndex(idea => new { idea.ProjectId, idea.Title });
+            entity.HasOne(idea => idea.Score)
+                .WithOne(score => score.Idea)
+                .HasForeignKey<IdeaScoreRecord>(score => score.IdeaId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<IdeaScoreRecord>(entity =>
+        {
+            entity.ToTable("IdeaScores");
+            entity.HasKey(score => score.Id);
+            entity.Property(score => score.Decision).HasMaxLength(100);
+            entity.HasIndex(score => score.IdeaId).IsUnique();
+            entity.HasIndex(score => score.ProjectId);
         });
     }
 }

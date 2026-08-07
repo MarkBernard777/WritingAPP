@@ -15,9 +15,6 @@ public abstract partial class PlaceholderViewModel : ObservableObject
     public string Description { get; }
 }
 
-public sealed class ToolsViewModel()
-    : PlaceholderViewModel("Tools", "Mini tools and diagnostic reports will appear here.");
-
 public sealed class PublishingViewModel()
     : PlaceholderViewModel("Publishing", "Publishing route, launch and post-publication modules will appear here.");
 

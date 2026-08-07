@@ -229,7 +229,7 @@ public sealed class StoryDataServiceTests : IDisposable
         var validation = await _projects.ValidateAsync(project.RootPath);
         Assert.True(validation.IsValid);
         Assert.Equal(ProjectSchema.CurrentVersion, validation.SchemaVersion);
-        Assert.Equal(4, validation.SchemaVersion);
+        Assert.Equal(5, validation.SchemaVersion);
     }
 
     private async Task<Project> CreateAsync(string title)

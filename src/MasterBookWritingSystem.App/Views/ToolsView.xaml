@@ -1,6 +1,171 @@
 <UserControl x:Class="MasterBookWritingSystem.App.Views.ToolsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:views="clr-namespace:MasterBookWritingSystem.App.Views">
-    <views:PlaceholderView />
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,12">
+            <Button DockPanel.Dock="Right" Content="Refresh" Width="90" Command="{Binding RefreshCommand}" Margin="0,0,8,0" />
+            <Button DockPanel.Dock="Right" Content="Export report" Width="110" Command="{Binding ExportReportCommand}" Margin="0,0,8,0" />
+            <TextBox DockPanel.Dock="Right" Width="220" Margin="0,0,8,0"
+                     Text="{Binding ExportFileName, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Export file name under Exports/" />
+            <TextBlock Text="Tools" FontSize="26" FontWeight="SemiBold" VerticalAlignment="Center" />
+        </DockPanel>
+
+        <TextBlock Grid.Row="1"
+                   Text="{Binding StatusMessage}"
+                   Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
+                   TextWrapping="Wrap" />
+
+        <TabControl Grid.Row="1" Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TabItem Header="Idea scorecard">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="280" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Add" Width="70" Margin="0,0,8,0" Command="{Binding AddIdeaCommand}" />
+                            <Button Content="Delete" Width="70" Command="{Binding DeleteIdeaCommand}" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding Ideas}" SelectedItem="{Binding SelectedIdea}" DisplayMemberPath="Display" />
+                    </DockPanel>
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <TextBlock Text="Title" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding IdeaTitle, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Notes" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding IdeaNotes, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" MinHeight="50" TextWrapping="Wrap" />
+                            <TextBlock Text="Scores 0–10 (ten criteria)" FontWeight="SemiBold" Margin="0,0,0,6" />
+                            <UniformGrid Columns="2">
+                                <StackPanel Margin="0,0,8,6"><TextBlock Text="Fascination" /><TextBox Text="{Binding Fascination}" /></StackPanel>
+                                <StackPanel Margin="0,0,0,6"><TextBlock Text="Emotional Power" /><TextBox Text="{Binding EmotionalPower}" /></StackPanel>
+                                <StackPanel Margin="0,0,8,6"><TextBlock Text="Conflict" /><TextBox Text="{Binding Conflict}" /></StackPanel>
+                                <StackPanel Margin="0,0,0,6"><TextBlock Text="Character" /><TextBox Text="{Binding CharacterScore}" /></StackPanel>
+                                <StackPanel Margin="0,0,8,6"><TextBlock Text="Visual" /><TextBox Text="{Binding Visual}" /></StackPanel>
+                                <StackPanel Margin="0,0,0,6"><TextBlock Text="Original Combination" /><TextBox Text="{Binding OriginalCombination}" /></StackPanel>
+                                <StackPanel Margin="0,0,8,6"><TextBlock Text="Novel Length" /><TextBox Text="{Binding NovelLength}" /></StackPanel>
+                                <StackPanel Margin="0,0,0,6"><TextBlock Text="Difficult Choices" /><TextBox Text="{Binding DifficultChoices}" /></StackPanel>
+                                <StackPanel Margin="0,0,8,6"><TextBlock Text="Audience Fit" /><TextBox Text="{Binding AudienceFit}" /></StackPanel>
+                                <StackPanel Margin="0,0,0,6"><TextBlock Text="Series Fit" /><TextBox Text="{Binding SeriesFit}" /></StackPanel>
+                            </UniformGrid>
+                            <TextBlock Text="{Binding IdeaScoreSummary}" TextWrapping="Wrap" Margin="0,8,0,8" Opacity="0.85" />
+                            <Button Content="Save &amp; score" HorizontalAlignment="Left" Padding="12,6" Command="{Binding SaveIdeaCommand}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Premise builder">
+                <ScrollViewer Margin="8" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Seven premise components (saved to Premise Document)" FontWeight="SemiBold" Margin="0,0,0,8" />
+                        <TextBlock Text="Protagonist" /><TextBox Text="{Binding Protagonist, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,6" />
+                        <TextBlock Text="Disruption" /><TextBox Text="{Binding Disruption, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,6" />
+                        <TextBlock Text="Goal" /><TextBox Text="{Binding PremiseGoal, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,6" />
+                        <TextBlock Text="Opposition" /><TextBox Text="{Binding Opposition, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,6" />
+                        <TextBlock Text="Stakes" /><TextBox Text="{Binding Stakes, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,6" />
+                        <TextBlock Text="Urgency" /><TextBox Text="{Binding Urgency, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,6" />
+                        <TextBlock Text="Transformation" /><TextBox Text="{Binding Transformation, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,6" />
+                        <TextBlock Text="Final sentence (optional override)" /><TextBox Text="{Binding FinalSentence, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,6" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <Button Content="Generate" Margin="0,0,8,0" Padding="12,6" Command="{Binding BuildPremiseCommand}" />
+                            <Button Content="Save to premise document" Padding="12,6" Command="{Binding SavePremiseCommand}" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding PremiseValidation}" Margin="0,0,0,6" />
+                        <TextBlock Text="{Binding GeneratedPremise}" TextWrapping="Wrap" FontWeight="SemiBold" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Draft planner">
+                <StackPanel Margin="8">
+                    <UniformGrid Columns="2">
+                        <StackPanel Margin="0,0,8,8"><TextBlock Text="Target words" /><TextBox Text="{Binding TargetWordCount}" /></StackPanel>
+                        <StackPanel Margin="0,0,0,8"><TextBlock Text="Words completed" /><TextBox Text="{Binding WordsCompleted}" /></StackPanel>
+                        <StackPanel Margin="0,0,8,8"><TextBlock Text="Words / session" /><TextBox Text="{Binding WordsPerSession}" /></StackPanel>
+                        <StackPanel Margin="0,0,0,8"><TextBlock Text="Sessions / week" /><TextBox Text="{Binding SessionsPerWeek}" /></StackPanel>
+                        <StackPanel Margin="0,0,8,8"><TextBlock Text="Start date (yyyy-MM-dd)" /><TextBox Text="{Binding StartDateText}" /></StackPanel>
+                    </UniformGrid>
+                    <Button Content="Calculate plan" HorizontalAlignment="Left" Padding="12,6" Command="{Binding CalculateDraftPlanCommand}" />
+                    <TextBlock Text="{Binding DraftPlanSummary}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Scene diagnostic">
+                <DockPanel Margin="8">
+                    <Button DockPanel.Dock="Top" Content="Run diagnostics" HorizontalAlignment="Left" Padding="12,6" Margin="0,0,0,8" Command="{Binding RunSceneDiagnosticsCommand}" />
+                    <ListBox ItemsSource="{Binding SceneDiagnostics}" DisplayMemberPath="Display" />
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Text analyzer">
+                <StackPanel Margin="8">
+                    <CheckBox Content="Analyze all chapters (compiled order)" IsChecked="{Binding AnalyzeAllChapters}" Margin="0,0,0,8" />
+                    <TextBlock Text="Or select one chapter" />
+                    <ComboBox ItemsSource="{Binding AnalyzerChapters}"
+                              SelectedItem="{Binding SelectedAnalyzerChapter}"
+                              DisplayMemberPath="Display"
+                              Margin="0,4,0,8" />
+                    <Button Content="Analyze" HorizontalAlignment="Left" Padding="12,6" Command="{Binding AnalyzeTextCommand}" />
+                    <TextBlock Text="{Binding TextAnalyzerSummary}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Publishing route">
+                <ScrollViewer Margin="8" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Importance weights 0–10" FontWeight="SemiBold" Margin="0,0,0,8" />
+                        <UniformGrid Columns="3">
+                            <StackPanel Margin="0,0,8,8"><TextBlock Text="Control" /><TextBox Text="{Binding ControlWeight}" /></StackPanel>
+                            <StackPanel Margin="0,0,8,8"><TextBlock Text="Funding" /><TextBox Text="{Binding FundingWeight}" /></StackPanel>
+                            <StackPanel Margin="0,0,0,8"><TextBlock Text="Speed" /><TextBox Text="{Binding SpeedWeight}" /></StackPanel>
+                            <StackPanel Margin="0,0,8,8"><TextBlock Text="Distribution" /><TextBox Text="{Binding DistributionWeight}" /></StackPanel>
+                            <StackPanel Margin="0,0,8,8"><TextBlock Text="Rights" /><TextBox Text="{Binding RightsWeight}" /></StackPanel>
+                            <StackPanel Margin="0,0,0,8"><TextBlock Text="Production" /><TextBox Text="{Binding ProductionWeight}" /></StackPanel>
+                        </UniformGrid>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <Button Content="Evaluate" Margin="0,0,8,0" Padding="12,6" Command="{Binding EvaluatePublishingRouteCommand}" />
+                            <Button Content="Apply recommended route" Padding="12,6" Command="{Binding ApplyPublishingRouteCommand}" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding RouteRecommendation}" FontWeight="SemiBold" Margin="0,0,0,6" />
+                        <TextBlock Text="{Binding ActivePublishingRoute, StringFormat=Active route: {0}}" Margin="0,0,0,6" />
+                        <ItemsControl ItemsSource="{Binding RouteBreakdownLines}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Beta feedback">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0">
+                        <TextBlock Text="Structured feedback (local grouping — not AI)" FontWeight="SemiBold" Margin="0,0,0,8" />
+                        <TextBox Text="{Binding BetaReader, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,4" Tag="Reader" ToolTip="Reader" />
+                        <TextBox Text="{Binding BetaCategory, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,4" ToolTip="Category" />
+                        <TextBox Text="{Binding BetaObservation, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,4" AcceptsReturn="True" MinHeight="40" TextWrapping="Wrap" ToolTip="Observation" />
+                        <TextBox Text="{Binding BetaSuggestedFix, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8" AcceptsReturn="True" MinHeight="40" TextWrapping="Wrap" ToolTip="Suggested fix" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Add entry" Margin="0,0,8,0" Padding="12,6" Command="{Binding AddBetaEntryCommand}" />
+                            <Button Content="Synthesize" Padding="12,6" Command="{Binding SynthesizeBetaFeedbackCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <ListBox Grid.Row="1" Margin="0,12,0,0" ItemsSource="{Binding BetaSummaryLines}" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="2" Margin="0,10,0,0">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="#276749" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding ToolExplanation}" Opacity="0.75" TextWrapping="Wrap" Margin="0,4,0,0" />
+        </StackPanel>
+    </Grid>
 </UserControl>
