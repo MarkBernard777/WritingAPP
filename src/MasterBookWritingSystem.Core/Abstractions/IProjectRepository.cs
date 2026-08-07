@@ -3,7 +3,8 @@ using MasterBookWritingSystem.Core.Domain;
 namespace MasterBookWritingSystem.Core.Abstractions;
 
 /// <summary>
-/// Persistence contract for book projects. SQLite implementation arrives in Milestone 2.
+/// Persistence contract for book-project records inside an open project database.
+/// Prefer <see cref="IProjectService"/> for create/open/close/validate of portable folders.
 /// </summary>
 public interface IProjectRepository
 {
