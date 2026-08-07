@@ -30,12 +30,23 @@ public interface IWorkflowService
         Guid projectId,
         string phaseId,
         int stepNumber,
+        string? notes = null,
         CancellationToken cancellationToken = default);
 
     Task<StepProgress> GetStepProgressAsync(
         Guid projectId,
         string phaseId,
         int stepNumber,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<StepProgress>> GetPhaseStepProgressAsync(
+        Guid projectId,
+        string phaseId,
+        CancellationToken cancellationToken = default);
+
+    Task<PhaseGate?> GetPhaseGateAsync(
+        Guid projectId,
+        string phaseId,
         CancellationToken cancellationToken = default);
 
     Task<bool> CanPassGateAsync(

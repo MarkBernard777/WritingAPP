@@ -1,4 +1,5 @@
 using MasterBookWritingSystem.App.Navigation;
+using MasterBookWritingSystem.App.Services;
 using MasterBookWritingSystem.App.ViewModels;
 using MasterBookWritingSystem.Infrastructure.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,8 @@ public static class AppServiceCollectionExtensions
     {
         services.AddInfrastructure();
 
+        services.AddSingleton<IProjectDialogService, WpfProjectDialogService>();
+        services.AddSingleton<IRecentProjectsStore, RecentProjectsStore>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<ShellViewModel>();
         services.AddSingleton<MainWindow>();

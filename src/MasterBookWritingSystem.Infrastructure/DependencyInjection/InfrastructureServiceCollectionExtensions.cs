@@ -1,4 +1,5 @@
 using MasterBookWritingSystem.Core.Abstractions;
+using MasterBookWritingSystem.Infrastructure.Dashboard;
 using MasterBookWritingSystem.Infrastructure.Paths;
 using MasterBookWritingSystem.Infrastructure.Persistence;
 using MasterBookWritingSystem.Infrastructure.Workflow;
@@ -16,6 +17,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddSingleton<IProjectService, ProjectService>();
         services.AddSingleton<IChapterFileStore, ChapterFileStore>();
         services.AddSingleton<IWorkflowService, WorkflowService>();
+        services.AddSingleton<IDashboardService, DashboardService>();
         return services;
     }
 }

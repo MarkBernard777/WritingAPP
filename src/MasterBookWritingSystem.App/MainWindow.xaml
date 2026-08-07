@@ -14,10 +14,38 @@
         <Border DockPanel.Dock="Top"
                 Background="#1F2933"
                 Padding="16,12">
-            <TextBlock Text="{Binding ApplicationTitle}"
-                       Foreground="White"
-                       FontSize="18"
-                       FontWeight="SemiBold" />
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Create Project"
+                            Margin="0,0,8,0"
+                            Padding="10,4"
+                            Command="{Binding CreateProjectCommand}" />
+                    <Button Content="Open Project"
+                            Margin="0,0,8,0"
+                            Padding="10,4"
+                            Command="{Binding OpenProjectCommand}" />
+                    <Button Content="Close Project"
+                            Padding="10,4"
+                            Command="{Binding CloseProjectCommand}" />
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="{Binding ApplicationTitle}"
+                               Foreground="White"
+                               FontSize="18"
+                               FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding ActiveProjectCaption}"
+                               Foreground="#CBD5E0"
+                               FontSize="12"
+                               Margin="0,4,0,0"
+                               TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Border DockPanel.Dock="Bottom"
+                Background="#EDF2F7"
+                Padding="12,8">
+            <TextBlock Text="{Binding StatusMessage}" Opacity="0.8" />
         </Border>
 
         <Border DockPanel.Dock="Left"

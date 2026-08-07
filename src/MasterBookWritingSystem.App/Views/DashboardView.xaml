@@ -1,6 +1,86 @@
 <UserControl x:Class="MasterBookWritingSystem.App.Views.DashboardView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:views="clr-namespace:MasterBookWritingSystem.App.Views">
-    <views:PlaceholderView />
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28">
+        <StackPanel>
+            <DockPanel Margin="0,0,0,16">
+                <Button DockPanel.Dock="Right"
+                        Content="Refresh"
+                        Width="90"
+                        Command="{Binding RefreshCommand}" />
+                <TextBlock Text="Project Dashboard"
+                           FontSize="26"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center" />
+            </DockPanel>
+
+            <TextBlock Text="{Binding StatusMessage}"
+                       Foreground="#9B2C2C"
+                       Margin="0,0,0,12"
+                       TextWrapping="Wrap" />
+
+            <Border Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
+                    Background="#F7FAFC"
+                    Padding="20"
+                    CornerRadius="8">
+                <TextBlock Text="No project is open. Use Create Project or Open Project in the header."
+                           TextWrapping="Wrap" />
+            </Border>
+
+            <StackPanel Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock Text="{Binding Title}" FontSize="22" FontWeight="SemiBold" />
+                <TextBlock Margin="0,4,0,0" Opacity="0.75">
+                    <Run Text="{Binding Author, Mode=OneWay}" />
+                    <Run Text=" • " />
+                    <Run Text="{Binding Genre, Mode=OneWay}" />
+                    <Run Text=" • " />
+                    <Run Text="{Binding PublishingRoute, Mode=OneWay}" />
+                </TextBlock>
+                <TextBlock Text="{Binding RootPath}" Margin="0,4,0,16" Opacity="0.6" TextWrapping="Wrap" />
+
+                <TextBlock Text="North Star" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding NorthStar}" TextWrapping="Wrap" Margin="0,4,0,20" />
+
+                <UniformGrid Columns="4" Margin="0,0,0,20">
+                    <Border Background="#EDF2F7" Padding="12" Margin="0,0,8,0" CornerRadius="6">
+                        <StackPanel>
+                            <TextBlock Text="Phases" Opacity="0.7" />
+                            <TextBlock Text="{Binding ApplicablePhaseCount}" FontSize="22" FontWeight="SemiBold" />
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#EDF2F7" Padding="12" Margin="0,0,8,0" CornerRadius="6">
+                        <StackPanel>
+                            <TextBlock Text="Steps done" Opacity="0.7" />
+                            <TextBlock FontSize="22" FontWeight="SemiBold">
+                                <Run Text="{Binding CompletedStepCount, Mode=OneWay}" />
+                                <Run Text="/" />
+                                <Run Text="{Binding ApplicableStepCount, Mode=OneWay}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#EDF2F7" Padding="12" Margin="0,0,8,0" CornerRadius="6">
+                        <StackPanel>
+                            <TextBlock Text="Gates passed" Opacity="0.7" />
+                            <TextBlock Text="{Binding PassedGateCount}" FontSize="22" FontWeight="SemiBold" />
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#EDF2F7" Padding="12" CornerRadius="6">
+                        <StackPanel>
+                            <TextBlock Text="Word count" Opacity="0.7" />
+                            <TextBlock Text="{Binding WordCount}" FontSize="22" FontWeight="SemiBold" />
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <TextBlock Text="Current phase" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding CurrentPhase}" Margin="0,4,0,12" TextWrapping="Wrap" />
+
+                <TextBlock Text="Required deliverable" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding CurrentDeliverable}" Margin="0,4,0,12" TextWrapping="Wrap" />
+
+                <TextBlock Text="Next action" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding NextAction}" Margin="0,4,0,0" TextWrapping="Wrap" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

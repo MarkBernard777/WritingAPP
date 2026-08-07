@@ -15,12 +15,6 @@ public abstract partial class PlaceholderViewModel : ObservableObject
     public string Description { get; }
 }
 
-public sealed class DashboardViewModel()
-    : PlaceholderViewModel("Dashboard", "Project overview, progress and next actions will appear here.");
-
-public sealed class WorkflowViewModel()
-    : PlaceholderViewModel("Workflow", "Guided phases, steps and gates will appear here.");
-
 public sealed class DocumentsViewModel()
     : PlaceholderViewModel("Documents", "The 24 structured working documents will appear here.");
 

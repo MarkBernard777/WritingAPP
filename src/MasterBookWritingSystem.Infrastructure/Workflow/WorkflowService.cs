@@ -99,6 +99,7 @@ public sealed class WorkflowService : IWorkflowService
         Guid projectId,
         string phaseId,
         int stepNumber,
+        string? notes = null,
         CancellationToken cancellationToken = default)
     {
         var rootPath = RequireActiveRoot(projectId);
@@ -142,6 +143,10 @@ public sealed class WorkflowService : IWorkflowService
 
             progress.Status = StepStatus.Complete;
             progress.CompletedUtc = DateTimeOffset.UtcNow;
+            if (notes is not null)
+            {
+                progress.Notes = notes;
+            }
 
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
@@ -183,16 +188,46 @@ public sealed class WorkflowService : IWorkflowService
             };
         }
 
-        return new StepProgress
-        {
-            Id = progress.Id,
-            ProjectId = progress.ProjectId,
-            PhaseId = progress.PhaseId,
-            StepNumber = progress.StepNumber,
-            Status = progress.Status,
-            Notes = progress.Notes,
-            CompletedUtc = progress.CompletedUtc,
-        };
+        return ToDomainProgress(progress);
+    }
+
+    public async Task<IReadOnlyList<StepProgress>> GetPhaseStepProgressAsync(
+        Guid projectId,
+        string phaseId,
+        CancellationToken cancellationToken = default)
+    {
+        var rootPath = RequireActiveRoot(projectId);
+        var databasePath = Path.Combine(rootPath, ProjectPaths.DatabaseFileName);
+
+        await using var context = ProjectDbContextFactory.Create(databasePath);
+        var progress = await context.StepProgress
+            .AsNoTracking()
+            .Where(item => item.ProjectId == projectId && item.PhaseId == phaseId)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        SqliteConnection.ClearAllPools();
+        return progress.Select(ToDomainProgress).ToList();
+    }
+
+    public async Task<PhaseGate?> GetPhaseGateAsync(
+        Guid projectId,
+        string phaseId,
+        CancellationToken cancellationToken = default)
+    {
+        var rootPath = RequireActiveRoot(projectId);
+        var databasePath = Path.Combine(rootPath, ProjectPaths.DatabaseFileName);
+
+        await using var context = ProjectDbContextFactory.Create(databasePath);
+        var gate = await context.PhaseGates
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                item => item.ProjectId == projectId && item.PhaseId == phaseId,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        SqliteConnection.ClearAllPools();
+        return gate is null ? null : ToDomainGate(gate);
     }
 
     public async Task<bool> CanPassGateAsync(
@@ -292,18 +327,7 @@ public sealed class WorkflowService : IWorkflowService
 
         SqliteConnection.ClearAllPools();
 
-        return new PhaseGate
-        {
-            Id = gate.Id,
-            ProjectId = gate.ProjectId,
-            PhaseId = gate.PhaseId,
-            IsPassed = gate.IsPassed,
-            ConfirmedByUser = gate.ConfirmedByUser,
-            Evidence = gate.Evidence,
-            Notes = gate.Notes,
-            OverrideReason = gate.OverrideReason,
-            PassedUtc = gate.PassedUtc,
-        };
+        return ToDomainGate(gate);
     }
 
     private string RequireActiveRoot(Guid projectId)
@@ -360,6 +384,30 @@ public sealed class WorkflowService : IWorkflowService
 
         return phase;
     }
+
+    private static StepProgress ToDomainProgress(StepProgressRecord progress) => new()
+    {
+        Id = progress.Id,
+        ProjectId = progress.ProjectId,
+        PhaseId = progress.PhaseId,
+        StepNumber = progress.StepNumber,
+        Status = progress.Status,
+        Notes = progress.Notes,
+        CompletedUtc = progress.CompletedUtc,
+    };
+
+    private static PhaseGate ToDomainGate(PhaseGateRecord gate) => new()
+    {
+        Id = gate.Id,
+        ProjectId = gate.ProjectId,
+        PhaseId = gate.PhaseId,
+        IsPassed = gate.IsPassed,
+        ConfirmedByUser = gate.ConfirmedByUser,
+        Evidence = gate.Evidence,
+        Notes = gate.Notes,
+        OverrideReason = gate.OverrideReason,
+        PassedUtc = gate.PassedUtc,
+    };
 }
 
 public static class WorkflowDefinitionImporter

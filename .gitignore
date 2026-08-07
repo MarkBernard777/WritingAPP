@@ -27,3 +27,5 @@ coverage/
 *.userosscache
 *.sln.docstates
 appsettings.*.local.json
+design-time.mbws
+**/design-time.mbws
