@@ -129,18 +129,7 @@ public sealed class SeedDocumentTemplateCatalog : FileDocumentTemplateCatalog
 
     private static string ResolveDefaultPath()
     {
-        var dir = new DirectoryInfo(AppContext.BaseDirectory);
-        while (dir is not null)
-        {
-            var candidate = Path.Combine(dir.FullName, "seed", "schemas", "document-templates.json");
-            if (File.Exists(candidate))
-            {
-                return candidate;
-            }
-
-            dir = dir.Parent;
-        }
-
-        throw new FileNotFoundException("Could not locate seed/schemas/document-templates.json.");
+        var seedRoot = SeedPaths.FindSeedRoot();
+        return SeedPaths.GetDocumentTemplatesPath(seedRoot);
     }
 }

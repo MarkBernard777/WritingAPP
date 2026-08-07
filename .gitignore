@@ -1,31 +1,8 @@
-## Build
+artifacts/
+*.mbws
 bin/
 obj/
-[Bb]uild/
-[Ll]og/
+.vs/
 *.user
 *.suo
-*.userprefs
-*.DotSettings.user
-
-## IDE / OS
-.vs/
-.idea/
-*.user
-*.swp
-Thumbs.db
-Desktop.ini
-
-## Test / coverage
-TestResults/
-coverage/
-*.coverage
-*.coveragexml
-
-## User / local
-*.user
-*.userosscache
-*.sln.docstates
-appsettings.*.local.json
 design-time.mbws
-**/design-time.mbws

@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using MasterBookWritingSystem.App.DependencyInjection;
+using MasterBookWritingSystem.Core.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -12,6 +13,22 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        var seedErrors = SeedPaths.ValidateRequiredSeedFiles();
+        if (seedErrors.Count > 0)
+        {
+            MessageBox.Show(
+                string.Join(Environment.NewLine, seedErrors)
+                + Environment.NewLine
+                + Environment.NewLine
+                + "The application cannot start without its seed templates. "
+                + "Reinstall or restore the seed folder next to the executable.",
+                "Master Book-Writing System — Missing seed content",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            Shutdown(1);
+            return;
+        }
 
         _host = Host.CreateDefaultBuilder()
             .ConfigureServices(static (_, services) => services.AddApplicationServices())

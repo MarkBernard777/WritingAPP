@@ -83,20 +83,5 @@ public static class DocumentSeeder
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public static string FindSeedRoot()
-    {
-        var dir = new DirectoryInfo(AppContext.BaseDirectory);
-        while (dir is not null)
-        {
-            var candidate = Path.Combine(dir.FullName, "seed");
-            if (Directory.Exists(candidate))
-            {
-                return candidate;
-            }
-
-            dir = dir.Parent;
-        }
-
-        throw new FileNotFoundException("Could not locate seed directory.");
-    }
+    public static string FindSeedRoot() => SeedPaths.FindSeedRoot();
 }

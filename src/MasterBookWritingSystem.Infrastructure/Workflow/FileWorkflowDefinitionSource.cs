@@ -115,24 +115,7 @@ public sealed class EmbeddedOrSeedWorkflowDefinitionSource : IWorkflowDefinition
 
     private static string ResolveDefaultPath()
     {
-        var dir = new DirectoryInfo(AppContext.BaseDirectory);
-        while (dir is not null)
-        {
-            var candidate = Path.Combine(dir.FullName, "seed", "workflow.json");
-            if (File.Exists(candidate))
-            {
-                return candidate;
-            }
-
-            dir = dir.Parent;
-        }
-
-        var relative = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "seed", "workflow.json"));
-        if (File.Exists(relative))
-        {
-            return relative;
-        }
-
-        throw new FileNotFoundException("Could not locate seed/workflow.json for workflow import.");
+        var seedRoot = SeedPaths.FindSeedRoot();
+        return SeedPaths.GetWorkflowPath(seedRoot);
     }
 }
