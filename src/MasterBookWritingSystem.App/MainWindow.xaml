@@ -100,7 +100,7 @@
                              Command="{Binding NavigateCommand}"
                              CommandParameter="{x:Static nav:AppSection.Publishing}"
                              IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Publishing, Mode=OneWay}" />
-                <RadioButton Content="Settings"
+                <RadioButton Content="Backup &amp; Export"
                              GroupName="Nav"
                              Style="{StaticResource NavRadioButtonStyle}"
                              Command="{Binding NavigateCommand}"

@@ -41,4 +41,29 @@ public sealed class WpfProjectDialogService : IProjectDialogService
             caption,
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning) == MessageBoxResult.Yes;
+
+    public string? PickOpenFile(string title, string filter)
+    {
+        var dialog = new OpenFileDialog
+        {
+            Title = title,
+            Filter = filter,
+            Multiselect = false,
+            CheckFileExists = true,
+        };
+        return dialog.ShowDialog() == true ? dialog.FileName : null;
+    }
+
+    public string? PickSaveFile(string title, string filter, string defaultFileName)
+    {
+        var dialog = new SaveFileDialog
+        {
+            Title = title,
+            Filter = filter,
+            FileName = defaultFileName,
+            AddExtension = true,
+            OverwritePrompt = true,
+        };
+        return dialog.ShowDialog() == true ? dialog.FileName : null;
+    }
 }

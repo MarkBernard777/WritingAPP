@@ -20,4 +20,8 @@ public interface IProjectDialogService
     void ShowMessage(string message, string caption);
 
     bool Confirm(string message, string caption);
+
+    string? PickOpenFile(string title, string filter);
+
+    string? PickSaveFile(string title, string filter, string defaultFileName);
 }

@@ -17,6 +17,3 @@ public abstract partial class PlaceholderViewModel : ObservableObject
 
 public sealed class PublishingViewModel()
     : PlaceholderViewModel("Publishing", "Publishing route, launch and post-publication modules will appear here.");
-
-public sealed class SettingsViewModel()
-    : PlaceholderViewModel("Settings", "Application preferences will appear here.");

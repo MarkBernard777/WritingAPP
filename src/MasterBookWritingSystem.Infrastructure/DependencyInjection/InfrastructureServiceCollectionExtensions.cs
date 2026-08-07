@@ -1,5 +1,6 @@
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Infrastructure.Dashboard;
+using MasterBookWritingSystem.Infrastructure.Backup;
 using MasterBookWritingSystem.Infrastructure.Documents;
 using MasterBookWritingSystem.Infrastructure.Manuscript;
 using MasterBookWritingSystem.Infrastructure.Paths;
@@ -25,6 +26,9 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddSingleton<IDocumentService, DocumentService>();
         services.AddSingleton<IIdeaService, IdeaService>();
         services.AddSingleton<IToolsReportExporter, ToolsReportExporter>();
+        services.AddSingleton<IExportService, ExportService>();
+        services.AddSingleton<ISnapshotService, SnapshotService>();
+        services.AddSingleton<IPortablePackageService, PortablePackageService>();
         services.AddSingleton<IStoryDataService, StoryDataService>();
         services.AddSingleton<IWorkflowService, WorkflowService>();
         services.AddSingleton<IDashboardService, DashboardService>();
