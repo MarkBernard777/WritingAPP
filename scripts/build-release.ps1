@@ -69,9 +69,10 @@ function Assert-PublishLayout([string]$publishDir) {
         throw "Publish validation failed: missing executable at $exe"
     }
 
-    $dlls = Get-ChildItem -LiteralPath $publishDir -Filter "*.dll" -File -ErrorAction SilentlyContinue
-    if ($null -eq $dlls -or $dlls.Count -lt 1) {
-        throw "Publish validation failed: no DLLs found under $publishDir (expected self-contained layout)."
+    # Single-file publish may leave few or no managed DLLs beside the exe; seed must still be external.
+    $exeInfo = Get-Item -LiteralPath $exe
+    if ($exeInfo.Length -lt 1MB) {
+        throw "Publish validation failed: executable looks too small for a self-contained single-file build ($exe)."
     }
 
     if (-not (Test-Path -LiteralPath $workflow)) {
@@ -91,7 +92,7 @@ function Assert-PublishLayout([string]$publishDir) {
         throw "Publish validation failed: no markdown templates under $core"
     }
 
-    Write-Host "Publish layout validated (exe, DLLs, seed)."
+    Write-Host "Publish layout validated (self-contained exe, seed)."
 }
 
 $repoRoot = Get-RepoRoot

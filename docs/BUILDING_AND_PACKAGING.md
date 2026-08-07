@@ -34,7 +34,7 @@ The script:
 
 1. Restores and builds in Release
 2. Runs `dotnet test`
-3. Publishes self-contained `win-x64` with `PublishTrimmed=false`
+3. Publishes self-contained single-file `win-x64` (`PublishSingleFile=true`, `PublishTrimmed=false`; `seed/` remains beside the exe)
 4. Validates the publish folder (exe, DLLs, `seed/`)
 5. Creates a portable ZIP
 6. Compiles the Inno Setup installer (fails clearly if `ISCC.exe` is missing)
