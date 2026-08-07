@@ -2,19 +2,32 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MasterBookWritingSystem.Core.Abstractions;
+using MasterBookWritingSystem.Core.Domain.Manuscript;
 using MasterBookWritingSystem.Core.Domain.Story;
+using MasterBookWritingSystem.Core.Story;
 
 namespace MasterBookWritingSystem.App.ViewModels;
 
 public partial class StoryDataViewModel : ObservableObject
 {
+    public const int ScenesTabIndex = 3;
+
     private readonly IProjectService _projectService;
     private readonly IStoryDataService _storyData;
+    private readonly IChapterService _chapters;
+    private readonly List<Scene> _allScenes = [];
+    private readonly Dictionary<Guid, Chapter> _chaptersById = [];
+    private readonly Dictionary<Guid, Character> _charactersById = [];
+    private bool _suppressSceneFilterReload;
 
-    public StoryDataViewModel(IProjectService projectService, IStoryDataService storyData)
+    public StoryDataViewModel(
+        IProjectService projectService,
+        IStoryDataService storyData,
+        IChapterService chapters)
     {
         _projectService = projectService;
         _storyData = storyData;
+        _chapters = chapters;
         _ = RefreshAsync();
     }
 
@@ -25,6 +38,12 @@ public partial class StoryDataViewModel : ObservableObject
     public ObservableCollection<BeatListItemViewModel> Beats { get; } = [];
 
     public ObservableCollection<SceneListItemViewModel> Scenes { get; } = [];
+
+    public ObservableCollection<ChapterOptionViewModel> ChapterOptions { get; } = [];
+
+    public ObservableCollection<ChapterFilterOptionViewModel> SceneChapterFilters { get; } = [];
+
+    public ObservableCollection<CharacterOptionViewModel> ViewpointCharacterOptions { get; } = [];
 
     public IReadOnlyList<WorldDepth> WorldDepthOptions { get; } = Enum.GetValues<WorldDepth>();
 
@@ -37,6 +56,12 @@ public partial class StoryDataViewModel : ObservableObject
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
+
+    [ObservableProperty]
+    private int _selectedTabIndex;
+
+    [ObservableProperty]
+    private ChapterFilterOptionViewModel? _selectedSceneChapterFilter;
 
     [ObservableProperty]
     private CharacterListItemViewModel? _selectedCharacter;
@@ -72,7 +97,33 @@ public partial class StoryDataViewModel : ObservableObject
         => BeatEditor = value is null ? null : BeatEditorViewModel.From(value.Source);
 
     partial void OnSelectedSceneChanged(SceneListItemViewModel? value)
-        => SceneEditor = value is null ? null : SceneEditorViewModel.From(value.Source);
+        => SceneEditor = value is null
+            ? null
+            : SceneEditorViewModel.From(value.Source, ChapterOptions, ViewpointCharacterOptions);
+
+    partial void OnSelectedSceneChapterFilterChanged(ChapterFilterOptionViewModel? value)
+    {
+        if (_suppressSceneFilterReload)
+        {
+            return;
+        }
+
+        RebuildSceneList(preserveSelectedId: SelectedScene?.Id);
+    }
+
+    public async Task FocusSceneAsync(Guid sceneId)
+    {
+        await RefreshAsync().ConfigureAwait(true);
+        SelectedTabIndex = ScenesTabIndex;
+        _suppressSceneFilterReload = true;
+        SelectedSceneChapterFilter = SceneChapterFilters.FirstOrDefault(item => item.IsAllChapters);
+        _suppressSceneFilterReload = false;
+        RebuildSceneList(preserveSelectedId: sceneId);
+        SelectedScene = Scenes.FirstOrDefault(item => item.Id == sceneId);
+        StatusMessage = SelectedScene is null
+            ? "Requested scene was not found."
+            : $"Opened scene '{SelectedScene.Source.Title}'.";
+    }
 
     [RelayCommand]
     private async Task RefreshAsync()
@@ -83,6 +134,12 @@ public partial class StoryDataViewModel : ObservableObject
         WorldEntries.Clear();
         Beats.Clear();
         Scenes.Clear();
+        ChapterOptions.Clear();
+        SceneChapterFilters.Clear();
+        ViewpointCharacterOptions.Clear();
+        _allScenes.Clear();
+        _chaptersById.Clear();
+        _charactersById.Clear();
         CharacterEditor = null;
         WorldEditor = null;
         BeatEditor = null;
@@ -99,6 +156,7 @@ public partial class StoryDataViewModel : ObservableObject
             foreach (var character in await _storyData.GetCharactersAsync(project.Id).ConfigureAwait(true))
             {
                 Characters.Add(new CharacterListItemViewModel(character));
+                _charactersById[character.Id] = character;
             }
 
             foreach (var entry in await _storyData.GetWorldEntriesAsync(project.Id).ConfigureAwait(true))
@@ -111,21 +169,77 @@ public partial class StoryDataViewModel : ObservableObject
                 Beats.Add(new BeatListItemViewModel(beat));
             }
 
-            foreach (var scene in await _storyData.GetScenesAsync(project.Id).ConfigureAwait(true))
-            {
-                Scenes.Add(new SceneListItemViewModel(scene));
-            }
+            RebuildChapterLookups(await _chapters.GetAllAsync(project.Id).ConfigureAwait(true));
+            _allScenes.AddRange(await _storyData.GetScenesAsync(project.Id).ConfigureAwait(true));
 
             SelectedCharacter = Characters.FirstOrDefault();
             SelectedWorldEntry = WorldEntries.FirstOrDefault();
             SelectedBeat = Beats.FirstOrDefault();
-            SelectedScene = Scenes.FirstOrDefault();
+
+            _suppressSceneFilterReload = true;
+            SelectedSceneChapterFilter = SceneChapterFilters.FirstOrDefault(item => item.IsAllChapters);
+            _suppressSceneFilterReload = false;
+            RebuildSceneList(preserveSelectedId: null);
             StatusMessage = string.Empty;
         }
         catch (Exception ex)
         {
             StatusMessage = ex.Message;
         }
+    }
+
+    private void RebuildChapterLookups(IReadOnlyList<Chapter> chapters)
+    {
+        ChapterOptions.Clear();
+        SceneChapterFilters.Clear();
+        ViewpointCharacterOptions.Clear();
+        _chaptersById.Clear();
+
+        ChapterOptions.Add(ChapterOptionViewModel.Unassigned());
+        SceneChapterFilters.Add(ChapterFilterOptionViewModel.All());
+        SceneChapterFilters.Add(ChapterFilterOptionViewModel.Unassigned());
+        ViewpointCharacterOptions.Add(CharacterOptionViewModel.Unassigned());
+
+        foreach (var chapter in chapters.OrderBy(item => item.SequenceNumber))
+        {
+            _chaptersById[chapter.Id] = chapter;
+            var option = ChapterOptionViewModel.From(chapter);
+            ChapterOptions.Add(option);
+            SceneChapterFilters.Add(ChapterFilterOptionViewModel.From(chapter));
+        }
+
+        foreach (var character in Characters)
+        {
+            ViewpointCharacterOptions.Add(CharacterOptionViewModel.From(character.Source));
+        }
+    }
+
+    private void RebuildSceneList(Guid? preserveSelectedId)
+    {
+        var filter = SelectedSceneChapterFilter;
+        var filtered = SceneChapterOrdering.FilterByChapter(
+            _allScenes,
+            filter?.ChapterId,
+            unassignedOnly: filter?.IsUnassignedOnly == true);
+        var sequences = _chaptersById.ToDictionary(pair => pair.Key, pair => pair.Value.SequenceNumber);
+        var ordered = SceneChapterOrdering.OrderByChapterThenSequence(filtered, sequences);
+
+        Scenes.Clear();
+        foreach (var scene in ordered)
+        {
+            var chapterLabel = scene.ChapterId is { } chapterId && _chaptersById.TryGetValue(chapterId, out var chapter)
+                ? SceneChapterOrdering.FormatChapterLabel(chapter.SequenceNumber, chapter.Title)
+                : SceneChapterOrdering.UnassignedLabel;
+            var pov = scene.ViewpointCharacterId is { } characterId
+                && _charactersById.TryGetValue(characterId, out var character)
+                ? character.Name
+                : string.Empty;
+            Scenes.Add(new SceneListItemViewModel(scene, chapterLabel, pov));
+        }
+
+        SelectedScene = preserveSelectedId is { } id
+            ? Scenes.FirstOrDefault(item => item.Id == id) ?? Scenes.FirstOrDefault()
+            : Scenes.FirstOrDefault();
     }
 
     [RelayCommand]
@@ -358,15 +472,20 @@ public partial class StoryDataViewModel : ObservableObject
 
         try
         {
-            var nextSequence = Scenes.Count == 0 ? 1 : Scenes.Max(item => item.SequenceNumber) + 1;
+            var nextSequence = _allScenes.Count == 0 ? 1 : _allScenes.Max(item => item.SequenceNumber) + 1;
+            Guid? preferredChapterId = SelectedSceneChapterFilter is { IsAllChapters: false, IsUnassignedOnly: false } filter
+                ? filter.ChapterId
+                : null;
             var created = await _storyData.CreateSceneAsync(project.Id, new Scene
             {
                 Id = Guid.NewGuid(),
                 ProjectId = project.Id,
                 SequenceNumber = nextSequence,
                 Title = $"Scene {nextSequence}",
+                ChapterId = preferredChapterId,
             }).ConfigureAwait(true);
             await RefreshAsync().ConfigureAwait(true);
+            SelectedTabIndex = ScenesTabIndex;
             SelectedScene = Scenes.FirstOrDefault(item => item.Id == created.Id);
             StatusMessage = "Scene created.";
         }
@@ -455,7 +574,7 @@ public sealed class BeatListItemViewModel(Beat source)
     public string DisplayName => $"{Source.Number}. {Source.Name}";
 }
 
-public sealed class SceneListItemViewModel(Scene source)
+public sealed class SceneListItemViewModel(Scene source, string chapterDisplayName, string viewpointDisplayName)
 {
     public Scene Source { get; } = source;
 
@@ -463,7 +582,90 @@ public sealed class SceneListItemViewModel(Scene source)
 
     public int SequenceNumber => Source.SequenceNumber;
 
-    public string DisplayName => $"{Source.SequenceNumber}. {Source.Title}";
+    public string ChapterDisplayName { get; } = chapterDisplayName;
+
+    public string ViewpointDisplayName { get; } = viewpointDisplayName;
+
+    public string Title => Source.Title;
+
+    public string Location => Source.Location;
+
+    public SceneDraftStatus Status => Source.Status;
+
+    public string DisplayName => $"{Source.SequenceNumber}. {Source.Title} — {ChapterDisplayName}";
+}
+
+public sealed class ChapterOptionViewModel
+{
+    private ChapterOptionViewModel(Guid? chapterId, string displayName, int sequenceNumber)
+    {
+        ChapterId = chapterId;
+        DisplayName = displayName;
+        SequenceNumber = sequenceNumber;
+    }
+
+    public Guid? ChapterId { get; }
+
+    public string DisplayName { get; }
+
+    public int SequenceNumber { get; }
+
+    public static ChapterOptionViewModel Unassigned()
+        => new(null, SceneChapterOrdering.UnassignedLabel, int.MaxValue);
+
+    public static ChapterOptionViewModel From(Chapter chapter)
+        => new(chapter.Id, SceneChapterOrdering.FormatChapterLabel(chapter.SequenceNumber, chapter.Title), chapter.SequenceNumber);
+}
+
+public sealed class ChapterFilterOptionViewModel
+{
+    private ChapterFilterOptionViewModel(Guid? chapterId, string displayName, bool isAllChapters, bool isUnassignedOnly)
+    {
+        ChapterId = chapterId;
+        DisplayName = displayName;
+        IsAllChapters = isAllChapters;
+        IsUnassignedOnly = isUnassignedOnly;
+    }
+
+    public Guid? ChapterId { get; }
+
+    public string DisplayName { get; }
+
+    public bool IsAllChapters { get; }
+
+    public bool IsUnassignedOnly { get; }
+
+    public static ChapterFilterOptionViewModel All()
+        => new(null, "All Chapters", isAllChapters: true, isUnassignedOnly: false);
+
+    public static ChapterFilterOptionViewModel Unassigned()
+        => new(null, SceneChapterOrdering.UnassignedLabel, isAllChapters: false, isUnassignedOnly: true);
+
+    public static ChapterFilterOptionViewModel From(Chapter chapter)
+        => new(
+            chapter.Id,
+            SceneChapterOrdering.FormatChapterLabel(chapter.SequenceNumber, chapter.Title),
+            isAllChapters: false,
+            isUnassignedOnly: false);
+}
+
+public sealed class CharacterOptionViewModel
+{
+    private CharacterOptionViewModel(Guid? characterId, string displayName)
+    {
+        CharacterId = characterId;
+        DisplayName = displayName;
+    }
+
+    public Guid? CharacterId { get; }
+
+    public string DisplayName { get; }
+
+    public static CharacterOptionViewModel Unassigned()
+        => new(null, "(None)");
+
+    public static CharacterOptionViewModel From(Character character)
+        => new(character.Id, character.Name);
 }
 
 public partial class CharacterEditorViewModel : ObservableObject
@@ -652,10 +854,14 @@ public partial class SceneEditorViewModel : ObservableObject
 
     public Guid ProjectId { get; private set; }
 
-    [ObservableProperty] private string _chapterIdText = string.Empty;
+    public ObservableCollection<ChapterOptionViewModel> ChapterOptions { get; private set; } = [];
+
+    public ObservableCollection<CharacterOptionViewModel> ViewpointCharacterOptions { get; private set; } = [];
+
+    [ObservableProperty] private ChapterOptionViewModel? _selectedChapterOption;
     [ObservableProperty] private int _sequenceNumber = 1;
     [ObservableProperty] private string _title = string.Empty;
-    [ObservableProperty] private string _viewpointCharacterIdText = string.Empty;
+    [ObservableProperty] private CharacterOptionViewModel? _selectedViewpointCharacter;
     [ObservableProperty] private string _location = string.Empty;
     [ObservableProperty] private string _time = string.Empty;
     [ObservableProperty] private string _goal = string.Empty;
@@ -673,40 +879,52 @@ public partial class SceneEditorViewModel : ObservableObject
     [ObservableProperty] private SceneDraftStatus _status = SceneDraftStatus.Outlined;
     [ObservableProperty] private int _wordCount;
 
-    public static SceneEditorViewModel From(Scene scene) => new()
+    public static SceneEditorViewModel From(
+        Scene scene,
+        IEnumerable<ChapterOptionViewModel> chapterOptions,
+        IEnumerable<CharacterOptionViewModel> viewpointOptions)
     {
-        Id = scene.Id,
-        ProjectId = scene.ProjectId,
-        ChapterIdText = scene.ChapterId?.ToString() ?? string.Empty,
-        SequenceNumber = scene.SequenceNumber,
-        Title = scene.Title,
-        ViewpointCharacterIdText = scene.ViewpointCharacterId?.ToString() ?? string.Empty,
-        Location = scene.Location,
-        Time = scene.Time,
-        Goal = scene.Goal,
-        Opposition = scene.Opposition,
-        Stakes = scene.Stakes,
-        MainEvent = scene.MainEvent,
-        Revelation = scene.Revelation,
-        EmotionalTurn = scene.EmotionalTurn,
-        Choice = scene.Choice,
-        Outcome = scene.Outcome,
-        Consequence = scene.Consequence,
-        SetupObligations = scene.SetupObligations,
-        PayoffObligations = scene.PayoffObligations,
-        NextSceneIdText = scene.NextSceneId?.ToString() ?? string.Empty,
-        Status = scene.Status,
-        WordCount = scene.WordCount,
-    };
+        var chapters = new ObservableCollection<ChapterOptionViewModel>(chapterOptions);
+        var viewpoints = new ObservableCollection<CharacterOptionViewModel>(viewpointOptions);
+        return new SceneEditorViewModel
+        {
+            Id = scene.Id,
+            ProjectId = scene.ProjectId,
+            ChapterOptions = chapters,
+            ViewpointCharacterOptions = viewpoints,
+            SelectedChapterOption = chapters.FirstOrDefault(item => item.ChapterId == scene.ChapterId)
+                ?? chapters.FirstOrDefault(item => item.ChapterId is null),
+            SequenceNumber = scene.SequenceNumber,
+            Title = scene.Title,
+            SelectedViewpointCharacter = viewpoints.FirstOrDefault(item => item.CharacterId == scene.ViewpointCharacterId)
+                ?? viewpoints.FirstOrDefault(item => item.CharacterId is null),
+            Location = scene.Location,
+            Time = scene.Time,
+            Goal = scene.Goal,
+            Opposition = scene.Opposition,
+            Stakes = scene.Stakes,
+            MainEvent = scene.MainEvent,
+            Revelation = scene.Revelation,
+            EmotionalTurn = scene.EmotionalTurn,
+            Choice = scene.Choice,
+            Outcome = scene.Outcome,
+            Consequence = scene.Consequence,
+            SetupObligations = scene.SetupObligations,
+            PayoffObligations = scene.PayoffObligations,
+            NextSceneIdText = scene.NextSceneId?.ToString() ?? string.Empty,
+            Status = scene.Status,
+            WordCount = scene.WordCount,
+        };
+    }
 
     public Scene ToModel() => new()
     {
         Id = Id,
         ProjectId = ProjectId,
-        ChapterId = ParseOptionalGuid(ChapterIdText),
+        ChapterId = SelectedChapterOption?.ChapterId,
         SequenceNumber = SequenceNumber,
         Title = Title,
-        ViewpointCharacterId = ParseOptionalGuid(ViewpointCharacterIdText),
+        ViewpointCharacterId = SelectedViewpointCharacter?.CharacterId,
         Location = Location,
         Time = Time,
         Goal = Goal,

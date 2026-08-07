@@ -29,7 +29,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TabControl>
+            <TabControl SelectedIndex="{Binding SelectedTabIndex}">
                 <TabItem Header="Characters">
                     <Grid Margin="8">
                         <Grid.ColumnDefinitions>
@@ -195,10 +195,17 @@
                 <TabItem Header="Scenes">
                     <Grid Margin="8">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="280" />
+                            <ColumnDefinition Width="300" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                                <TextBlock Text="Filter by chapter" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding SceneChapterFilters}"
+                                          SelectedItem="{Binding SelectedSceneChapterFilter}"
+                                          DisplayMemberPath="DisplayName"
+                                          Margin="0,4,0,0" />
+                            </StackPanel>
                             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
                                 <Button Content="Add" Width="70" Command="{Binding AddSceneCommand}" Margin="0,0,8,0" />
                                 <Button Content="Delete" Width="70" Command="{Binding DeleteSceneCommand}" />
@@ -214,10 +221,16 @@
                                 <TextBox Text="{Binding SequenceNumber, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
                                 <TextBlock Text="Title *" FontWeight="SemiBold" />
                                 <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
-                                <TextBlock Text="Chapter Id" FontWeight="SemiBold" />
-                                <TextBox Text="{Binding ChapterIdText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
-                                <TextBlock Text="Viewpoint character Id" FontWeight="SemiBold" />
-                                <TextBox Text="{Binding ViewpointCharacterIdText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Chapter" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding ChapterOptions}"
+                                          SelectedItem="{Binding SelectedChapterOption}"
+                                          DisplayMemberPath="DisplayName"
+                                          Margin="0,4,0,8" />
+                                <TextBlock Text="Viewpoint character" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding ViewpointCharacterOptions}"
+                                          SelectedItem="{Binding SelectedViewpointCharacter}"
+                                          DisplayMemberPath="DisplayName"
+                                          Margin="0,4,0,8" />
                                 <TextBlock Text="Location" FontWeight="SemiBold" />
                                 <TextBox Text="{Binding Location, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
                                 <TextBlock Text="Time" FontWeight="SemiBold" />

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MasterBookWritingSystem.App.Navigation;
 using MasterBookWritingSystem.App.Services;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Manuscript;
@@ -12,6 +13,8 @@ public partial class ManuscriptViewModel : ObservableObject
 {
     private readonly IProjectService _projectService;
     private readonly IChapterService _chapterService;
+    private readonly IStoryDataService _storyData;
+    private readonly INavigationService _navigation;
     private readonly IProjectDialogService _dialogs;
     private string _savedContent = string.Empty;
     private bool _suppressDirty;
@@ -21,10 +24,14 @@ public partial class ManuscriptViewModel : ObservableObject
     public ManuscriptViewModel(
         IProjectService projectService,
         IChapterService chapterService,
+        IStoryDataService storyData,
+        INavigationService navigation,
         IProjectDialogService dialogs)
     {
         _projectService = projectService;
         _chapterService = chapterService;
+        _storyData = storyData;
+        _navigation = navigation;
         _dialogs = dialogs;
         _ = RefreshAsync();
     }
@@ -32,6 +39,8 @@ public partial class ManuscriptViewModel : ObservableObject
     public ObservableCollection<ChapterListItemViewModel> Chapters { get; } = [];
 
     public ObservableCollection<BracketNoteItemViewModel> BracketNotes { get; } = [];
+
+    public ObservableCollection<LinkedSceneItemViewModel> LinkedScenes { get; } = [];
 
     [ObservableProperty]
     private bool _hasProject;
@@ -59,6 +68,9 @@ public partial class ManuscriptViewModel : ObservableObject
 
     [ObservableProperty]
     private string _exportFileName = $"manuscript-{DateTime.Now:yyyyMMdd-HHmmss}.md";
+
+    [ObservableProperty]
+    private LinkedSceneItemViewModel? _selectedLinkedScene;
 
     partial void OnSelectedChapterChanged(ChapterListItemViewModel? value)
     {
@@ -95,6 +107,8 @@ public partial class ManuscriptViewModel : ObservableObject
         HasProject = project is not null;
         Chapters.Clear();
         BracketNotes.Clear();
+        LinkedScenes.Clear();
+        SelectedLinkedScene = null;
         _loadedChapterId = null;
         SetEditorContent(string.Empty, markClean: true);
         ChapterTitle = string.Empty;
@@ -346,6 +360,8 @@ public partial class ManuscriptViewModel : ObservableObject
         {
             ChapterTitle = string.Empty;
             _loadedChapterId = null;
+            LinkedScenes.Clear();
+            SelectedLinkedScene = null;
             SetEditorContent(string.Empty, markClean: true);
             return;
         }
@@ -356,12 +372,42 @@ public partial class ManuscriptViewModel : ObservableObject
             var content = await _chapterService.LoadContentAsync(project.Id, value.Id).ConfigureAwait(true);
             SetEditorContent(content, markClean: true);
             _loadedChapterId = value.Id;
+            await LoadLinkedScenesAsync(project.Id, value.Id).ConfigureAwait(true);
             StatusMessage = string.Empty;
         }
         catch (Exception ex)
         {
             StatusMessage = ex.Message;
         }
+    }
+
+    [RelayCommand]
+    private void OpenLinkedSceneInStoryData()
+    {
+        var scene = SelectedLinkedScene;
+        if (scene is null)
+        {
+            StatusMessage = "Select a linked scene first.";
+            return;
+        }
+
+        _navigation.NavigateToStoryDataScene(scene.Id);
+    }
+
+    private async Task LoadLinkedScenesAsync(Guid projectId, Guid chapterId)
+    {
+        LinkedScenes.Clear();
+        SelectedLinkedScene = null;
+        var scenes = await _storyData.GetScenesAsync(projectId).ConfigureAwait(true);
+        foreach (var scene in scenes
+                     .Where(item => item.ChapterId == chapterId)
+                     .OrderBy(item => item.SequenceNumber)
+                     .ThenBy(item => item.Title, StringComparer.OrdinalIgnoreCase))
+        {
+            LinkedScenes.Add(new LinkedSceneItemViewModel(scene));
+        }
+
+        SelectedLinkedScene = LinkedScenes.FirstOrDefault();
     }
 
     private async Task ReloadListAsync(Guid? selectId)
@@ -462,4 +508,13 @@ public partial class ChapterListItemViewModel : ObservableObject
 public sealed class BracketNoteItemViewModel(BracketNote note)
 {
     public string Display => $"Line {note.LineNumber}: {note.Marker} — {note.LineText}";
+}
+
+public sealed class LinkedSceneItemViewModel(Core.Domain.Story.Scene source)
+{
+    public Core.Domain.Story.Scene Source { get; } = source;
+
+    public Guid Id => Source.Id;
+
+    public string DisplayName => $"{Source.SequenceNumber}. {Source.Title} ({Source.Status})";
 }

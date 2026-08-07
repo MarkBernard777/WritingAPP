@@ -73,7 +73,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="140" />
+                    <RowDefinition Height="120" />
+                    <RowDefinition Height="120" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
@@ -117,13 +118,29 @@
                 </Grid>
 
                 <DockPanel Grid.Row="2" Margin="0,12,0,0">
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
+                        <Button DockPanel.Dock="Right"
+                                Content="Open in Story Data"
+                                Padding="10,4"
+                                Command="{Binding OpenLinkedSceneInStoryDataCommand}" />
+                        <TextBlock Text="Linked scenes (read-only)"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center" />
+                    </DockPanel>
+                    <ListBox ItemsSource="{Binding LinkedScenes}"
+                             SelectedItem="{Binding SelectedLinkedScene}"
+                             DisplayMemberPath="DisplayName"
+                             BorderBrush="#E2E8F0" />
+                </DockPanel>
+
+                <DockPanel Grid.Row="3" Margin="0,12,0,0">
                     <TextBlock DockPanel.Dock="Top" Text="Bracket notes" FontWeight="SemiBold" Margin="0,0,0,6" />
                     <ListBox ItemsSource="{Binding BracketNotes}"
                              DisplayMemberPath="Display"
                              BorderBrush="#E2E8F0" />
                 </DockPanel>
 
-                <DockPanel Grid.Row="3" Margin="0,10,0,0">
+                <DockPanel Grid.Row="4" Margin="0,10,0,0">
                     <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center">
                         <Run Text="{Binding WordCount, Mode=OneWay}" />
                         <Run Text=" words" />

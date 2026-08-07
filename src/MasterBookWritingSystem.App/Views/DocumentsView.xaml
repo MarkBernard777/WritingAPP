@@ -60,39 +60,77 @@
                                Margin="0,0,0,8" />
                     <TextBlock Text="{Binding ValidationMessage}"
                                Margin="0,0,0,12"
-                               Opacity="0.8" />
+                               Opacity="0.8"
+                               TextWrapping="Wrap" />
 
-                    <TextBlock Text="Structured fields" FontWeight="SemiBold" Margin="0,0,0,8" />
-                    <ItemsControl ItemsSource="{Binding Fields}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="0,8">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
-                                            <TextBlock Text="{Binding Label}" FontWeight="SemiBold" />
-                                            <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
-                                                     Margin="0,6,0,0"
-                                                     MinHeight="40"
-                                                     TextWrapping="Wrap"
-                                                     AcceptsReturn="True" />
-                                        </StackPanel>
-                                        <Button Grid.Column="1"
-                                                Content="Save"
-                                                VerticalAlignment="Center"
-                                                Padding="10,4"
-                                                Command="{Binding DataContext.SaveFieldCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <StackPanel Visibility="{Binding IsSceneListDocument, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Text="{Binding SceneInventoryExplanation}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12" />
+                        <TextBlock Text="Scene inventory" FontWeight="SemiBold" Margin="0,0,0,8" />
+                        <DataGrid ItemsSource="{Binding SceneInventory}"
+                                  SelectedItem="{Binding SelectedInventoryScene}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  HeadersVisibility="Column"
+                                  SelectionMode="Single"
+                                  MinHeight="180"
+                                  MaxHeight="360"
+                                  Margin="0,0,0,8">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="#" Binding="{Binding SequenceNumber}" Width="40" />
+                                <DataGridTextColumn Header="Chapter" Binding="{Binding ChapterDisplayName}" Width="*" />
+                                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*" />
+                                <DataGridTextColumn Header="POV" Binding="{Binding ViewpointDisplayName}" Width="100" />
+                                <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="100" />
+                                <DataGridTextColumn Header="Status" Binding="{Binding StatusDisplay}" Width="90" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Button Content="Open / Edit in Story Data"
+                                HorizontalAlignment="Left"
+                                Padding="12,6"
+                                Margin="0,0,0,16"
+                                Command="{Binding OpenSelectedSceneInStoryDataCommand}" />
+                        <TextBlock Text="Optional document notes (not the scene inventory)"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,8" />
+                    </StackPanel>
 
-                    <TextBlock Text="Markdown notes" FontWeight="SemiBold" Margin="0,20,0,8" />
+                    <StackPanel Visibility="{Binding IsSceneListDocument, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}">
+                        <TextBlock Text="Structured fields" FontWeight="SemiBold" Margin="0,0,0,8" />
+                        <ItemsControl ItemsSource="{Binding Fields}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="0,8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                                <TextBlock Text="{Binding Label}" FontWeight="SemiBold" />
+                                                <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                                                         Margin="0,6,0,0"
+                                                         MinHeight="40"
+                                                         TextWrapping="Wrap"
+                                                         AcceptsReturn="True" />
+                                            </StackPanel>
+                                            <Button Grid.Column="1"
+                                                    Content="Save"
+                                                    VerticalAlignment="Center"
+                                                    Padding="10,4"
+                                                    Command="{Binding DataContext.SaveFieldCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="Markdown notes" FontWeight="SemiBold" Margin="0,20,0,8" />
+                    </StackPanel>
+
                     <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
                              Height="100"
                              TextWrapping="Wrap"
