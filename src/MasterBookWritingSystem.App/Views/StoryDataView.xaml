@@ -1,6 +1,272 @@
 <UserControl x:Class="MasterBookWritingSystem.App.Views.StoryDataView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:views="clr-namespace:MasterBookWritingSystem.App.Views">
-    <views:PlaceholderView />
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,12">
+            <Button DockPanel.Dock="Right"
+                    Content="Refresh"
+                    Width="90"
+                    Command="{Binding RefreshCommand}" />
+            <TextBlock Text="Story Data"
+                       FontSize="26"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center" />
+        </DockPanel>
+
+        <TextBlock Grid.Row="1"
+                   Text="{Binding StatusMessage}"
+                   Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
+                   TextWrapping="Wrap" />
+
+        <Grid Grid.Row="1" Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TabControl>
+                <TabItem Header="Characters">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="280" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Content="Add" Width="70" Command="{Binding AddCharacterCommand}" Margin="0,0,8,0" />
+                                <Button Content="Delete" Width="70" Command="{Binding DeleteCharacterCommand}" />
+                            </StackPanel>
+                            <ListBox ItemsSource="{Binding Characters}"
+                                     SelectedItem="{Binding SelectedCharacter}"
+                                     DisplayMemberPath="DisplayName" />
+                        </DockPanel>
+                        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                                      DataContext="{Binding CharacterEditor}">
+                            <StackPanel>
+                                <TextBlock Text="Name *" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Role" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Role, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Goal" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Goal, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Need" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Need, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Fear" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Fear, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Wound" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Wound, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="False belief" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding FalseBelief, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Contradiction" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Contradiction, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Skills" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Skills, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Weaknesses" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Weaknesses, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Resources" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Resources, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Relationships notes" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding RelationshipsNotes, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60" />
+                                <TextBlock Text="Starting state" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding StartingState, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Ending state" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding EndingState, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Book arc" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding BookArc, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Series arc" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding SeriesArc, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <CheckBox Content="Viewpoint character" IsChecked="{Binding IsViewpoint}" Margin="0,0,0,8" />
+                                <TextBlock Text="Scene appearances notes" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding SceneAppearancesNotes, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60" />
+                                <Button Content="Save character"
+                                        HorizontalAlignment="Left"
+                                        Padding="12,6"
+                                        Command="{Binding DataContext.SaveCharacterCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="World">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="280" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Content="Add" Width="70" Command="{Binding AddWorldEntryCommand}" Margin="0,0,8,0" />
+                                <Button Content="Delete" Width="70" Command="{Binding DeleteWorldEntryCommand}" />
+                            </StackPanel>
+                            <ListBox ItemsSource="{Binding WorldEntries}"
+                                     SelectedItem="{Binding SelectedWorldEntry}"
+                                     DisplayMemberPath="DisplayName" />
+                        </DockPanel>
+                        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                                      DataContext="{Binding WorldEditor}">
+                            <StackPanel>
+                                <TextBlock Text="Name *" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Category" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Category, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Depth" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding DataContext.WorldDepthOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          SelectedItem="{Binding Depth}"
+                                          Margin="0,4,0,8" />
+                                <TextBlock Text="Notes" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60" />
+                                <TextBlock Text="Travel distance" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding TravelDistance, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Travel time" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding TravelTime, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Canonical facts" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding CanonicalFacts, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60" />
+                                <TextBlock Text="Conflicting entries" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding ConflictingEntries, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60" />
+                                <Button Content="Save world entry"
+                                        HorizontalAlignment="Left"
+                                        Padding="12,6"
+                                        Command="{Binding DataContext.SaveWorldEntryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="Beats">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="280" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Content="Add" Width="70" Command="{Binding AddBeatCommand}" Margin="0,0,8,0" />
+                                <Button Content="Delete" Width="70" Command="{Binding DeleteBeatCommand}" />
+                            </StackPanel>
+                            <ListBox ItemsSource="{Binding Beats}"
+                                     SelectedItem="{Binding SelectedBeat}"
+                                     DisplayMemberPath="DisplayName" />
+                        </DockPanel>
+                        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                                      DataContext="{Binding BeatEditor}">
+                            <StackPanel>
+                                <TextBlock Text="Number *" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Number, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Name *" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Summary" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Summary, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60" />
+                                <TextBlock Text="Chapter ref" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding ChapterRef, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Scene ref" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding SceneRef, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Viewpoint character Id" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding ViewpointCharacterIdText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Event" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Event, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Cause" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Cause, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Consequence" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Consequence, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Arc function" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding ArcFunction, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Theme" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Theme, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Escalation" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Escalation, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Status" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding DataContext.BeatStatusOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          SelectedItem="{Binding Status}"
+                                          Margin="0,4,0,8" />
+                                <Button Content="Save beat"
+                                        HorizontalAlignment="Left"
+                                        Padding="12,6"
+                                        Command="{Binding DataContext.SaveBeatCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="Scenes">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="280" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Content="Add" Width="70" Command="{Binding AddSceneCommand}" Margin="0,0,8,0" />
+                                <Button Content="Delete" Width="70" Command="{Binding DeleteSceneCommand}" />
+                            </StackPanel>
+                            <ListBox ItemsSource="{Binding Scenes}"
+                                     SelectedItem="{Binding SelectedScene}"
+                                     DisplayMemberPath="DisplayName" />
+                        </DockPanel>
+                        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                                      DataContext="{Binding SceneEditor}">
+                            <StackPanel>
+                                <TextBlock Text="Sequence *" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding SequenceNumber, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Title *" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Chapter Id" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding ChapterIdText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Viewpoint character Id" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding ViewpointCharacterIdText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Location" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Location, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Time" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Time, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Goal" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Goal, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Opposition" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Opposition, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Stakes" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Stakes, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Main event" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding MainEvent, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Revelation" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Revelation, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Emotional turn" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding EmotionalTurn, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Choice" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Choice, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Outcome" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Outcome, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Consequence" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding Consequence, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Setup obligations" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding SetupObligations, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Payoff obligations" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding PayoffObligations, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                                <TextBlock Text="Next scene Id" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding NextSceneIdText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <TextBlock Text="Status" FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding DataContext.SceneStatusOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          SelectedItem="{Binding Status}"
+                                          Margin="0,4,0,8" />
+                                <TextBlock Text="Word count" FontWeight="SemiBold" />
+                                <TextBox Text="{Binding WordCount, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                                <Button Content="Save scene"
+                                        HorizontalAlignment="Left"
+                                        Padding="12,6"
+                                        Command="{Binding DataContext.SaveSceneCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+
+            <TextBlock Grid.Row="1"
+                       Text="{Binding StatusMessage}"
+                       Foreground="#276749"
+                       Margin="0,12,0,0"
+                       TextWrapping="Wrap" />
+        </Grid>
+    </Grid>
 </UserControl>

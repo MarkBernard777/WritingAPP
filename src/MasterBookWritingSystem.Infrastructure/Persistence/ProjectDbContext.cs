@@ -28,6 +28,14 @@ public sealed class ProjectDbContext : DbContext
 
     public DbSet<DocumentFieldRecord> DocumentFields => Set<DocumentFieldRecord>();
 
+    public DbSet<CharacterRecord> Characters => Set<CharacterRecord>();
+
+    public DbSet<WorldEntryRecord> WorldEntries => Set<WorldEntryRecord>();
+
+    public DbSet<BeatRecord> Beats => Set<BeatRecord>();
+
+    public DbSet<SceneRecord> Scenes => Set<SceneRecord>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ProjectRecord>(entity =>
@@ -141,6 +149,85 @@ public sealed class ProjectDbContext : DbContext
                 .WithMany(document => document.Fields)
                 .HasForeignKey(field => field.DocumentId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CharacterRecord>(entity =>
+        {
+            entity.ToTable("Characters");
+            entity.HasKey(character => character.Id);
+            entity.Property(character => character.Name).HasMaxLength(500).IsRequired();
+            entity.Property(character => character.Role).HasMaxLength(200);
+            entity.Property(character => character.Goal).HasMaxLength(4000);
+            entity.Property(character => character.Need).HasMaxLength(4000);
+            entity.Property(character => character.Fear).HasMaxLength(4000);
+            entity.Property(character => character.Wound).HasMaxLength(4000);
+            entity.Property(character => character.FalseBelief).HasMaxLength(4000);
+            entity.Property(character => character.Contradiction).HasMaxLength(4000);
+            entity.Property(character => character.Skills).HasMaxLength(4000);
+            entity.Property(character => character.Weaknesses).HasMaxLength(4000);
+            entity.Property(character => character.Resources).HasMaxLength(4000);
+            entity.Property(character => character.RelationshipsNotes).HasMaxLength(8000);
+            entity.Property(character => character.StartingState).HasMaxLength(4000);
+            entity.Property(character => character.EndingState).HasMaxLength(4000);
+            entity.Property(character => character.BookArc).HasMaxLength(4000);
+            entity.Property(character => character.SeriesArc).HasMaxLength(4000);
+            entity.Property(character => character.SceneAppearancesNotes).HasMaxLength(8000);
+            entity.HasIndex(character => new { character.ProjectId, character.Name });
+        });
+
+        modelBuilder.Entity<WorldEntryRecord>(entity =>
+        {
+            entity.ToTable("WorldEntries");
+            entity.HasKey(entry => entry.Id);
+            entity.Property(entry => entry.Name).HasMaxLength(500).IsRequired();
+            entity.Property(entry => entry.Category).HasMaxLength(200);
+            entity.Property(entry => entry.Depth).HasConversion<int>();
+            entity.Property(entry => entry.Notes).HasMaxLength(8000);
+            entity.Property(entry => entry.TravelDistance).HasMaxLength(500);
+            entity.Property(entry => entry.TravelTime).HasMaxLength(500);
+            entity.Property(entry => entry.CanonicalFacts).HasMaxLength(8000);
+            entity.Property(entry => entry.ConflictingEntries).HasMaxLength(8000);
+            entity.HasIndex(entry => new { entry.ProjectId, entry.Category, entry.Name });
+        });
+
+        modelBuilder.Entity<BeatRecord>(entity =>
+        {
+            entity.ToTable("Beats");
+            entity.HasKey(beat => beat.Id);
+            entity.Property(beat => beat.Name).HasMaxLength(500).IsRequired();
+            entity.Property(beat => beat.Summary).HasMaxLength(8000);
+            entity.Property(beat => beat.ChapterRef).HasMaxLength(200);
+            entity.Property(beat => beat.SceneRef).HasMaxLength(200);
+            entity.Property(beat => beat.Event).HasMaxLength(4000);
+            entity.Property(beat => beat.Cause).HasMaxLength(4000);
+            entity.Property(beat => beat.Consequence).HasMaxLength(4000);
+            entity.Property(beat => beat.ArcFunction).HasMaxLength(500);
+            entity.Property(beat => beat.Theme).HasMaxLength(500);
+            entity.Property(beat => beat.Escalation).HasMaxLength(4000);
+            entity.Property(beat => beat.Status).HasConversion<int>();
+            entity.HasIndex(beat => new { beat.ProjectId, beat.Number }).IsUnique();
+        });
+
+        modelBuilder.Entity<SceneRecord>(entity =>
+        {
+            entity.ToTable("Scenes");
+            entity.HasKey(scene => scene.Id);
+            entity.Property(scene => scene.Title).HasMaxLength(500).IsRequired();
+            entity.Property(scene => scene.Location).HasMaxLength(500);
+            entity.Property(scene => scene.Time).HasMaxLength(500);
+            entity.Property(scene => scene.Goal).HasMaxLength(4000);
+            entity.Property(scene => scene.Opposition).HasMaxLength(4000);
+            entity.Property(scene => scene.Stakes).HasMaxLength(4000);
+            entity.Property(scene => scene.MainEvent).HasMaxLength(4000);
+            entity.Property(scene => scene.Revelation).HasMaxLength(4000);
+            entity.Property(scene => scene.EmotionalTurn).HasMaxLength(4000);
+            entity.Property(scene => scene.Choice).HasMaxLength(4000);
+            entity.Property(scene => scene.Outcome).HasMaxLength(4000);
+            entity.Property(scene => scene.Consequence).HasMaxLength(4000);
+            entity.Property(scene => scene.SetupObligations).HasMaxLength(8000);
+            entity.Property(scene => scene.PayoffObligations).HasMaxLength(8000);
+            entity.Property(scene => scene.Status).HasConversion<int>();
+            entity.HasIndex(scene => new { scene.ProjectId, scene.SequenceNumber }).IsUnique();
         });
     }
 }

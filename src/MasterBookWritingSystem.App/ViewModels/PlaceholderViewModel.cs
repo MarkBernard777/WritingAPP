@@ -18,9 +18,6 @@ public abstract partial class PlaceholderViewModel : ObservableObject
 public sealed class ManuscriptViewModel()
     : PlaceholderViewModel("Manuscript", "Chapter editor and compilation tools will appear here.");
 
-public sealed class StoryDataViewModel()
-    : PlaceholderViewModel("Story Data", "Characters, world, plot, beats and scenes will appear here.");
-
 public sealed class ToolsViewModel()
     : PlaceholderViewModel("Tools", "Mini tools and diagnostic reports will appear here.");
 
