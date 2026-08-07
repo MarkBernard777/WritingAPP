@@ -3,6 +3,7 @@ using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Domain;
 using MasterBookWritingSystem.Infrastructure.IO;
 using MasterBookWritingSystem.Infrastructure.Persistence.Entities;
+using MasterBookWritingSystem.Infrastructure.Workflow;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,12 +17,16 @@ public sealed class ProjectService : IProjectService
     };
 
     private readonly IApplicationPaths _applicationPaths;
+    private readonly IWorkflowDefinitionSource _workflowDefinitionSource;
     private readonly object _gate = new();
     private Project? _activeProject;
 
-    public ProjectService(IApplicationPaths applicationPaths)
+    public ProjectService(
+        IApplicationPaths applicationPaths,
+        IWorkflowDefinitionSource workflowDefinitionSource)
     {
         _applicationPaths = applicationPaths;
+        _workflowDefinitionSource = workflowDefinitionSource;
     }
 
     public Project? ActiveProject
@@ -89,9 +94,16 @@ public sealed class ProjectService : IProjectService
             context.SchemaVersions.Add(new SchemaVersionRecord
             {
                 Version = ProjectSchema.CurrentVersion,
-                Name = ProjectSchema.InitialMigrationName,
+                Name = ProjectSchema.WorkflowMigrationName,
                 AppliedUtc = now,
             });
+
+            var definitions = await _workflowDefinitionSource
+                .LoadAsync(cancellationToken)
+                .ConfigureAwait(false);
+            await WorkflowDefinitionImporter
+                .ImportAsync(context, record.Id, definitions, cancellationToken)
+                .ConfigureAwait(false);
 
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);

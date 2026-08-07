@@ -1,6 +1,7 @@
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Infrastructure.Paths;
 using MasterBookWritingSystem.Infrastructure.Persistence;
+using MasterBookWritingSystem.Infrastructure.Workflow;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MasterBookWritingSystem.Infrastructure.DependencyInjection;
@@ -11,8 +12,10 @@ public static class InfrastructureServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
         services.AddSingleton<IApplicationPaths, LocalApplicationPaths>();
+        services.AddSingleton<IWorkflowDefinitionSource, EmbeddedOrSeedWorkflowDefinitionSource>();
         services.AddSingleton<IProjectService, ProjectService>();
         services.AddSingleton<IChapterFileStore, ChapterFileStore>();
+        services.AddSingleton<IWorkflowService, WorkflowService>();
         return services;
     }
 }

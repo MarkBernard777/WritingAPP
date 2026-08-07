@@ -1,0 +1,5809 @@
+[
+  {
+    "id": "1",
+    "title": "Define the Book You Are Creating",
+    "steps": [
+      {
+        "number": 1,
+        "title": "Decide the project’s purpose",
+        "content": [
+          {
+            "type": "text",
+            "text": "Write one paragraph answering:"
+          },
+          {
+            "type": "bullet",
+            "text": "Why do I need to write this book?"
+          },
+          {
+            "type": "bullet",
+            "text": "What experience do I want the reader to have?"
+          },
+          {
+            "type": "bullet",
+            "text": "What kind of reader is it for?"
+          },
+          {
+            "type": "bullet",
+            "text": "Is it entertainment, exploration, instruction, persuasion or some combination?"
+          },
+          {
+            "type": "bullet",
+            "text": "Is it a standalone book, a standalone with sequel potential, or part of a planned series?"
+          },
+          {
+            "type": "text",
+            "text": "For your epic fantasy, separate two promises:"
+          },
+          {
+            "type": "text",
+            "text": "1. Book One promise: What complete experience will this novel deliver?"
+          },
+          {
+            "type": "text",
+            "text": "2. Series promise: What larger transformation or conflict will unfold across the saga?"
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "title": "Define the broad category",
+        "content": [
+          {
+            "type": "text",
+            "text": "Record:"
+          },
+          {
+            "type": "bullet",
+            "text": "Fiction or nonfiction"
+          },
+          {
+            "type": "bullet",
+            "text": "Genre"
+          },
+          {
+            "type": "bullet",
+            "text": "Subgenre"
+          },
+          {
+            "type": "bullet",
+            "text": "Intended readership"
+          },
+          {
+            "type": "bullet",
+            "text": "General tone"
+          },
+          {
+            "type": "bullet",
+            "text": "Point-of-view style"
+          },
+          {
+            "type": "bullet",
+            "text": "Approximate scale"
+          },
+          {
+            "type": "bullet",
+            "text": "Publishing intention"
+          },
+          {
+            "type": "text",
+            "text": "For example:"
+          },
+          {
+            "type": "quote",
+            "text": "Adult epic fantasy with political conflict, ancient oaths, moral compromise and an ultimately hopeful resolution."
+          }
+        ]
+      },
+      {
+        "number": 3,
+        "title": "Create the project’s North Star",
+        "content": [
+          {
+            "type": "text",
+            "text": "The North Star prevents the story from becoming an uncontrolled collection of ideas."
+          },
+          {
+            "type": "text",
+            "text": "Complete these sentences:"
+          },
+          {
+            "type": "quote",
+            "text": "This is a story about…"
+          },
+          {
+            "type": "quote",
+            "text": "Beneath the fantasy conflict, it is really examining…"
+          },
+          {
+            "type": "quote",
+            "text": "The reader should finish the book feeling…"
+          },
+          {
+            "type": "quote",
+            "text": "The central question is…"
+          },
+          {
+            "type": "text",
+            "text": "Possible thematic questions include:"
+          },
+          {
+            "type": "bullet",
+            "text": "What does power cost?"
+          },
+          {
+            "type": "bullet",
+            "text": "Can someone use evil without becoming evil?"
+          },
+          {
+            "type": "bullet",
+            "text": "Is loyalty still virtuous when the cause is corrupt?"
+          },
+          {
+            "type": "bullet",
+            "text": "What does a person owe to a broken society?"
+          },
+          {
+            "type": "bullet",
+            "text": "Can justice survive hatred?"
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "a one-page Project Definition",
+    "gate": "Do not begin detailed plotting until you can explain the intended book clearly in under one minute.",
+    "template": "templates/core/01_Project_Definition.md"
+  },
+  {
+    "id": "2",
+    "title": "Find and Select the Core Idea",
+    "steps": [
+      {
+        "number": 4,
+        "title": "Build an idea bank",
+        "content": [
+          {
+            "type": "text",
+            "text": "Do not demand that one idea carry the entire novel. Generate several categories of ideas."
+          },
+          {
+            "type": "subheading",
+            "text": "Character ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "A disgraced commander who must protect the people who condemned him.",
+            "subheading": "Character ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "A revolutionary who discovers that victory requires becoming what he hates.",
+            "subheading": "Character ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "A healer whose power transfers wounds rather than curing them.",
+            "subheading": "Character ideas"
+          },
+          {
+            "type": "subheading",
+            "text": "Situation ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "The heir to a kingdom is murdered during peace negotiations.",
+            "subheading": "Situation ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "An ancient treaty is discovered to have been deliberately mistranslated.",
+            "subheading": "Situation ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "A magical barrier protecting humanity begins to fail.",
+            "subheading": "Situation ideas"
+          },
+          {
+            "type": "subheading",
+            "text": "World ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "Magic is created by binding promises.",
+            "subheading": "World ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "Kingdoms are built over the remains of dead gods.",
+            "subheading": "World ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "Memories can be inherited, traded or stolen.",
+            "subheading": "World ideas"
+          },
+          {
+            "type": "subheading",
+            "text": "Conflict ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "Two morally defensible causes cannot coexist.",
+            "subheading": "Conflict ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "Saving one kingdom will condemn another.",
+            "subheading": "Conflict ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "The person destined to stop a prophecy is the one causing it.",
+            "subheading": "Conflict ideas"
+          },
+          {
+            "type": "subheading",
+            "text": "Image ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "A frozen battlefield where the dead remain standing.",
+            "subheading": "Image ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "A king receiving news of his son’s death before dawn.",
+            "subheading": "Image ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "A child carrying a forbidden book through a burning city.",
+            "subheading": "Image ideas"
+          },
+          {
+            "type": "subheading",
+            "text": "Philosophical ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "Is a person responsible for evil committed under coercion?",
+            "subheading": "Philosophical ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "Is peace merely controlled injustice?",
+            "subheading": "Philosophical ideas"
+          },
+          {
+            "type": "bullet",
+            "text": "Can truth itself become destructive?",
+            "subheading": "Philosophical ideas"
+          },
+          {
+            "type": "text",
+            "text": "Record every idea without judging it.",
+            "subheading": "Philosophical ideas"
+          }
+        ]
+      },
+      {
+        "number": 5,
+        "title": "Combine ideas",
+        "content": [
+          {
+            "type": "text",
+            "text": "Strong stories often come from combining three or more elements:"
+          },
+          {
+            "type": "quote",
+            "text": "Character + situation + world mechanism + moral problem."
+          },
+          {
+            "type": "text",
+            "text": "Example:"
+          },
+          {
+            "type": "quote",
+            "text": "A young oathkeeper discovers that the magical treaties holding the kingdoms together are built on an ancient lie. Exposing it could free the oppressed but also collapse the protections keeping an older enemy imprisoned."
+          }
+        ]
+      },
+      {
+        "number": 6,
+        "title": "Score the ideas",
+        "content": [
+          {
+            "type": "text",
+            "text": "Rate each potential idea from 1–5 for:"
+          },
+          {
+            "type": "bullet",
+            "text": "Personal fascination"
+          },
+          {
+            "type": "bullet",
+            "text": "Emotional power"
+          },
+          {
+            "type": "bullet",
+            "text": "Conflict potential"
+          },
+          {
+            "type": "bullet",
+            "text": "Character potential"
+          },
+          {
+            "type": "bullet",
+            "text": "Visual potential"
+          },
+          {
+            "type": "bullet",
+            "text": "Original combination"
+          },
+          {
+            "type": "bullet",
+            "text": "Ability to sustain a full novel"
+          },
+          {
+            "type": "bullet",
+            "text": "Ability to create difficult decisions"
+          },
+          {
+            "type": "bullet",
+            "text": "Suitability for your intended audience"
+          },
+          {
+            "type": "bullet",
+            "text": "Suitability for a series"
+          },
+          {
+            "type": "text",
+            "text": "Choose the idea you would still want to explore after spending several years with it."
+          }
+        ]
+      },
+      {
+        "number": 7,
+        "title": "Identify the story engine",
+        "content": [
+          {
+            "type": "text",
+            "text": "The story engine is the recurring source of movement and conflict."
+          },
+          {
+            "type": "text",
+            "text": "Examples:"
+          },
+          {
+            "type": "bullet",
+            "text": "A pursuit"
+          },
+          {
+            "type": "bullet",
+            "text": "A rebellion"
+          },
+          {
+            "type": "bullet",
+            "text": "A mystery"
+          },
+          {
+            "type": "bullet",
+            "text": "A war"
+          },
+          {
+            "type": "bullet",
+            "text": "A quest"
+          },
+          {
+            "type": "bullet",
+            "text": "A political struggle"
+          },
+          {
+            "type": "bullet",
+            "text": "A survival ordeal"
+          },
+          {
+            "type": "bullet",
+            "text": "A succession crisis"
+          },
+          {
+            "type": "bullet",
+            "text": "A magical investigation"
+          },
+          {
+            "type": "text",
+            "text": "A premise may sound interesting but still lack an engine."
+          },
+          {
+            "type": "text",
+            "text": "Weak:"
+          },
+          {
+            "type": "quote",
+            "text": "A prince learns that his kingdom was founded on a lie."
+          },
+          {
+            "type": "text",
+            "text": "Stronger:"
+          },
+          {
+            "type": "quote",
+            "text": "After discovering that his kingdom was founded on a lie, a prince must find the surviving witnesses before his father’s secret police kill them."
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "an Idea Selection Sheet",
+    "gate": "The idea must create continuous action, escalation and meaningful choices—not merely interesting history.",
+    "template": "templates/core/02_Idea_Bank.md"
+  },
+  {
+    "id": "3",
+    "title": "Build the Premise",
+    "steps": [
+      {
+        "number": 8,
+        "title": "Write the one-sentence premise",
+        "content": [
+          {
+            "type": "text",
+            "text": "Use this structure:"
+          },
+          {
+            "type": "quote",
+            "text": "When an initiating event happens, a specific protagonist must pursue a difficult objective, but an opposing force stands in the way, forcing the protagonist to confront the central moral or personal problem."
+          },
+          {
+            "type": "text",
+            "text": "Example:"
+          },
+          {
+            "type": "quote",
+            "text": "When an ancient oath protecting the northern kingdoms is broken, a disgraced royal guard must escort the suspected oathbreaker to the capital before civil war begins, while deciding whether the law he serves deserves to survive."
+          }
+        ]
+      },
+      {
+        "number": 9,
+        "title": "Define the seven premise components",
+        "content": [
+          {
+            "type": "text",
+            "text": "Your premise should contain:"
+          },
+          {
+            "type": "text",
+            "text": "1. Protagonist: Who carries the story?"
+          },
+          {
+            "type": "text",
+            "text": "2. Disruption: What destroys normal life?"
+          },
+          {
+            "type": "text",
+            "text": "3. Goal: What must be achieved?"
+          },
+          {
+            "type": "text",
+            "text": "4. Opposition: Who or what prevents it?"
+          },
+          {
+            "type": "text",
+            "text": "5. Stakes: What happens if the protagonist fails?"
+          },
+          {
+            "type": "text",
+            "text": "6. Urgency: Why must this happen now?"
+          },
+          {
+            "type": "text",
+            "text": "7. Transformation: How will the struggle change the protagonist?"
+          }
+        ]
+      },
+      {
+        "number": 10,
+        "title": "Write the expanded premise",
+        "content": [
+          {
+            "type": "text",
+            "text": "Expand the sentence into three paragraphs:"
+          },
+          {
+            "type": "subheading",
+            "text": "Paragraph 1 — Before"
+          },
+          {
+            "type": "text",
+            "text": "Who is the protagonist before the central conflict? What is wrong or incomplete in their life?",
+            "subheading": "Paragraph 1 — Before"
+          },
+          {
+            "type": "subheading",
+            "text": "Paragraph 2 — Disruption"
+          },
+          {
+            "type": "text",
+            "text": "What happens, what goal emerges, and what stands in the way?",
+            "subheading": "Paragraph 2 — Disruption"
+          },
+          {
+            "type": "subheading",
+            "text": "Paragraph 3 — Escalation"
+          },
+          {
+            "type": "text",
+            "text": "What choices, losses and revelations will force the protagonist to change?",
+            "subheading": "Paragraph 3 — Escalation"
+          }
+        ]
+      },
+      {
+        "number": 11,
+        "title": "Test the premise",
+        "content": [
+          {
+            "type": "text",
+            "text": "Ask:"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the protagonist have to act?"
+          },
+          {
+            "type": "bullet",
+            "text": "Is the goal concrete?"
+          },
+          {
+            "type": "bullet",
+            "text": "Can success or failure be recognised?"
+          },
+          {
+            "type": "bullet",
+            "text": "Is there a credible opposing force?"
+          },
+          {
+            "type": "bullet",
+            "text": "Can the conflict escalate?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the protagonist face difficult choices?"
+          },
+          {
+            "type": "bullet",
+            "text": "Could this sustain an entire book?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does it promise the experience expected from the genre?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does it contain emotional conflict as well as physical conflict?"
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "one-sentence and one-page premise",
+    "gate": "You should be able to generate at least ten major complications from the premise.",
+    "template": "templates/core/03_Premise_Document.md"
+  },
+  {
+    "id": "4",
+    "title": "Establish Theme and Meaning",
+    "steps": [
+      {
+        "number": 12,
+        "title": "Turn the theme into a question",
+        "content": [
+          {
+            "type": "text",
+            "text": "Avoid beginning with a sermon or predetermined answer."
+          },
+          {
+            "type": "text",
+            "text": "Instead of:"
+          },
+          {
+            "type": "quote",
+            "text": "Power corrupts everyone."
+          },
+          {
+            "type": "text",
+            "text": "Use:"
+          },
+          {
+            "type": "quote",
+            "text": "Can someone hold great power without being corrupted by it?"
+          },
+          {
+            "type": "text",
+            "text": "The story then tests possible answers through different characters."
+          }
+        ]
+      },
+      {
+        "number": 13,
+        "title": "Create competing answers",
+        "content": [
+          {
+            "type": "text",
+            "text": "Give major characters different responses to the thematic question."
+          },
+          {
+            "type": "text",
+            "text": "For example:"
+          },
+          {
+            "type": "bullet",
+            "text": "Protagonist: Power can be controlled through good intentions."
+          },
+          {
+            "type": "bullet",
+            "text": "Mentor: Power can only be controlled through discipline."
+          },
+          {
+            "type": "bullet",
+            "text": "Antagonist: Power belongs to whoever can take it."
+          },
+          {
+            "type": "bullet",
+            "text": "Ally: All concentrated power eventually becomes abusive."
+          },
+          {
+            "type": "bullet",
+            "text": "Victim: Power is irrelevant unless ordinary people are protected."
+          }
+        ]
+      },
+      {
+        "number": 14,
+        "title": "Connect theme to decisions",
+        "content": [
+          {
+            "type": "text",
+            "text": "Theme should appear through choices and consequences rather than speeches."
+          },
+          {
+            "type": "text",
+            "text": "At major turning points, ask:"
+          },
+          {
+            "type": "quote",
+            "text": "What does this decision reveal about the protagonist’s current answer to the theme?"
+          },
+          {
+            "type": "text",
+            "text": "The climax should contain the protagonist’s strongest thematic decision."
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "a one-page Theme Map",
+    "gate": "The theme must affect the plot. Removing it should materially weaken the protagonist’s decisions.",
+    "template": "templates/core/04_Theme_Map.md"
+  },
+  {
+    "id": "5",
+    "title": "Design the Series Before the Individual Book",
+    "steps": [
+      {
+        "number": 15,
+        "title": "Define the series-level conflict",
+        "content": [
+          {
+            "type": "text",
+            "text": "Write:"
+          },
+          {
+            "type": "bullet",
+            "text": "What is wrong with the world at the beginning?"
+          },
+          {
+            "type": "bullet",
+            "text": "What hidden truth drives the larger conflict?"
+          },
+          {
+            "type": "bullet",
+            "text": "What force is changing or threatening the world?"
+          },
+          {
+            "type": "bullet",
+            "text": "Who benefits from the present system?"
+          },
+          {
+            "type": "bullet",
+            "text": "What must ultimately be defeated, restored, exposed or transformed?"
+          },
+          {
+            "type": "bullet",
+            "text": "How will the world be different at the end?"
+          }
+        ]
+      },
+      {
+        "number": 16,
+        "title": "Define the protagonist’s series transformation",
+        "content": [
+          {
+            "type": "text",
+            "text": "Describe the protagonist at four points:"
+          },
+          {
+            "type": "text",
+            "text": "1. At the beginning of Book One"
+          },
+          {
+            "type": "text",
+            "text": "2. At the first major series transformation"
+          },
+          {
+            "type": "text",
+            "text": "3. At the lowest moral or emotional point"
+          },
+          {
+            "type": "text",
+            "text": "4. At the conclusion of the series"
+          },
+          {
+            "type": "text",
+            "text": "Track:"
+          },
+          {
+            "type": "bullet",
+            "text": "Beliefs"
+          },
+          {
+            "type": "bullet",
+            "text": "Relationships"
+          },
+          {
+            "type": "bullet",
+            "text": "Abilities"
+          },
+          {
+            "type": "bullet",
+            "text": "Reputation"
+          },
+          {
+            "type": "bullet",
+            "text": "Political power"
+          },
+          {
+            "type": "bullet",
+            "text": "Moral compromises"
+          },
+          {
+            "type": "bullet",
+            "text": "Wounds"
+          },
+          {
+            "type": "bullet",
+            "text": "Responsibilities"
+          }
+        ]
+      },
+      {
+        "number": 17,
+        "title": "Give each book its own purpose",
+        "content": [
+          {
+            "type": "text",
+            "text": "Every volume should have:"
+          },
+          {
+            "type": "bullet",
+            "text": "A book-specific protagonist goal"
+          },
+          {
+            "type": "bullet",
+            "text": "A primary antagonist or opposing force"
+          },
+          {
+            "type": "bullet",
+            "text": "A complete central conflict"
+          },
+          {
+            "type": "bullet",
+            "text": "A distinct emotional movement"
+          },
+          {
+            "type": "bullet",
+            "text": "A climax"
+          },
+          {
+            "type": "bullet",
+            "text": "A permanent consequence"
+          },
+          {
+            "type": "bullet",
+            "text": "A contribution to the larger saga"
+          },
+          {
+            "type": "text",
+            "text": "Book One should not feel like a 150,000-word introduction to Book Two."
+          }
+        ]
+      },
+      {
+        "number": 18,
+        "title": "Build a series escalation ladder",
+        "content": [
+          {
+            "type": "text",
+            "text": "Each book should escalate at least one dimension:"
+          },
+          {
+            "type": "bullet",
+            "text": "Geographic scale"
+          },
+          {
+            "type": "bullet",
+            "text": "Political scale"
+          },
+          {
+            "type": "bullet",
+            "text": "Personal cost"
+          },
+          {
+            "type": "bullet",
+            "text": "Moral difficulty"
+          },
+          {
+            "type": "bullet",
+            "text": "Knowledge revealed"
+          },
+          {
+            "type": "bullet",
+            "text": "Enemy strength"
+          },
+          {
+            "type": "bullet",
+            "text": "Magical consequences"
+          },
+          {
+            "type": "bullet",
+            "text": "Relationship damage"
+          },
+          {
+            "type": "bullet",
+            "text": "Public responsibility"
+          }
+        ]
+      },
+      {
+        "number": 19,
+        "title": "Create three series ledgers",
+        "content": [
+          {
+            "type": "subheading",
+            "text": "Setup and payoff ledger"
+          },
+          {
+            "type": "text",
+            "text": "Track every:",
+            "subheading": "Setup and payoff ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Prophecy",
+            "subheading": "Setup and payoff ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Mystery",
+            "subheading": "Setup and payoff ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Secret",
+            "subheading": "Setup and payoff ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Symbol",
+            "subheading": "Setup and payoff ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Object",
+            "subheading": "Setup and payoff ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Promise",
+            "subheading": "Setup and payoff ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Historical event",
+            "subheading": "Setup and payoff ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Character warning",
+            "subheading": "Setup and payoff ledger"
+          },
+          {
+            "type": "text",
+            "text": "Record where it is introduced, developed and resolved.",
+            "subheading": "Setup and payoff ledger"
+          },
+          {
+            "type": "subheading",
+            "text": "Revelation ledger"
+          },
+          {
+            "type": "text",
+            "text": "Record:",
+            "subheading": "Revelation ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "What the reader knows",
+            "subheading": "Revelation ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "What the protagonist knows",
+            "subheading": "Revelation ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "What the antagonist knows",
+            "subheading": "Revelation ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "What is believed incorrectly",
+            "subheading": "Revelation ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "When each truth is revealed",
+            "subheading": "Revelation ledger"
+          },
+          {
+            "type": "subheading",
+            "text": "Continuity ledger"
+          },
+          {
+            "type": "text",
+            "text": "Track:",
+            "subheading": "Continuity ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Ages",
+            "subheading": "Continuity ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Dates",
+            "subheading": "Continuity ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Distances",
+            "subheading": "Continuity ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Travel time",
+            "subheading": "Continuity ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Injuries",
+            "subheading": "Continuity ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Seasons",
+            "subheading": "Continuity ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Titles",
+            "subheading": "Continuity ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Family relationships",
+            "subheading": "Continuity ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Political events",
+            "subheading": "Continuity ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "Magic limitations",
+            "subheading": "Continuity ledger"
+          }
+        ]
+      }
+    ],
+    "intro": [
+      {
+        "type": "text",
+        "text": "For a planned epic series, build the skeleton of the saga without outlining all nine books scene by scene."
+      }
+    ],
+    "deliverable": "a Series Architecture Document",
+    "gate": "You know the broad destination of the saga, but Book One still functions as a satisfying novel.",
+    "template": "templates/core/05_Series_Architecture.md"
+  },
+  {
+    "id": "6",
+    "title": "Build the World Around the Story",
+    "steps": [
+      {
+        "number": 20,
+        "title": "Begin with story requirements",
+        "content": [
+          {
+            "type": "text",
+            "text": "Do not start by inventing thousands of years of history."
+          },
+          {
+            "type": "text",
+            "text": "List what the premise requires:"
+          },
+          {
+            "type": "bullet",
+            "text": "Locations"
+          },
+          {
+            "type": "bullet",
+            "text": "Governments"
+          },
+          {
+            "type": "bullet",
+            "text": "Institutions"
+          },
+          {
+            "type": "bullet",
+            "text": "Beliefs"
+          },
+          {
+            "type": "bullet",
+            "text": "Occupations"
+          },
+          {
+            "type": "bullet",
+            "text": "Social divisions"
+          },
+          {
+            "type": "bullet",
+            "text": "Military forces"
+          },
+          {
+            "type": "bullet",
+            "text": "Travel systems"
+          },
+          {
+            "type": "bullet",
+            "text": "Economic pressures"
+          },
+          {
+            "type": "bullet",
+            "text": "Magic"
+          },
+          {
+            "type": "bullet",
+            "text": "Historical conflicts"
+          },
+          {
+            "type": "text",
+            "text": "Build outward from those needs."
+          }
+        ]
+      },
+      {
+        "number": 21,
+        "title": "Establish physical reality",
+        "content": [
+          {
+            "type": "text",
+            "text": "Define:"
+          },
+          {
+            "type": "bullet",
+            "text": "Geography"
+          },
+          {
+            "type": "bullet",
+            "text": "Climate"
+          },
+          {
+            "type": "bullet",
+            "text": "Seasons"
+          },
+          {
+            "type": "bullet",
+            "text": "Natural resources"
+          },
+          {
+            "type": "bullet",
+            "text": "Roads and waterways"
+          },
+          {
+            "type": "bullet",
+            "text": "Borders"
+          },
+          {
+            "type": "bullet",
+            "text": "Food production"
+          },
+          {
+            "type": "bullet",
+            "text": "Dangerous regions"
+          },
+          {
+            "type": "bullet",
+            "text": "Distances and travel times"
+          },
+          {
+            "type": "bullet",
+            "text": "Strategic locations"
+          },
+          {
+            "type": "text",
+            "text": "Geography should influence politics, food, war, trade, architecture and culture."
+          }
+        ]
+      },
+      {
+        "number": 22,
+        "title": "Establish political reality",
+        "content": [
+          {
+            "type": "text",
+            "text": "For each important realm or faction, define:"
+          },
+          {
+            "type": "bullet",
+            "text": "Who officially rules"
+          },
+          {
+            "type": "bullet",
+            "text": "Who actually holds power"
+          },
+          {
+            "type": "bullet",
+            "text": "How leadership is chosen"
+          },
+          {
+            "type": "bullet",
+            "text": "What legitimises authority"
+          },
+          {
+            "type": "bullet",
+            "text": "How laws are enforced"
+          },
+          {
+            "type": "bullet",
+            "text": "Who is protected by the system"
+          },
+          {
+            "type": "bullet",
+            "text": "Who is exploited"
+          },
+          {
+            "type": "bullet",
+            "text": "What internal factions exist"
+          },
+          {
+            "type": "bullet",
+            "text": "What could cause the system to collapse"
+          }
+        ]
+      },
+      {
+        "number": 23,
+        "title": "Establish economic reality",
+        "content": [
+          {
+            "type": "text",
+            "text": "Determine:"
+          },
+          {
+            "type": "bullet",
+            "text": "What people eat"
+          },
+          {
+            "type": "bullet",
+            "text": "What they produce"
+          },
+          {
+            "type": "bullet",
+            "text": "What they trade"
+          },
+          {
+            "type": "bullet",
+            "text": "What is scarce"
+          },
+          {
+            "type": "bullet",
+            "text": "Who owns land"
+          },
+          {
+            "type": "bullet",
+            "text": "Who collects taxes"
+          },
+          {
+            "type": "bullet",
+            "text": "How armies are supplied"
+          },
+          {
+            "type": "bullet",
+            "text": "How ordinary people earn a living"
+          },
+          {
+            "type": "bullet",
+            "text": "How magic affects labour and wealth"
+          },
+          {
+            "type": "text",
+            "text": "Economic pressure frequently creates more believable conflict than invented hatred."
+          }
+        ]
+      },
+      {
+        "number": 24,
+        "title": "Build cultures",
+        "content": [
+          {
+            "type": "text",
+            "text": "For each major culture, define:"
+          },
+          {
+            "type": "bullet",
+            "text": "Shared values"
+          },
+          {
+            "type": "bullet",
+            "text": "Family structure"
+          },
+          {
+            "type": "bullet",
+            "text": "Class system"
+          },
+          {
+            "type": "bullet",
+            "text": "Clothing"
+          },
+          {
+            "type": "bullet",
+            "text": "Food"
+          },
+          {
+            "type": "bullet",
+            "text": "Architecture"
+          },
+          {
+            "type": "bullet",
+            "text": "Religion"
+          },
+          {
+            "type": "bullet",
+            "text": "Funeral customs"
+          },
+          {
+            "type": "bullet",
+            "text": "Marriage customs"
+          },
+          {
+            "type": "bullet",
+            "text": "Attitudes toward outsiders"
+          },
+          {
+            "type": "bullet",
+            "text": "Attitudes toward violence"
+          },
+          {
+            "type": "bullet",
+            "text": "Taboos"
+          },
+          {
+            "type": "bullet",
+            "text": "Humour"
+          },
+          {
+            "type": "bullet",
+            "text": "Insults"
+          },
+          {
+            "type": "bullet",
+            "text": "Greetings"
+          },
+          {
+            "type": "bullet",
+            "text": "Concepts that lack direct equivalents in other cultures"
+          },
+          {
+            "type": "text",
+            "text": "Avoid making every member of a culture identical. Include regions, classes, generations, reformers and internal disagreements."
+          }
+        ]
+      },
+      {
+        "number": 25,
+        "title": "Build religion and mythology",
+        "content": [
+          {
+            "type": "text",
+            "text": "Determine:"
+          },
+          {
+            "type": "bullet",
+            "text": "What people believe"
+          },
+          {
+            "type": "bullet",
+            "text": "What is historically true"
+          },
+          {
+            "type": "bullet",
+            "text": "What institutions teach"
+          },
+          {
+            "type": "bullet",
+            "text": "What rulers exploit"
+          },
+          {
+            "type": "bullet",
+            "text": "What ordinary worship looks like"
+          },
+          {
+            "type": "bullet",
+            "text": "How beliefs affect law and morality"
+          },
+          {
+            "type": "bullet",
+            "text": "What different sects dispute"
+          },
+          {
+            "type": "bullet",
+            "text": "Whether supernatural claims are provable"
+          },
+          {
+            "type": "bullet",
+            "text": "What happens when faith and evidence conflict"
+          }
+        ]
+      },
+      {
+        "number": 26,
+        "title": "Design the magic system",
+        "content": [
+          {
+            "type": "text",
+            "text": "Define:"
+          },
+          {
+            "type": "text",
+            "text": "1. Source"
+          },
+          {
+            "type": "text",
+            "text": "2. Access"
+          },
+          {
+            "type": "text",
+            "text": "3. Method"
+          },
+          {
+            "type": "text",
+            "text": "4. Capabilities"
+          },
+          {
+            "type": "text",
+            "text": "5. Limitations"
+          },
+          {
+            "type": "text",
+            "text": "6. Cost"
+          },
+          {
+            "type": "text",
+            "text": "7. Risks"
+          },
+          {
+            "type": "text",
+            "text": "8. Social consequences"
+          },
+          {
+            "type": "text",
+            "text": "9. Military consequences"
+          },
+          {
+            "type": "text",
+            "text": "10. Economic consequences"
+          },
+          {
+            "type": "text",
+            "text": "11. Religious interpretation"
+          },
+          {
+            "type": "text",
+            "text": "12. Ways it can be resisted"
+          },
+          {
+            "type": "text",
+            "text": "13. Ways it can fail"
+          },
+          {
+            "type": "text",
+            "text": "14. Things it can never do"
+          },
+          {
+            "type": "text",
+            "text": "The most important question is not merely:"
+          },
+          {
+            "type": "quote",
+            "text": "What can magic do?"
+          },
+          {
+            "type": "text",
+            "text": "It is:"
+          },
+          {
+            "type": "quote",
+            "text": "What problems does magic create?"
+          }
+        ]
+      },
+      {
+        "number": 27,
+        "title": "Create the historical pressure",
+        "content": [
+          {
+            "type": "text",
+            "text": "You do not need a complete chronology at first. Identify the past events still affecting the present:"
+          },
+          {
+            "type": "bullet",
+            "text": "Lost wars"
+          },
+          {
+            "type": "bullet",
+            "text": "Betrayals"
+          },
+          {
+            "type": "bullet",
+            "text": "Migrations"
+          },
+          {
+            "type": "bullet",
+            "text": "Broken treaties"
+          },
+          {
+            "type": "bullet",
+            "text": "Religious divisions"
+          },
+          {
+            "type": "bullet",
+            "text": "Dynastic marriages"
+          },
+          {
+            "type": "bullet",
+            "text": "Disasters"
+          },
+          {
+            "type": "bullet",
+            "text": "Magical catastrophes"
+          },
+          {
+            "type": "bullet",
+            "text": "Suppressed crimes"
+          },
+          {
+            "type": "bullet",
+            "text": "Competing versions of history"
+          }
+        ]
+      },
+      {
+        "number": 28,
+        "title": "Build only to three depths",
+        "content": [
+          {
+            "type": "subheading",
+            "text": "Depth 1 — On-page knowledge"
+          },
+          {
+            "type": "text",
+            "text": "Information required for current scenes.",
+            "subheading": "Depth 1 — On-page knowledge"
+          },
+          {
+            "type": "subheading",
+            "text": "Depth 2 — Author knowledge"
+          },
+          {
+            "type": "text",
+            "text": "Information needed to keep the story consistent.",
+            "subheading": "Depth 2 — Author knowledge"
+          },
+          {
+            "type": "subheading",
+            "text": "Depth 3 — Expansion knowledge"
+          },
+          {
+            "type": "text",
+            "text": "Material that may become relevant in later books.",
+            "subheading": "Depth 3 — Expansion knowledge"
+          },
+          {
+            "type": "text",
+            "text": "Complete Depth 1 first.",
+            "subheading": "Depth 3 — Expansion knowledge"
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "a controlled World Bible",
+    "gate": "The world creates obstacles and opportunities for the characters. It is not merely decoration.",
+    "template": "templates/core/06_World_Bible.md"
+  },
+  {
+    "id": "7",
+    "title": "Create the Characters",
+    "steps": [
+      {
+        "number": 29,
+        "title": "Build the protagonist",
+        "content": [
+          {
+            "type": "text",
+            "text": "Define the protagonist’s external structure:"
+          },
+          {
+            "type": "bullet",
+            "text": "Current situation"
+          },
+          {
+            "type": "bullet",
+            "text": "Role in society"
+          },
+          {
+            "type": "bullet",
+            "text": "External goal"
+          },
+          {
+            "type": "bullet",
+            "text": "Reason for pursuing it"
+          },
+          {
+            "type": "bullet",
+            "text": "Opposition"
+          },
+          {
+            "type": "bullet",
+            "text": "Stakes"
+          },
+          {
+            "type": "bullet",
+            "text": "Skills"
+          },
+          {
+            "type": "bullet",
+            "text": "Weaknesses"
+          },
+          {
+            "type": "bullet",
+            "text": "Resources"
+          },
+          {
+            "type": "bullet",
+            "text": "Relationships"
+          },
+          {
+            "type": "text",
+            "text": "Then define the internal structure:"
+          },
+          {
+            "type": "bullet",
+            "text": "Emotional wound"
+          },
+          {
+            "type": "bullet",
+            "text": "Fear"
+          },
+          {
+            "type": "bullet",
+            "text": "False belief"
+          },
+          {
+            "type": "bullet",
+            "text": "Defence mechanism"
+          },
+          {
+            "type": "bullet",
+            "text": "Hidden desire"
+          },
+          {
+            "type": "bullet",
+            "text": "Moral boundary"
+          },
+          {
+            "type": "bullet",
+            "text": "Contradiction"
+          },
+          {
+            "type": "bullet",
+            "text": "Need"
+          },
+          {
+            "type": "bullet",
+            "text": "Truth they resist"
+          },
+          {
+            "type": "bullet",
+            "text": "Person they could become"
+          },
+          {
+            "type": "subheading",
+            "text": "The essential distinction"
+          },
+          {
+            "type": "text",
+            "text": "Want: What the protagonist consciously pursues.",
+            "subheading": "The essential distinction"
+          },
+          {
+            "type": "text",
+            "text": "Need: What the protagonist must learn, accept or become.",
+            "subheading": "The essential distinction"
+          },
+          {
+            "type": "text",
+            "text": "The want drives the plot. The need drives the character arc.",
+            "subheading": "The essential distinction"
+          }
+        ]
+      },
+      {
+        "number": 30,
+        "title": "Create the character’s contradiction",
+        "content": [
+          {
+            "type": "text",
+            "text": "Memorable characters contain opposing qualities:"
+          },
+          {
+            "type": "bullet",
+            "text": "Merciful but vindictive when betrayed"
+          },
+          {
+            "type": "bullet",
+            "text": "Courageous in battle but afraid of intimacy"
+          },
+          {
+            "type": "bullet",
+            "text": "Honest about facts but dishonest about motives"
+          },
+          {
+            "type": "bullet",
+            "text": "Loyal to individuals but hostile to institutions"
+          },
+          {
+            "type": "bullet",
+            "text": "Kind to strangers but cold toward family"
+          }
+        ]
+      },
+      {
+        "number": 31,
+        "title": "Define the protagonist’s agency",
+        "content": [
+          {
+            "type": "text",
+            "text": "The protagonist must cause major developments."
+          },
+          {
+            "type": "text",
+            "text": "Ask:"
+          },
+          {
+            "type": "bullet",
+            "text": "What decisions can only this character make?"
+          },
+          {
+            "type": "bullet",
+            "text": "What mistakes make the situation worse?"
+          },
+          {
+            "type": "bullet",
+            "text": "What risks do they voluntarily accept?"
+          },
+          {
+            "type": "bullet",
+            "text": "How do their actions alter the antagonist’s plans?"
+          },
+          {
+            "type": "bullet",
+            "text": "What happens because of their personality rather than coincidence?"
+          }
+        ]
+      },
+      {
+        "number": 32,
+        "title": "Build the antagonist",
+        "content": [
+          {
+            "type": "text",
+            "text": "The antagonist needs:"
+          },
+          {
+            "type": "bullet",
+            "text": "A specific objective"
+          },
+          {
+            "type": "bullet",
+            "text": "A believable reason for wanting it"
+          },
+          {
+            "type": "bullet",
+            "text": "Competence"
+          },
+          {
+            "type": "bullet",
+            "text": "Resources"
+          },
+          {
+            "type": "bullet",
+            "text": "A strategy"
+          },
+          {
+            "type": "bullet",
+            "text": "A moral justification"
+          },
+          {
+            "type": "bullet",
+            "text": "Personal or ideological connection to the protagonist"
+          },
+          {
+            "type": "bullet",
+            "text": "The ability to adapt"
+          },
+          {
+            "type": "bullet",
+            "text": "The ability to win"
+          },
+          {
+            "type": "bullet",
+            "text": "Something valuable or truthful in their position"
+          },
+          {
+            "type": "text",
+            "text": "The antagonist is not merely cruel. The antagonist is pursuing an outcome incompatible with the protagonist’s objective."
+          }
+        ]
+      },
+      {
+        "number": 33,
+        "title": "Build supporting characters by function",
+        "content": [
+          {
+            "type": "text",
+            "text": "Every major supporting character should serve several purposes:"
+          },
+          {
+            "type": "bullet",
+            "text": "Ally"
+          },
+          {
+            "type": "bullet",
+            "text": "Rival"
+          },
+          {
+            "type": "bullet",
+            "text": "Mentor"
+          },
+          {
+            "type": "bullet",
+            "text": "Foil"
+          },
+          {
+            "type": "bullet",
+            "text": "Emotional anchor"
+          },
+          {
+            "type": "bullet",
+            "text": "Source of temptation"
+          },
+          {
+            "type": "bullet",
+            "text": "Source of information"
+          },
+          {
+            "type": "bullet",
+            "text": "Representative of a faction"
+          },
+          {
+            "type": "bullet",
+            "text": "Witness to the protagonist’s change"
+          },
+          {
+            "type": "bullet",
+            "text": "Cause of difficult choices"
+          },
+          {
+            "type": "text",
+            "text": "Avoid characters who exist only to provide exposition."
+          }
+        ]
+      },
+      {
+        "number": 34,
+        "title": "Build relationship arcs",
+        "content": [
+          {
+            "type": "text",
+            "text": "For every important relationship, define:"
+          },
+          {
+            "type": "bullet",
+            "text": "Starting condition"
+          },
+          {
+            "type": "bullet",
+            "text": "What each person wants from the other"
+          },
+          {
+            "type": "bullet",
+            "text": "Source of trust"
+          },
+          {
+            "type": "bullet",
+            "text": "Source of tension"
+          },
+          {
+            "type": "bullet",
+            "text": "Unspoken truth"
+          },
+          {
+            "type": "bullet",
+            "text": "Point of change"
+          },
+          {
+            "type": "bullet",
+            "text": "Major betrayal or sacrifice"
+          },
+          {
+            "type": "bullet",
+            "text": "Ending condition"
+          }
+        ]
+      },
+      {
+        "number": 35,
+        "title": "Map character arcs",
+        "content": [
+          {
+            "type": "text",
+            "text": "A positive arc often follows:"
+          },
+          {
+            "type": "text",
+            "text": "1. Character lives according to a false belief."
+          },
+          {
+            "type": "text",
+            "text": "2. The false belief offers protection."
+          },
+          {
+            "type": "text",
+            "text": "3. Events expose its limitations."
+          },
+          {
+            "type": "text",
+            "text": "4. The character resists change."
+          },
+          {
+            "type": "text",
+            "text": "5. Resistance causes loss."
+          },
+          {
+            "type": "text",
+            "text": "6. The character recognises a deeper truth."
+          },
+          {
+            "type": "text",
+            "text": "7. The climax demands action based on that truth."
+          },
+          {
+            "type": "text",
+            "text": "8. The ending shows the cost and result."
+          },
+          {
+            "type": "text",
+            "text": "A negative arc follows a similar structure, but the character embraces a more destructive belief."
+          },
+          {
+            "type": "text",
+            "text": "A flat arc involves a character who already holds an important truth and changes the world by defending it."
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "character dossiers and relationship map",
+    "gate": "Every major character wants something, fears something and can act independently of the protagonist.",
+    "template": "templates/core/08_Character_Bible.md"
+  },
+  {
+    "id": "8",
+    "title": "Build the Plot Architecture",
+    "steps": [
+      {
+        "number": 36,
+        "title": "Decide the ending first",
+        "content": [
+          {
+            "type": "text",
+            "text": "You do not need every detail, but determine:"
+          },
+          {
+            "type": "bullet",
+            "text": "What final confrontation occurs?"
+          },
+          {
+            "type": "bullet",
+            "text": "What decision resolves the internal arc?"
+          },
+          {
+            "type": "bullet",
+            "text": "What does success look like?"
+          },
+          {
+            "type": "bullet",
+            "text": "What does failure cost?"
+          },
+          {
+            "type": "bullet",
+            "text": "What changes permanently?"
+          },
+          {
+            "type": "bullet",
+            "text": "What question is answered?"
+          },
+          {
+            "type": "bullet",
+            "text": "What remains unresolved for the series?"
+          },
+          {
+            "type": "text",
+            "text": "The ending determines what must be prepared earlier."
+          }
+        ]
+      },
+      {
+        "number": 37,
+        "title": "Define the major structural points",
+        "content": [
+          {
+            "type": "subheading",
+            "text": "Beginning"
+          },
+          {
+            "type": "bullet",
+            "text": "Show the protagonist’s existing world.",
+            "subheading": "Beginning"
+          },
+          {
+            "type": "bullet",
+            "text": "Reveal the problem beneath the surface.",
+            "subheading": "Beginning"
+          },
+          {
+            "type": "bullet",
+            "text": "Establish the emotional weakness.",
+            "subheading": "Beginning"
+          },
+          {
+            "type": "bullet",
+            "text": "Introduce the disruption.",
+            "subheading": "Beginning"
+          },
+          {
+            "type": "bullet",
+            "text": "Force the protagonist into the story.",
+            "subheading": "Beginning"
+          },
+          {
+            "type": "subheading",
+            "text": "First major turning point"
+          },
+          {
+            "type": "text",
+            "text": "The protagonist crosses a threshold and cannot easily return to ordinary life.",
+            "subheading": "First major turning point"
+          },
+          {
+            "type": "subheading",
+            "text": "Midpoint"
+          },
+          {
+            "type": "text",
+            "text": "The meaning of the conflict changes through a major victory, defeat, revelation or commitment.",
+            "subheading": "Midpoint"
+          },
+          {
+            "type": "subheading",
+            "text": "Second major turning point"
+          },
+          {
+            "type": "text",
+            "text": "The protagonist loses a major protection, assumption, relationship or advantage.",
+            "subheading": "Second major turning point"
+          },
+          {
+            "type": "subheading",
+            "text": "Crisis"
+          },
+          {
+            "type": "text",
+            "text": "The protagonist faces the most difficult choice in the story.",
+            "subheading": "Crisis"
+          },
+          {
+            "type": "subheading",
+            "text": "Climax"
+          },
+          {
+            "type": "text",
+            "text": "The protagonist acts, and the central conflict is decided.",
+            "subheading": "Climax"
+          },
+          {
+            "type": "subheading",
+            "text": "Resolution"
+          },
+          {
+            "type": "text",
+            "text": "The consequences become visible and a new normal begins.",
+            "subheading": "Resolution"
+          }
+        ]
+      },
+      {
+        "number": 38,
+        "title": "Design the core beat sheet",
+        "content": [
+          {
+            "type": "text",
+            "text": "A practical novel beat sequence is:"
+          },
+          {
+            "type": "text",
+            "text": "1. Opening image"
+          },
+          {
+            "type": "text",
+            "text": "2. Existing normal"
+          },
+          {
+            "type": "text",
+            "text": "3. Evidence of the underlying problem"
+          },
+          {
+            "type": "text",
+            "text": "4. Introduction of the protagonist’s want"
+          },
+          {
+            "type": "text",
+            "text": "5. Introduction of the internal flaw or false belief"
+          },
+          {
+            "type": "text",
+            "text": "6. Inciting incident"
+          },
+          {
+            "type": "text",
+            "text": "7. Immediate reaction"
+          },
+          {
+            "type": "text",
+            "text": "8. Attempt to avoid, control or misunderstand the problem"
+          },
+          {
+            "type": "text",
+            "text": "9. Escalating pressure"
+          },
+          {
+            "type": "text",
+            "text": "10. Threshold decision"
+          },
+          {
+            "type": "text",
+            "text": "11. Entry into the main conflict"
+          },
+          {
+            "type": "text",
+            "text": "12. First active strategy"
+          },
+          {
+            "type": "text",
+            "text": "13. Initial progress"
+          },
+          {
+            "type": "text",
+            "text": "14. New allies and enemies"
+          },
+          {
+            "type": "text",
+            "text": "15. First major complication"
+          },
+          {
+            "type": "text",
+            "text": "16. First major cost"
+          },
+          {
+            "type": "text",
+            "text": "17. Midpoint revelation, victory or defeat"
+          },
+          {
+            "type": "text",
+            "text": "18. New understanding and stronger commitment"
+          },
+          {
+            "type": "text",
+            "text": "19. Antagonistic counterattack"
+          },
+          {
+            "type": "text",
+            "text": "20. Relationships and plans deteriorate"
+          },
+          {
+            "type": "text",
+            "text": "21. Major revelation or betrayal"
+          },
+          {
+            "type": "text",
+            "text": "22. Lowest point"
+          },
+          {
+            "type": "text",
+            "text": "23. Crisis decision"
+          },
+          {
+            "type": "text",
+            "text": "24. Final plan"
+          },
+          {
+            "type": "text",
+            "text": "25. Approach to confrontation"
+          },
+          {
+            "type": "text",
+            "text": "26. Climax"
+          },
+          {
+            "type": "text",
+            "text": "27. Immediate consequence"
+          },
+          {
+            "type": "text",
+            "text": "28. Resolution"
+          },
+          {
+            "type": "text",
+            "text": "29. Final image"
+          },
+          {
+            "type": "text",
+            "text": "Not every beat needs its own chapter. Some require several chapters; others may occur within one scene."
+          }
+        ]
+      },
+      {
+        "number": 39,
+        "title": "Build cause-and-effect",
+        "content": [
+          {
+            "type": "text",
+            "text": "Connect events using:"
+          },
+          {
+            "type": "bullet",
+            "text": "Therefore"
+          },
+          {
+            "type": "bullet",
+            "text": "But"
+          },
+          {
+            "type": "bullet",
+            "text": "Because"
+          },
+          {
+            "type": "text",
+            "text": "Weak plotting:"
+          },
+          {
+            "type": "quote",
+            "text": "This happens, and then this happens, and then this happens."
+          },
+          {
+            "type": "text",
+            "text": "Stronger plotting:"
+          },
+          {
+            "type": "quote",
+            "text": "The protagonist does this; therefore the antagonist responds. But the response exposes a hidden weakness. Therefore the protagonist changes strategy."
+          },
+          {
+            "type": "text",
+            "text": "Coincidence may create trouble. It should rarely solve trouble."
+          }
+        ]
+      },
+      {
+        "number": 40,
+        "title": "Design escalation",
+        "content": [
+          {
+            "type": "text",
+            "text": "Increase pressure through:"
+          },
+          {
+            "type": "bullet",
+            "text": "Less time"
+          },
+          {
+            "type": "bullet",
+            "text": "Fewer resources"
+          },
+          {
+            "type": "bullet",
+            "text": "Stronger opposition"
+          },
+          {
+            "type": "bullet",
+            "text": "More public consequences"
+          },
+          {
+            "type": "bullet",
+            "text": "Greater personal cost"
+          },
+          {
+            "type": "bullet",
+            "text": "Conflicting loyalties"
+          },
+          {
+            "type": "bullet",
+            "text": "Incomplete information"
+          },
+          {
+            "type": "bullet",
+            "text": "Irreversible choices"
+          },
+          {
+            "type": "bullet",
+            "text": "Moral compromise"
+          },
+          {
+            "type": "bullet",
+            "text": "Damage to relationships"
+          }
+        ]
+      },
+      {
+        "number": 41,
+        "title": "Design subplots",
+        "content": [
+          {
+            "type": "text",
+            "text": "A subplot must affect the main story."
+          },
+          {
+            "type": "text",
+            "text": "For each subplot, identify:"
+          },
+          {
+            "type": "bullet",
+            "text": "Its central character"
+          },
+          {
+            "type": "bullet",
+            "text": "Its goal"
+          },
+          {
+            "type": "bullet",
+            "text": "Its conflict"
+          },
+          {
+            "type": "bullet",
+            "text": "Its thematic purpose"
+          },
+          {
+            "type": "bullet",
+            "text": "Its turning points"
+          },
+          {
+            "type": "bullet",
+            "text": "Where it intersects the main plot"
+          },
+          {
+            "type": "bullet",
+            "text": "How it affects the climax"
+          },
+          {
+            "type": "bullet",
+            "text": "How it resolves"
+          },
+          {
+            "type": "text",
+            "text": "Common subplot types include:"
+          },
+          {
+            "type": "bullet",
+            "text": "Relationship"
+          },
+          {
+            "type": "bullet",
+            "text": "Political"
+          },
+          {
+            "type": "bullet",
+            "text": "Mystery"
+          },
+          {
+            "type": "bullet",
+            "text": "Rivalry"
+          },
+          {
+            "type": "bullet",
+            "text": "Family"
+          },
+          {
+            "type": "bullet",
+            "text": "Moral temptation"
+          },
+          {
+            "type": "bullet",
+            "text": "Secondary antagonist"
+          },
+          {
+            "type": "bullet",
+            "text": "Internal factional conflict"
+          }
+        ]
+      },
+      {
+        "number": 42,
+        "title": "Map promises and payoffs",
+        "content": [
+          {
+            "type": "text",
+            "text": "For every important element, record:"
+          },
+          {
+            "type": "bullet",
+            "text": "Setup"
+          },
+          {
+            "type": "bullet",
+            "text": "Reminder or development"
+          },
+          {
+            "type": "bullet",
+            "text": "Payoff"
+          },
+          {
+            "type": "text",
+            "text": "This includes:"
+          },
+          {
+            "type": "bullet",
+            "text": "Weapons"
+          },
+          {
+            "type": "bullet",
+            "text": "Powers"
+          },
+          {
+            "type": "bullet",
+            "text": "Rules"
+          },
+          {
+            "type": "bullet",
+            "text": "Prophecies"
+          },
+          {
+            "type": "bullet",
+            "text": "Character skills"
+          },
+          {
+            "type": "bullet",
+            "text": "Emotional wounds"
+          },
+          {
+            "type": "bullet",
+            "text": "Secrets"
+          },
+          {
+            "type": "bullet",
+            "text": "Relationships"
+          },
+          {
+            "type": "bullet",
+            "text": "Historical information"
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "full beat sheet and plot map",
+    "gate": "The climax grows from earlier decisions, preparations and consequences rather than appearing as a separate spectacular event.",
+    "template": "templates/core/10_Beat_Sheet.md"
+  },
+  {
+    "id": "9",
+    "title": "Convert Beats into Chapters and Scenes",
+    "steps": [
+      {
+        "number": 43,
+        "title": "Create a scene inventory",
+        "content": [
+          {
+            "type": "text",
+            "text": "For every proposed scene, record:"
+          },
+          {
+            "type": "bullet",
+            "text": "Scene number"
+          },
+          {
+            "type": "bullet",
+            "text": "Chapter"
+          },
+          {
+            "type": "bullet",
+            "text": "Point-of-view character"
+          },
+          {
+            "type": "bullet",
+            "text": "Location"
+          },
+          {
+            "type": "bullet",
+            "text": "Time"
+          },
+          {
+            "type": "bullet",
+            "text": "Character goal"
+          },
+          {
+            "type": "bullet",
+            "text": "Opposition"
+          },
+          {
+            "type": "bullet",
+            "text": "Stakes"
+          },
+          {
+            "type": "bullet",
+            "text": "Main event"
+          },
+          {
+            "type": "bullet",
+            "text": "Revelation"
+          },
+          {
+            "type": "bullet",
+            "text": "Emotional turn"
+          },
+          {
+            "type": "bullet",
+            "text": "Outcome"
+          },
+          {
+            "type": "bullet",
+            "text": "Link to the next scene"
+          }
+        ]
+      },
+      {
+        "number": 44,
+        "title": "Give every scene a change",
+        "content": [
+          {
+            "type": "text",
+            "text": "A scene should change at least one important condition:"
+          },
+          {
+            "type": "bullet",
+            "text": "Knowledge"
+          },
+          {
+            "type": "bullet",
+            "text": "Power"
+          },
+          {
+            "type": "bullet",
+            "text": "Trust"
+          },
+          {
+            "type": "bullet",
+            "text": "Danger"
+          },
+          {
+            "type": "bullet",
+            "text": "Commitment"
+          },
+          {
+            "type": "bullet",
+            "text": "Location"
+          },
+          {
+            "type": "bullet",
+            "text": "Resources"
+          },
+          {
+            "type": "bullet",
+            "text": "Relationships"
+          },
+          {
+            "type": "bullet",
+            "text": "Plans"
+          },
+          {
+            "type": "bullet",
+            "text": "Emotional condition"
+          },
+          {
+            "type": "text",
+            "text": "If nothing changes, the scene may be unnecessary."
+          }
+        ]
+      },
+      {
+        "number": 45,
+        "title": "Use the seven-part scene model",
+        "content": [
+          {
+            "type": "text",
+            "text": "A strong dramatic scene usually contains:"
+          },
+          {
+            "type": "text",
+            "text": "1. Situation: Where are we and what is happening?"
+          },
+          {
+            "type": "text",
+            "text": "2. Goal: What does the viewpoint character want now?"
+          },
+          {
+            "type": "text",
+            "text": "3. Obstacle: What prevents it?"
+          },
+          {
+            "type": "text",
+            "text": "4. Escalation: How does resistance increase?"
+          },
+          {
+            "type": "text",
+            "text": "5. Choice: What must the character decide?"
+          },
+          {
+            "type": "text",
+            "text": "6. Turn: What changes?"
+          },
+          {
+            "type": "text",
+            "text": "7. Consequence: What new problem follows?"
+          }
+        ]
+      },
+      {
+        "number": 46,
+        "title": "Alternate action and processing",
+        "content": [
+          {
+            "type": "text",
+            "text": "After significant events, characters may require a quieter sequence:"
+          },
+          {
+            "type": "text",
+            "text": "1. Emotional reaction"
+          },
+          {
+            "type": "text",
+            "text": "2. Consideration of what happened"
+          },
+          {
+            "type": "text",
+            "text": "3. Recognition of available options"
+          },
+          {
+            "type": "text",
+            "text": "4. Decision"
+          },
+          {
+            "type": "text",
+            "text": "5. New goal"
+          },
+          {
+            "type": "text",
+            "text": "This prevents characters from feeling mechanically driven through the plot."
+          }
+        ]
+      },
+      {
+        "number": 47,
+        "title": "Control chapter endings",
+        "content": [
+          {
+            "type": "text",
+            "text": "End chapters with forward pressure:"
+          },
+          {
+            "type": "bullet",
+            "text": "A revelation"
+          },
+          {
+            "type": "bullet",
+            "text": "A decision"
+          },
+          {
+            "type": "bullet",
+            "text": "A reversal"
+          },
+          {
+            "type": "bullet",
+            "text": "A threat"
+          },
+          {
+            "type": "bullet",
+            "text": "An unanswered question"
+          },
+          {
+            "type": "bullet",
+            "text": "An emotional fracture"
+          },
+          {
+            "type": "bullet",
+            "text": "An arrival"
+          },
+          {
+            "type": "bullet",
+            "text": "A discovery"
+          },
+          {
+            "type": "bullet",
+            "text": "A consequence"
+          },
+          {
+            "type": "text",
+            "text": "Avoid artificially withholding information the viewpoint character already knows."
+          }
+        ]
+      },
+      {
+        "number": 48,
+        "title": "Test the scene list",
+        "content": [
+          {
+            "type": "text",
+            "text": "For every scene, ask:"
+          },
+          {
+            "type": "bullet",
+            "text": "Why is this scene necessary?"
+          },
+          {
+            "type": "bullet",
+            "text": "Why does it happen now?"
+          },
+          {
+            "type": "bullet",
+            "text": "Why is this the correct viewpoint?"
+          },
+          {
+            "type": "bullet",
+            "text": "What would be lost if it were removed?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does it create or answer a question?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does it lead causally to another scene?"
+          },
+          {
+            "type": "bullet",
+            "text": "Is conflict present?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the scene end differently from how it began?"
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "numbered scene list",
+    "gate": "You can explain the purpose and turning point of every planned scene.",
+    "template": "templates/core/12_Scene_List.md"
+  },
+  {
+    "id": "10",
+    "title": "Establish the Narrative Method",
+    "steps": [
+      {
+        "number": 49,
+        "title": "Select point of view",
+        "content": [
+          {
+            "type": "text",
+            "text": "Choose deliberately:"
+          },
+          {
+            "type": "bullet",
+            "text": "First person"
+          },
+          {
+            "type": "bullet",
+            "text": "Close third person"
+          },
+          {
+            "type": "bullet",
+            "text": "Multiple close third person"
+          },
+          {
+            "type": "bullet",
+            "text": "Omniscient"
+          },
+          {
+            "type": "bullet",
+            "text": "Another controlled approach"
+          },
+          {
+            "type": "text",
+            "text": "For multiple-viewpoint epic fantasy, determine:"
+          },
+          {
+            "type": "bullet",
+            "text": "Who receives viewpoint status?"
+          },
+          {
+            "type": "bullet",
+            "text": "What unique story access does each viewpoint provide?"
+          },
+          {
+            "type": "bullet",
+            "text": "How frequently does each appear?"
+          },
+          {
+            "type": "bullet",
+            "text": "Which characters must remain mysterious?"
+          },
+          {
+            "type": "bullet",
+            "text": "Can two viewpoints be combined?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does each viewpoint have its own arc?"
+          },
+          {
+            "type": "text",
+            "text": "Do not give a character viewpoint status merely because they are present during an interesting event."
+          }
+        ]
+      },
+      {
+        "number": 50,
+        "title": "Select tense",
+        "content": [
+          {
+            "type": "text",
+            "text": "Choose past or present tense and remain consistent unless the narrative deliberately requires a change."
+          }
+        ]
+      },
+      {
+        "number": 51,
+        "title": "Define narrative distance",
+        "content": [
+          {
+            "type": "text",
+            "text": "Decide how closely the narration follows the character’s mind."
+          },
+          {
+            "type": "text",
+            "text": "Close narrative distance should reflect:"
+          },
+          {
+            "type": "bullet",
+            "text": "The character’s vocabulary"
+          },
+          {
+            "type": "bullet",
+            "text": "Personal observations"
+          },
+          {
+            "type": "bullet",
+            "text": "Knowledge"
+          },
+          {
+            "type": "bullet",
+            "text": "Biases"
+          },
+          {
+            "type": "bullet",
+            "text": "Emotional state"
+          },
+          {
+            "type": "bullet",
+            "text": "Cultural assumptions"
+          }
+        ]
+      },
+      {
+        "number": 52,
+        "title": "Establish prose principles",
+        "content": [
+          {
+            "type": "text",
+            "text": "Create a short style guide covering:"
+          },
+          {
+            "type": "bullet",
+            "text": "Sentence density"
+          },
+          {
+            "type": "bullet",
+            "text": "Description level"
+          },
+          {
+            "type": "bullet",
+            "text": "Dialogue style"
+          },
+          {
+            "type": "bullet",
+            "text": "Use of internal thought"
+          },
+          {
+            "type": "bullet",
+            "text": "Violence"
+          },
+          {
+            "type": "bullet",
+            "text": "Humour"
+          },
+          {
+            "type": "bullet",
+            "text": "Profanity"
+          },
+          {
+            "type": "bullet",
+            "text": "Invented terminology"
+          },
+          {
+            "type": "bullet",
+            "text": "Capitalisation"
+          },
+          {
+            "type": "bullet",
+            "text": "Titles"
+          },
+          {
+            "type": "bullet",
+            "text": "Numbers"
+          },
+          {
+            "type": "bullet",
+            "text": "Dates"
+          },
+          {
+            "type": "bullet",
+            "text": "Spelling convention"
+          }
+        ]
+      },
+      {
+        "number": 53,
+        "title": "Control exposition",
+        "content": [
+          {
+            "type": "text",
+            "text": "Reveal information when:"
+          },
+          {
+            "type": "bullet",
+            "text": "The character needs it"
+          },
+          {
+            "type": "bullet",
+            "text": "It changes a decision"
+          },
+          {
+            "type": "bullet",
+            "text": "It creates tension"
+          },
+          {
+            "type": "bullet",
+            "text": "It answers an active question"
+          },
+          {
+            "type": "bullet",
+            "text": "The reader would otherwise misunderstand the scene"
+          },
+          {
+            "type": "text",
+            "text": "Worldbuilding should usually enter through conflict, labour, customs, consequences and character assumptions—not lectures."
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "Narrative and Style Guide",
+    "gate": "You know how the story will sound, whose experience controls it and what information readers can access.",
+    "template": "templates/core/13_Narrative_Style_Guide.md"
+  },
+  {
+    "id": "11",
+    "title": "Prepare the Draft",
+    "steps": [
+      {
+        "number": 54,
+        "title": "Build the manuscript system",
+        "content": [
+          {
+            "type": "text",
+            "text": "Create a simple folder structure:"
+          },
+          {
+            "type": "example",
+            "text": "01 Project Definition 02 Ideas and Research 03 Premise and Theme 04 Series Architecture 05 World Bible 06 Character Bible 07 Plot and Beats 08 Scene Outline 09 Draft 10 Revision 11 Publishing 12 Marketing 13 Archive"
+          },
+          {
+            "type": "text",
+            "text": "Use versioned filenames:"
+          },
+          {
+            "type": "example",
+            "text": "Book01_Draft_2026-08-06_v01 Book01_DevelopmentalRevision_v02 Book01_Copyedited_v03 Book01_FinalProof_v04"
+          }
+        ]
+      },
+      {
+        "number": 55,
+        "title": "Set a working target",
+        "content": [
+          {
+            "type": "text",
+            "text": "Choose:"
+          },
+          {
+            "type": "bullet",
+            "text": "Approximate manuscript length"
+          },
+          {
+            "type": "bullet",
+            "text": "Number of chapters"
+          },
+          {
+            "type": "bullet",
+            "text": "Weekly writing sessions"
+          },
+          {
+            "type": "bullet",
+            "text": "Minimum session target"
+          },
+          {
+            "type": "bullet",
+            "text": "Target completion window"
+          },
+          {
+            "type": "bullet",
+            "text": "Rest or catch-up days"
+          },
+          {
+            "type": "text",
+            "text": "Measure progress through controllable actions:"
+          },
+          {
+            "type": "bullet",
+            "text": "Sessions completed"
+          },
+          {
+            "type": "bullet",
+            "text": "Scenes drafted"
+          },
+          {
+            "type": "bullet",
+            "text": "Words drafted"
+          },
+          {
+            "type": "bullet",
+            "text": "Problems resolved"
+          }
+        ]
+      },
+      {
+        "number": 56,
+        "title": "Create a drafting brief for every scene",
+        "content": [
+          {
+            "type": "text",
+            "text": "Before writing, note:"
+          },
+          {
+            "type": "bullet",
+            "text": "Viewpoint"
+          },
+          {
+            "type": "bullet",
+            "text": "Immediate goal"
+          },
+          {
+            "type": "bullet",
+            "text": "Conflict"
+          },
+          {
+            "type": "bullet",
+            "text": "Turn"
+          },
+          {
+            "type": "bullet",
+            "text": "Ending"
+          },
+          {
+            "type": "bullet",
+            "text": "Required setup"
+          },
+          {
+            "type": "bullet",
+            "text": "Required payoff"
+          },
+          {
+            "type": "bullet",
+            "text": "Necessary world information"
+          },
+          {
+            "type": "bullet",
+            "text": "Emotional condition entering and leaving"
+          },
+          {
+            "type": "text",
+            "text": "The brief should guide the scene without becoming a second manuscript."
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "draft-ready project",
+    "gate": "You can begin Scene One without needing to invent the entire story while drafting it.",
+    "template": "templates/extra/30_Scene_Drafting_Brief.md"
+  },
+  {
+    "id": "12",
+    "title": "Write the First Draft",
+    "steps": [
+      {
+        "number": 57,
+        "title": "Draft forward",
+        "content": [
+          {
+            "type": "text",
+            "text": "The first draft’s purpose is to discover and construct the complete story."
+          },
+          {
+            "type": "text",
+            "text": "Do not try to perform developmental editing, line editing and proofreading while drafting."
+          },
+          {
+            "type": "text",
+            "text": "When you find a problem, insert a note:"
+          },
+          {
+            "type": "example",
+            "text": "[CHECK TRAVEL TIME] [ESTABLISH THIS RULE EARLIER] [REWRITE AFTER ANTAGONIST MOTIVE IS FINALISED]"
+          },
+          {
+            "type": "text",
+            "text": "Continue forward."
+          }
+        ]
+      },
+      {
+        "number": 58,
+        "title": "Start scenes late",
+        "content": [
+          {
+            "type": "text",
+            "text": "Enter close to the important action."
+          },
+          {
+            "type": "text",
+            "text": "Instead of showing every arrival, greeting and meal, begin when:"
+          },
+          {
+            "type": "bullet",
+            "text": "The negotiation is already strained."
+          },
+          {
+            "type": "bullet",
+            "text": "The forbidden object is discovered."
+          },
+          {
+            "type": "bullet",
+            "text": "The order is refused."
+          },
+          {
+            "type": "bullet",
+            "text": "The witness changes their story."
+          },
+          {
+            "type": "bullet",
+            "text": "The attack begins."
+          },
+          {
+            "type": "bullet",
+            "text": "The character makes a dangerous request."
+          }
+        ]
+      },
+      {
+        "number": 59,
+        "title": "End scenes after the turn",
+        "content": [
+          {
+            "type": "text",
+            "text": "Once the central change has occurred, leave before the scene loses energy."
+          }
+        ]
+      },
+      {
+        "number": 60,
+        "title": "Maintain a drafting log",
+        "content": [
+          {
+            "type": "text",
+            "text": "After each session, record:"
+          },
+          {
+            "type": "bullet",
+            "text": "What was written"
+          },
+          {
+            "type": "bullet",
+            "text": "What changed from the outline"
+          },
+          {
+            "type": "bullet",
+            "text": "New continuity facts"
+          },
+          {
+            "type": "bullet",
+            "text": "Problems to address later"
+          },
+          {
+            "type": "bullet",
+            "text": "The next scene’s starting point"
+          }
+        ]
+      },
+      {
+        "number": 61,
+        "title": "Update the outline when discoveries are structural",
+        "content": [
+          {
+            "type": "text",
+            "text": "Do not force the draft to follow an obsolete outline."
+          },
+          {
+            "type": "text",
+            "text": "When something changes, check its effect on:"
+          },
+          {
+            "type": "bullet",
+            "text": "Later beats"
+          },
+          {
+            "type": "bullet",
+            "text": "Character motivation"
+          },
+          {
+            "type": "bullet",
+            "text": "Foreshadowing"
+          },
+          {
+            "type": "bullet",
+            "text": "World rules"
+          },
+          {
+            "type": "bullet",
+            "text": "Timeline"
+          },
+          {
+            "type": "bullet",
+            "text": "Climax"
+          },
+          {
+            "type": "bullet",
+            "text": "Series continuity"
+          }
+        ]
+      },
+      {
+        "number": 62,
+        "title": "Finish the complete draft",
+        "content": [
+          {
+            "type": "text",
+            "text": "A flawed completed manuscript can be revised. A collection of polished opening chapters cannot."
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "complete first draft",
+    "gate": "The story reaches its ending. Placeholders and weak scenes are acceptable; missing sections are not.",
+    "template": "templates/core/14_First_Draft_Control.md"
+  },
+  {
+    "id": "13",
+    "title": "Diagnose Before Revising",
+    "steps": [
+      {
+        "number": 63,
+        "title": "Rest the manuscript",
+        "content": [
+          {
+            "type": "text",
+            "text": "Create some distance before major revision. The goal is to return as a reader rather than continuing as the drafter."
+          }
+        ]
+      },
+      {
+        "number": 64,
+        "title": "Read without editing",
+        "content": [
+          {
+            "type": "text",
+            "text": "Read the complete manuscript and record reactions separately."
+          },
+          {
+            "type": "text",
+            "text": "Mark:"
+          },
+          {
+            "type": "bullet",
+            "text": "Confusing"
+          },
+          {
+            "type": "bullet",
+            "text": "Slow"
+          },
+          {
+            "type": "bullet",
+            "text": "Repetitive"
+          },
+          {
+            "type": "bullet",
+            "text": "Unbelievable"
+          },
+          {
+            "type": "bullet",
+            "text": "Emotionally weak"
+          },
+          {
+            "type": "bullet",
+            "text": "Strong"
+          },
+          {
+            "type": "bullet",
+            "text": "Missing setup"
+          },
+          {
+            "type": "bullet",
+            "text": "Predictable"
+          },
+          {
+            "type": "bullet",
+            "text": "Unresolved"
+          },
+          {
+            "type": "bullet",
+            "text": "Inconsistent"
+          },
+          {
+            "type": "text",
+            "text": "Do not begin rewriting Chapter One before understanding the whole manuscript."
+          }
+        ]
+      },
+      {
+        "number": 65,
+        "title": "Write a manuscript diagnosis",
+        "content": [
+          {
+            "type": "text",
+            "text": "Summarise:"
+          },
+          {
+            "type": "bullet",
+            "text": "What the story currently is"
+          },
+          {
+            "type": "bullet",
+            "text": "What it is trying to be"
+          },
+          {
+            "type": "bullet",
+            "text": "What works"
+          },
+          {
+            "type": "bullet",
+            "text": "What does not work"
+          },
+          {
+            "type": "bullet",
+            "text": "The five largest problems"
+          },
+          {
+            "type": "bullet",
+            "text": "Which problems cause other problems"
+          },
+          {
+            "type": "bullet",
+            "text": "What must be protected during revision"
+          }
+        ]
+      },
+      {
+        "number": 66,
+        "title": "Rank problems by level",
+        "content": [
+          {
+            "type": "text",
+            "text": "Fix in this order:"
+          },
+          {
+            "type": "text",
+            "text": "1. Premise"
+          },
+          {
+            "type": "text",
+            "text": "2. Character objective and motivation"
+          },
+          {
+            "type": "text",
+            "text": "3. Major structure"
+          },
+          {
+            "type": "text",
+            "text": "4. Ending"
+          },
+          {
+            "type": "text",
+            "text": "5. Antagonist strategy"
+          },
+          {
+            "type": "text",
+            "text": "6. World logic"
+          },
+          {
+            "type": "text",
+            "text": "7. Subplots"
+          },
+          {
+            "type": "text",
+            "text": "8. Scene order"
+          },
+          {
+            "type": "text",
+            "text": "9. Individual scenes"
+          },
+          {
+            "type": "text",
+            "text": "10. Prose"
+          },
+          {
+            "type": "text",
+            "text": "11. Grammar"
+          },
+          {
+            "type": "text",
+            "text": "12. Proofreading"
+          },
+          {
+            "type": "text",
+            "text": "Never polish sentences in a scene that may be deleted."
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "Developmental Revision Plan",
+    "gate": "You know what must change across the whole book before rewriting individual chapters.",
+    "template": "templates/core/15_Revision_Diagnosis.md"
+  },
+  {
+    "id": "14",
+    "title": "Complete the Structural Revision",
+    "steps": [
+      {
+        "number": 67,
+        "title": "Repair the protagonist’s arc",
+        "content": [
+          {
+            "type": "text",
+            "text": "Check:"
+          },
+          {
+            "type": "bullet",
+            "text": "Is the protagonist active?"
+          },
+          {
+            "type": "bullet",
+            "text": "Is the goal clear?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does motivation remain credible?"
+          },
+          {
+            "type": "bullet",
+            "text": "Do choices cause consequences?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does pressure expose character?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the protagonist change?"
+          },
+          {
+            "type": "bullet",
+            "text": "Is the climactic decision earned?"
+          }
+        ]
+      },
+      {
+        "number": 68,
+        "title": "Repair the antagonist",
+        "content": [
+          {
+            "type": "text",
+            "text": "Check:"
+          },
+          {
+            "type": "bullet",
+            "text": "Is the objective specific?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the strategy make sense?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the antagonist respond to setbacks?"
+          },
+          {
+            "type": "bullet",
+            "text": "Is the antagonist dangerous because of competence?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the antagonist pressure the protagonist’s internal weakness?"
+          },
+          {
+            "type": "bullet",
+            "text": "Would the antagonist’s victory meaningfully alter the world?"
+          }
+        ]
+      },
+      {
+        "number": 69,
+        "title": "Repair the plot",
+        "content": [
+          {
+            "type": "text",
+            "text": "Check:"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the inciting incident arrive early enough?"
+          },
+          {
+            "type": "bullet",
+            "text": "Is the protagonist locked into the conflict?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the middle deepen rather than repeat?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the midpoint change the story?"
+          },
+          {
+            "type": "bullet",
+            "text": "Do complications become more severe?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the lowest point result from earlier choices?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the climax resolve the central conflict?"
+          },
+          {
+            "type": "bullet",
+            "text": "Does the ending show consequences?"
+          }
+        ]
+      },
+      {
+        "number": 70,
+        "title": "Repair the worldbuilding",
+        "content": [
+          {
+            "type": "text",
+            "text": "Remove or revise worldbuilding that:"
+          },
+          {
+            "type": "bullet",
+            "text": "Does not affect the current story"
+          },
+          {
+            "type": "bullet",
+            "text": "Stops the action"
+          },
+          {
+            "type": "bullet",
+            "text": "Repeats known information"
+          },
+          {
+            "type": "bullet",
+            "text": "Contradicts another rule"
+          },
+          {
+            "type": "bullet",
+            "text": "Exists only to display invention"
+          },
+          {
+            "type": "bullet",
+            "text": "Makes the solution too easy"
+          },
+          {
+            "type": "bullet",
+            "text": "Removes meaningful human effort"
+          }
+        ]
+      },
+      {
+        "number": 71,
+        "title": "Repair the subplots",
+        "content": [
+          {
+            "type": "text",
+            "text": "Each subplot should:"
+          },
+          {
+            "type": "bullet",
+            "text": "Develop a character"
+          },
+          {
+            "type": "bullet",
+            "text": "Complicate the main objective"
+          },
+          {
+            "type": "bullet",
+            "text": "Explore the theme"
+          },
+          {
+            "type": "bullet",
+            "text": "Create a decision"
+          },
+          {
+            "type": "bullet",
+            "text": "Affect the final outcome"
+          },
+          {
+            "type": "text",
+            "text": "Combine or remove subplots that duplicate one another."
+          }
+        ]
+      },
+      {
+        "number": 72,
+        "title": "Rewrite the ending and beginning together",
+        "content": [
+          {
+            "type": "text",
+            "text": "After finalising the ending, revise the beginning so it establishes:"
+          },
+          {
+            "type": "bullet",
+            "text": "The eventual conflict"
+          },
+          {
+            "type": "bullet",
+            "text": "The emotional need"
+          },
+          {
+            "type": "bullet",
+            "text": "The thematic question"
+          },
+          {
+            "type": "bullet",
+            "text": "Relevant abilities and limitations"
+          },
+          {
+            "type": "bullet",
+            "text": "Images or ideas that will later pay off"
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "structurally revised manuscript",
+    "gate": "The complete story works before sentence-level polishing begins.",
+    "template": "templates/core/16_Revised_Manuscript_Control.md"
+  },
+  {
+    "id": "15",
+    "title": "Revise at Scene Level",
+    "steps": [
+      {
+        "number": 73,
+        "title": "Audit every scene",
+        "content": [
+          {
+            "type": "text",
+            "text": "For each scene, verify:"
+          },
+          {
+            "type": "bullet",
+            "text": "Viewpoint"
+          },
+          {
+            "type": "bullet",
+            "text": "Goal"
+          },
+          {
+            "type": "bullet",
+            "text": "Conflict"
+          },
+          {
+            "type": "bullet",
+            "text": "Stakes"
+          },
+          {
+            "type": "bullet",
+            "text": "Turn"
+          },
+          {
+            "type": "bullet",
+            "text": "Outcome"
+          },
+          {
+            "type": "bullet",
+            "text": "Emotional movement"
+          },
+          {
+            "type": "bullet",
+            "text": "Story function"
+          },
+          {
+            "type": "bullet",
+            "text": "Entry point"
+          },
+          {
+            "type": "bullet",
+            "text": "Exit point"
+          }
+        ]
+      },
+      {
+        "number": 74,
+        "title": "Strengthen conflict",
+        "content": [
+          {
+            "type": "text",
+            "text": "Conflict does not always require violence or argument. It can arise from:"
+          },
+          {
+            "type": "bullet",
+            "text": "Conflicting objectives"
+          },
+          {
+            "type": "bullet",
+            "text": "Social obligation"
+          },
+          {
+            "type": "bullet",
+            "text": "Hidden information"
+          },
+          {
+            "type": "bullet",
+            "text": "Unequal power"
+          },
+          {
+            "type": "bullet",
+            "text": "Time pressure"
+          },
+          {
+            "type": "bullet",
+            "text": "Emotional avoidance"
+          },
+          {
+            "type": "bullet",
+            "text": "Physical limitations"
+          },
+          {
+            "type": "bullet",
+            "text": "Political consequences"
+          },
+          {
+            "type": "bullet",
+            "text": "Misunderstanding"
+          },
+          {
+            "type": "bullet",
+            "text": "Moral disagreement"
+          }
+        ]
+      },
+      {
+        "number": 75,
+        "title": "Strengthen emotional causality",
+        "content": [
+          {
+            "type": "text",
+            "text": "After a significant event, show its effect through:"
+          },
+          {
+            "type": "bullet",
+            "text": "Changed behaviour"
+          },
+          {
+            "type": "bullet",
+            "text": "Different observations"
+          },
+          {
+            "type": "bullet",
+            "text": "Physical reactions"
+          },
+          {
+            "type": "bullet",
+            "text": "Altered speech"
+          },
+          {
+            "type": "bullet",
+            "text": "Avoidance"
+          },
+          {
+            "type": "bullet",
+            "text": "Risk-taking"
+          },
+          {
+            "type": "bullet",
+            "text": "Withdrawal"
+          },
+          {
+            "type": "bullet",
+            "text": "Aggression"
+          },
+          {
+            "type": "bullet",
+            "text": "New decisions"
+          },
+          {
+            "type": "text",
+            "text": "Avoid repeatedly naming the emotion when behaviour can reveal it."
+          }
+        ]
+      },
+      {
+        "number": 76,
+        "title": "Improve dialogue",
+        "content": [
+          {
+            "type": "text",
+            "text": "Every important speaker should have:"
+          },
+          {
+            "type": "bullet",
+            "text": "A purpose"
+          },
+          {
+            "type": "bullet",
+            "text": "A personal vocabulary"
+          },
+          {
+            "type": "bullet",
+            "text": "A relationship to power"
+          },
+          {
+            "type": "bullet",
+            "text": "Subjects they avoid"
+          },
+          {
+            "type": "bullet",
+            "text": "A method of persuasion"
+          },
+          {
+            "type": "bullet",
+            "text": "A method of hiding emotion"
+          },
+          {
+            "type": "bullet",
+            "text": "A distinctive rhythm"
+          },
+          {
+            "type": "text",
+            "text": "Dialogue becomes stronger when characters are trying to achieve something rather than merely exchanging information."
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "scene-revised manuscript",
+    "gate": "Every scene advances story, character, theme or tension—preferably several at once.",
+    "template": "templates/core/16_Revised_Manuscript_Control.md"
+  },
+  {
+    "id": "16",
+    "title": "Line Editing and Prose Refinement",
+    "steps": [
+      {
+        "number": 77,
+        "title": "Perform the line edit",
+        "content": [
+          {
+            "type": "text",
+            "text": "Examine:"
+          },
+          {
+            "type": "bullet",
+            "text": "Clarity"
+          },
+          {
+            "type": "bullet",
+            "text": "Rhythm"
+          },
+          {
+            "type": "bullet",
+            "text": "Repetition"
+          },
+          {
+            "type": "bullet",
+            "text": "Word choice"
+          },
+          {
+            "type": "bullet",
+            "text": "Sentence length"
+          },
+          {
+            "type": "bullet",
+            "text": "Paragraph movement"
+          },
+          {
+            "type": "bullet",
+            "text": "Description"
+          },
+          {
+            "type": "bullet",
+            "text": "Interior thought"
+          },
+          {
+            "type": "bullet",
+            "text": "Dialogue"
+          },
+          {
+            "type": "bullet",
+            "text": "Narrative distance"
+          },
+          {
+            "type": "bullet",
+            "text": "Unnecessary explanation"
+          },
+          {
+            "type": "bullet",
+            "text": "Weak verbs"
+          },
+          {
+            "type": "bullet",
+            "text": "Abstract phrasing"
+          },
+          {
+            "type": "bullet",
+            "text": "Accidental ambiguity"
+          }
+        ]
+      },
+      {
+        "number": 78,
+        "title": "Remove common prose weaknesses",
+        "content": [
+          {
+            "type": "text",
+            "text": "Look for:"
+          },
+          {
+            "type": "bullet",
+            "text": "Repeated emotional explanations"
+          },
+          {
+            "type": "bullet",
+            "text": "Unnecessary filtering: “he saw,” “she felt,” “he realised”"
+          },
+          {
+            "type": "bullet",
+            "text": "Excessive adverbs"
+          },
+          {
+            "type": "bullet",
+            "text": "Repeated gestures"
+          },
+          {
+            "type": "bullet",
+            "text": "Overwritten dialogue tags"
+          },
+          {
+            "type": "bullet",
+            "text": "Backstory in urgent scenes"
+          },
+          {
+            "type": "bullet",
+            "text": "Description with no viewpoint relevance"
+          },
+          {
+            "type": "bullet",
+            "text": "Multiple sentences making the same point"
+          },
+          {
+            "type": "bullet",
+            "text": "Unnecessary character names in every paragraph"
+          },
+          {
+            "type": "bullet",
+            "text": "Inflated language where simple language is stronger"
+          }
+        ]
+      },
+      {
+        "number": 79,
+        "title": "Improve description",
+        "content": [
+          {
+            "type": "text",
+            "text": "Description should do more than catalogue objects. It can reveal:"
+          },
+          {
+            "type": "bullet",
+            "text": "Mood"
+          },
+          {
+            "type": "bullet",
+            "text": "Culture"
+          },
+          {
+            "type": "bullet",
+            "text": "History"
+          },
+          {
+            "type": "bullet",
+            "text": "Threat"
+          },
+          {
+            "type": "bullet",
+            "text": "Class"
+          },
+          {
+            "type": "bullet",
+            "text": "Character bias"
+          },
+          {
+            "type": "bullet",
+            "text": "Physical difficulty"
+          },
+          {
+            "type": "bullet",
+            "text": "Opportunity"
+          },
+          {
+            "type": "bullet",
+            "text": "Change"
+          }
+        ]
+      },
+      {
+        "number": 80,
+        "title": "Read aloud",
+        "content": [
+          {
+            "type": "text",
+            "text": "Reading aloud exposes:"
+          },
+          {
+            "type": "bullet",
+            "text": "Awkward rhythm"
+          },
+          {
+            "type": "bullet",
+            "text": "Repeated words"
+          },
+          {
+            "type": "bullet",
+            "text": "Unnatural dialogue"
+          },
+          {
+            "type": "bullet",
+            "text": "Overlong sentences"
+          },
+          {
+            "type": "bullet",
+            "text": "Missing words"
+          },
+          {
+            "type": "bullet",
+            "text": "Accidental rhyme"
+          },
+          {
+            "type": "bullet",
+            "text": "Tonal inconsistency"
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "line-edited manuscript",
+    "gate": "The prose is clear, controlled and appropriate to the viewpoint and tone.",
+    "template": "templates/core/16_Revised_Manuscript_Control.md"
+  },
+  {
+    "id": "17",
+    "title": "External Reader Testing",
+    "steps": [
+      {
+        "number": 81,
+        "title": "Choose the right readers",
+        "content": [
+          {
+            "type": "text",
+            "text": "Use several reader types:"
+          },
+          {
+            "type": "bullet",
+            "text": "Genre readers"
+          },
+          {
+            "type": "bullet",
+            "text": "General story readers"
+          },
+          {
+            "type": "bullet",
+            "text": "Detail-oriented continuity readers"
+          },
+          {
+            "type": "bullet",
+            "text": "Readers knowledgeable about relevant subjects"
+          },
+          {
+            "type": "bullet",
+            "text": "Readers capable of honest criticism"
+          },
+          {
+            "type": "text",
+            "text": "Do not rely only on people who want to encourage you."
+          }
+        ]
+      },
+      {
+        "number": 82,
+        "title": "Give beta readers focused questions",
+        "content": [
+          {
+            "type": "text",
+            "text": "Ask:"
+          },
+          {
+            "type": "bullet",
+            "text": "Where were you most engaged?"
+          },
+          {
+            "type": "bullet",
+            "text": "Where did your attention weaken?"
+          },
+          {
+            "type": "bullet",
+            "text": "Where were you confused?"
+          },
+          {
+            "type": "bullet",
+            "text": "Which character did you care about most?"
+          },
+          {
+            "type": "bullet",
+            "text": "Which motivation felt unconvincing?"
+          },
+          {
+            "type": "bullet",
+            "text": "Did any section feel repetitive?"
+          },
+          {
+            "type": "bullet",
+            "text": "Which revelation surprised you?"
+          },
+          {
+            "type": "bullet",
+            "text": "Which revelation felt obvious?"
+          },
+          {
+            "type": "bullet",
+            "text": "Did the climax satisfy the story’s promises?"
+          },
+          {
+            "type": "bullet",
+            "text": "What did you expect to happen that never happened?"
+          },
+          {
+            "type": "bullet",
+            "text": "What questions remained unintentionally unanswered?"
+          }
+        ]
+      },
+      {
+        "number": 83,
+        "title": "Interpret feedback properly",
+        "content": [
+          {
+            "type": "text",
+            "text": "Do not obey every suggested solution."
+          },
+          {
+            "type": "text",
+            "text": "Look for repeated reader reactions."
+          },
+          {
+            "type": "text",
+            "text": "If several readers say a scene is slow, the problem is probably real. Their proposed repairs may differ because they are diagnosing symptoms."
+          }
+        ]
+      },
+      {
+        "number": 84,
+        "title": "Complete the beta revision",
+        "content": [
+          {
+            "type": "text",
+            "text": "Correct problems involving:"
+          },
+          {
+            "type": "bullet",
+            "text": "Confusion"
+          },
+          {
+            "type": "bullet",
+            "text": "Motivation"
+          },
+          {
+            "type": "bullet",
+            "text": "Pacing"
+          },
+          {
+            "type": "bullet",
+            "text": "Emotional impact"
+          },
+          {
+            "type": "bullet",
+            "text": "Missing setup"
+          },
+          {
+            "type": "bullet",
+            "text": "Unconvincing outcomes"
+          },
+          {
+            "type": "bullet",
+            "text": "Continuity"
+          },
+          {
+            "type": "bullet",
+            "text": "Ending satisfaction"
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "reader-tested manuscript",
+    "gate": "Readers understand the intended story and generally experience the emotions you designed.",
+    "template": "templates/core/17_Beta_Feedback_Register.md"
+  },
+  {
+    "id": "18",
+    "title": "Professional Editing and Finalisation",
+    "steps": [
+      {
+        "number": 85,
+        "title": "Determine the editing required",
+        "content": [
+          {
+            "type": "subheading",
+            "text": "Developmental editing"
+          },
+          {
+            "type": "text",
+            "text": "Examines premise, structure, character, pacing, stakes and overall story.",
+            "subheading": "Developmental editing"
+          },
+          {
+            "type": "subheading",
+            "text": "Line editing"
+          },
+          {
+            "type": "text",
+            "text": "Improves prose, clarity, rhythm and expression.",
+            "subheading": "Line editing"
+          },
+          {
+            "type": "subheading",
+            "text": "Copyediting"
+          },
+          {
+            "type": "text",
+            "text": "Corrects grammar, punctuation, consistency, spelling and style.",
+            "subheading": "Copyediting"
+          },
+          {
+            "type": "subheading",
+            "text": "Proofreading"
+          },
+          {
+            "type": "text",
+            "text": "Finds final errors after formatting.",
+            "subheading": "Proofreading"
+          },
+          {
+            "type": "text",
+            "text": "These are different stages.",
+            "subheading": "Proofreading"
+          }
+        ]
+      },
+      {
+        "number": 86,
+        "title": "Create a style sheet",
+        "content": [
+          {
+            "type": "text",
+            "text": "Track:"
+          },
+          {
+            "type": "bullet",
+            "text": "Character names"
+          },
+          {
+            "type": "bullet",
+            "text": "Place names"
+          },
+          {
+            "type": "bullet",
+            "text": "Capitalisation"
+          },
+          {
+            "type": "bullet",
+            "text": "Titles"
+          },
+          {
+            "type": "bullet",
+            "text": "Invented words"
+          },
+          {
+            "type": "bullet",
+            "text": "Spelling choices"
+          },
+          {
+            "type": "bullet",
+            "text": "Dates"
+          },
+          {
+            "type": "bullet",
+            "text": "Measurements"
+          },
+          {
+            "type": "bullet",
+            "text": "Hyphenation"
+          },
+          {
+            "type": "bullet",
+            "text": "Magic terminology"
+          },
+          {
+            "type": "bullet",
+            "text": "Punctuation conventions"
+          }
+        ]
+      },
+      {
+        "number": 87,
+        "title": "Perform the continuity audit",
+        "content": [
+          {
+            "type": "text",
+            "text": "Verify:"
+          },
+          {
+            "type": "bullet",
+            "text": "Timeline"
+          },
+          {
+            "type": "bullet",
+            "text": "Ages"
+          },
+          {
+            "type": "bullet",
+            "text": "Geography"
+          },
+          {
+            "type": "bullet",
+            "text": "Travel time"
+          },
+          {
+            "type": "bullet",
+            "text": "Injuries"
+          },
+          {
+            "type": "bullet",
+            "text": "Clothing"
+          },
+          {
+            "type": "bullet",
+            "text": "Weather"
+          },
+          {
+            "type": "bullet",
+            "text": "Moon or season references"
+          },
+          {
+            "type": "bullet",
+            "text": "Character knowledge"
+          },
+          {
+            "type": "bullet",
+            "text": "Object locations"
+          },
+          {
+            "type": "bullet",
+            "text": "Titles"
+          },
+          {
+            "type": "bullet",
+            "text": "Military ranks"
+          },
+          {
+            "type": "bullet",
+            "text": "Magic rules"
+          },
+          {
+            "type": "bullet",
+            "text": "Deaths and survivals"
+          },
+          {
+            "type": "bullet",
+            "text": "Relationship history"
+          }
+        ]
+      },
+      {
+        "number": 88,
+        "title": "Lock the manuscript",
+        "content": [
+          {
+            "type": "text",
+            "text": "Once the final copyedit is accepted, stop casually rewriting. Every late change can introduce new mistakes."
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "final edited manuscript",
+    "gate": "The text is ready to be turned into a commercial book.",
+    "template": "templates/core/19_Final_Manuscript_Control.md"
+  },
+  {
+    "id": "19",
+    "title": "Choose the Publishing Route",
+    "steps": [
+      {
+        "number": 89,
+        "title": "Compare the main paths",
+        "content": [
+          {
+            "type": "subheading",
+            "text": "Traditional publishing"
+          },
+          {
+            "type": "text",
+            "text": "You submit to literary agents or appropriate publishers.",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "text",
+            "text": "Advantages may include:",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Publisher-funded production",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Professional distribution",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Established industry relationships",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Editorial and sales teams",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Greater access to some physical bookstores",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "text",
+            "text": "Trade-offs include:",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Slow submission process",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Low acceptance rate",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Less control",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Smaller percentage of each sale",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Contractual rights commitments",
+            "subheading": "Traditional publishing"
+          },
+          {
+            "type": "subheading",
+            "text": "Self-publishing"
+          },
+          {
+            "type": "text",
+            "text": "You operate as the publisher.",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "text",
+            "text": "Advantages may include:",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Creative control",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Faster production",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Control of schedule and pricing",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Higher percentage of individual sales",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Direct ownership of publishing decisions",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "text",
+            "text": "Trade-offs include:",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "You fund production",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "You manage contractors",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "You control quality assurance",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "You must organise distribution and marketing",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "bullet",
+            "text": "Poor presentation directly damages credibility",
+            "subheading": "Self-publishing"
+          },
+          {
+            "type": "subheading",
+            "text": "Hybrid or assisted publishing"
+          },
+          {
+            "type": "text",
+            "text": "This can range from legitimate service provision to expensive vanity arrangements. Evaluate contracts, rights, distribution claims, ownership, costs and deliverables carefully.",
+            "subheading": "Hybrid or assisted publishing"
+          }
+        ]
+      },
+      {
+        "number": 90,
+        "title": "Make the decision commercially",
+        "content": [
+          {
+            "type": "text",
+            "text": "Consider:"
+          },
+          {
+            "type": "bullet",
+            "text": "Creative control"
+          },
+          {
+            "type": "bullet",
+            "text": "Available budget"
+          },
+          {
+            "type": "bullet",
+            "text": "Desired release speed"
+          },
+          {
+            "type": "bullet",
+            "text": "Willingness to manage production"
+          },
+          {
+            "type": "bullet",
+            "text": "Series frequency"
+          },
+          {
+            "type": "bullet",
+            "text": "Marketing willingness"
+          },
+          {
+            "type": "bullet",
+            "text": "Print distribution goals"
+          },
+          {
+            "type": "bullet",
+            "text": "Rights ownership"
+          },
+          {
+            "type": "bullet",
+            "text": "Long-term business plan"
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "Publishing Route Decision and Publishing Plan",
+    "gate": "Choose one primary route rather than preparing indefinitely for all routes.",
+    "deliverable_system_supplied": true,
+    "template": "templates/core/20_Publishing_Plan.md"
+  },
+  {
+    "id": "20A",
+    "title": "Traditional Publishing Path",
+    "steps": [
+      {
+        "number": 91,
+        "title": "Prepare the submission package",
+        "content": [
+          {
+            "type": "text",
+            "text": "Depending on requirements, prepare:"
+          },
+          {
+            "type": "bullet",
+            "text": "Query letter"
+          },
+          {
+            "type": "bullet",
+            "text": "Short pitch"
+          },
+          {
+            "type": "bullet",
+            "text": "One-page synopsis"
+          },
+          {
+            "type": "bullet",
+            "text": "Longer synopsis"
+          },
+          {
+            "type": "bullet",
+            "text": "Author biography"
+          },
+          {
+            "type": "bullet",
+            "text": "Comparable titles"
+          },
+          {
+            "type": "bullet",
+            "text": "Target readership"
+          },
+          {
+            "type": "bullet",
+            "text": "Sample chapters"
+          },
+          {
+            "type": "bullet",
+            "text": "Complete manuscript"
+          }
+        ]
+      },
+      {
+        "number": 92,
+        "title": "Research representatives",
+        "content": [
+          {
+            "type": "text",
+            "text": "Identify agents or publishers who:"
+          },
+          {
+            "type": "bullet",
+            "text": "Represent your genre"
+          },
+          {
+            "type": "bullet",
+            "text": "Are open to submissions"
+          },
+          {
+            "type": "bullet",
+            "text": "Have relevant sales"
+          },
+          {
+            "type": "bullet",
+            "text": "State clear submission requirements"
+          },
+          {
+            "type": "bullet",
+            "text": "Appear professionally credible"
+          },
+          {
+            "type": "bullet",
+            "text": "Do not charge improper reading fees"
+          }
+        ]
+      },
+      {
+        "number": 93,
+        "title": "Personalise and track submissions",
+        "content": [
+          {
+            "type": "text",
+            "text": "Maintain a submission register:"
+          },
+          {
+            "type": "bullet",
+            "text": "Name"
+          },
+          {
+            "type": "bullet",
+            "text": "Agency or publisher"
+          },
+          {
+            "type": "bullet",
+            "text": "Date"
+          },
+          {
+            "type": "bullet",
+            "text": "Material sent"
+          },
+          {
+            "type": "bullet",
+            "text": "Requirements"
+          },
+          {
+            "type": "bullet",
+            "text": "Response"
+          },
+          {
+            "type": "bullet",
+            "text": "Follow-up date"
+          },
+          {
+            "type": "bullet",
+            "text": "Outcome"
+          }
+        ]
+      },
+      {
+        "number": 94,
+        "title": "Evaluate representation or contract offers",
+        "content": [
+          {
+            "type": "text",
+            "text": "Obtain appropriate professional advice before signing."
+          },
+          {
+            "type": "text",
+            "text": "Examine:"
+          },
+          {
+            "type": "bullet",
+            "text": "Rights granted"
+          },
+          {
+            "type": "bullet",
+            "text": "Territory"
+          },
+          {
+            "type": "bullet",
+            "text": "Formats"
+          },
+          {
+            "type": "bullet",
+            "text": "Royalty structure"
+          },
+          {
+            "type": "bullet",
+            "text": "Advance"
+          },
+          {
+            "type": "bullet",
+            "text": "Option clauses"
+          },
+          {
+            "type": "bullet",
+            "text": "Non-compete provisions"
+          },
+          {
+            "type": "bullet",
+            "text": "Reversion of rights"
+          },
+          {
+            "type": "bullet",
+            "text": "Delivery requirements"
+          },
+          {
+            "type": "bullet",
+            "text": "Accounting periods"
+          },
+          {
+            "type": "bullet",
+            "text": "Termination provisions"
+          },
+          {
+            "type": "bullet",
+            "text": "Control of title and cover"
+          },
+          {
+            "type": "bullet",
+            "text": "Audiobook and translation rights"
+          }
+        ]
+      },
+      {
+        "number": 95,
+        "title": "Complete publisher revisions and production",
+        "content": [
+          {
+            "type": "text",
+            "text": "A traditional deal may still require:"
+          },
+          {
+            "type": "bullet",
+            "text": "Editorial revisions"
+          },
+          {
+            "type": "bullet",
+            "text": "Copyediting"
+          },
+          {
+            "type": "bullet",
+            "text": "Proof approval"
+          },
+          {
+            "type": "bullet",
+            "text": "Cover feedback"
+          },
+          {
+            "type": "bullet",
+            "text": "Author questionnaire"
+          },
+          {
+            "type": "bullet",
+            "text": "Marketing materials"
+          },
+          {
+            "type": "bullet",
+            "text": "Publicity participation"
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "Submission Package, Research List and Submission Register",
+    "gate": "The submission package matches each recipient's requirements and every submission is tracked.",
+    "deliverable_system_supplied": true,
+    "gate_system_supplied": true,
+    "template": "templates/extra/25_Query_Package.md"
+  },
+  {
+    "id": "20B",
+    "title": "Self-Publishing Path",
+    "steps": [
+      {
+        "number": 91,
+        "title": "Establish the publishing project",
+        "content": [
+          {
+            "type": "text",
+            "text": "Create:"
+          },
+          {
+            "type": "bullet",
+            "text": "Production budget"
+          },
+          {
+            "type": "bullet",
+            "text": "Publication date"
+          },
+          {
+            "type": "bullet",
+            "text": "Contractor schedule"
+          },
+          {
+            "type": "bullet",
+            "text": "Format list"
+          },
+          {
+            "type": "bullet",
+            "text": "Distribution plan"
+          },
+          {
+            "type": "bullet",
+            "text": "Marketing plan"
+          },
+          {
+            "type": "bullet",
+            "text": "Rights record"
+          },
+          {
+            "type": "bullet",
+            "text": "Asset folder"
+          }
+        ]
+      },
+      {
+        "number": 92,
+        "title": "Commission the cover",
+        "content": [
+          {
+            "type": "text",
+            "text": "Prepare a cover brief containing:"
+          },
+          {
+            "type": "bullet",
+            "text": "Genre"
+          },
+          {
+            "type": "bullet",
+            "text": "Audience"
+          },
+          {
+            "type": "bullet",
+            "text": "Tone"
+          },
+          {
+            "type": "bullet",
+            "text": "Central imagery"
+          },
+          {
+            "type": "bullet",
+            "text": "Comparable visual positioning"
+          },
+          {
+            "type": "bullet",
+            "text": "Title"
+          },
+          {
+            "type": "bullet",
+            "text": "Author name"
+          },
+          {
+            "type": "bullet",
+            "text": "Series name"
+          },
+          {
+            "type": "bullet",
+            "text": "Required formats"
+          },
+          {
+            "type": "bullet",
+            "text": "Back-cover copy"
+          },
+          {
+            "type": "bullet",
+            "text": "Trim specifications when known"
+          },
+          {
+            "type": "text",
+            "text": "The cover’s first task is not to illustrate every detail. It is to signal the correct genre and attract the appropriate reader."
+          }
+        ]
+      },
+      {
+        "number": 93,
+        "title": "Format the interior",
+        "content": [
+          {
+            "type": "text",
+            "text": "Prepare separate files as required for:"
+          },
+          {
+            "type": "bullet",
+            "text": "Ebook"
+          },
+          {
+            "type": "bullet",
+            "text": "Paperback"
+          },
+          {
+            "type": "bullet",
+            "text": "Hardback"
+          },
+          {
+            "type": "bullet",
+            "text": "Large print"
+          },
+          {
+            "type": "bullet",
+            "text": "Audiobook script or production"
+          },
+          {
+            "type": "text",
+            "text": "Check:"
+          },
+          {
+            "type": "bullet",
+            "text": "Chapter headings"
+          },
+          {
+            "type": "bullet",
+            "text": "Scene breaks"
+          },
+          {
+            "type": "bullet",
+            "text": "Paragraph indents"
+          },
+          {
+            "type": "bullet",
+            "text": "Page numbers"
+          },
+          {
+            "type": "bullet",
+            "text": "Headers"
+          },
+          {
+            "type": "bullet",
+            "text": "Front matter"
+          },
+          {
+            "type": "bullet",
+            "text": "Back matter"
+          },
+          {
+            "type": "bullet",
+            "text": "Maps"
+          },
+          {
+            "type": "bullet",
+            "text": "Illustrations"
+          },
+          {
+            "type": "bullet",
+            "text": "Table of contents"
+          },
+          {
+            "type": "bullet",
+            "text": "Widows and orphans"
+          },
+          {
+            "type": "bullet",
+            "text": "Blank pages"
+          },
+          {
+            "type": "bullet",
+            "text": "Embedded fonts and images where relevant"
+          }
+        ]
+      },
+      {
+        "number": 94,
+        "title": "Prepare the publishing metadata",
+        "content": [
+          {
+            "type": "text",
+            "text": "Create:"
+          },
+          {
+            "type": "bullet",
+            "text": "Title"
+          },
+          {
+            "type": "bullet",
+            "text": "Subtitle where appropriate"
+          },
+          {
+            "type": "bullet",
+            "text": "Series name"
+          },
+          {
+            "type": "bullet",
+            "text": "Series number"
+          },
+          {
+            "type": "bullet",
+            "text": "Author name"
+          },
+          {
+            "type": "bullet",
+            "text": "Book description"
+          },
+          {
+            "type": "bullet",
+            "text": "Categories"
+          },
+          {
+            "type": "bullet",
+            "text": "Search terms"
+          },
+          {
+            "type": "bullet",
+            "text": "Reader age classification"
+          },
+          {
+            "type": "bullet",
+            "text": "Language"
+          },
+          {
+            "type": "bullet",
+            "text": "Publication date"
+          },
+          {
+            "type": "bullet",
+            "text": "Edition"
+          },
+          {
+            "type": "bullet",
+            "text": "Publisher name"
+          },
+          {
+            "type": "bullet",
+            "text": "Pricing"
+          },
+          {
+            "type": "bullet",
+            "text": "Territory and rights information"
+          }
+        ]
+      },
+      {
+        "number": 95,
+        "title": "Prepare the book description",
+        "content": [
+          {
+            "type": "text",
+            "text": "A strong fiction description generally includes:"
+          },
+          {
+            "type": "text",
+            "text": "1. Character"
+          },
+          {
+            "type": "text",
+            "text": "2. Disruption"
+          },
+          {
+            "type": "text",
+            "text": "3. Objective"
+          },
+          {
+            "type": "text",
+            "text": "4. Opposition"
+          },
+          {
+            "type": "text",
+            "text": "5. Stakes"
+          },
+          {
+            "type": "text",
+            "text": "6. A final question or tension"
+          },
+          {
+            "type": "text",
+            "text": "It should sell the reading experience without summarising the entire plot."
+          }
+        ]
+      },
+      {
+        "number": 96,
+        "title": "Complete identifiers and legal checks",
+        "content": [
+          {
+            "type": "text",
+            "text": "Depending on your location, format and distribution choices, determine requirements for:"
+          },
+          {
+            "type": "bullet",
+            "text": "ISBNs"
+          },
+          {
+            "type": "bullet",
+            "text": "Copyright page"
+          },
+          {
+            "type": "bullet",
+            "text": "Publisher details"
+          },
+          {
+            "type": "bullet",
+            "text": "Legal deposit"
+          },
+          {
+            "type": "bullet",
+            "text": "Permissions"
+          },
+          {
+            "type": "bullet",
+            "text": "Quoted material"
+          },
+          {
+            "type": "bullet",
+            "text": "Maps and artwork"
+          },
+          {
+            "type": "bullet",
+            "text": "Fonts"
+          },
+          {
+            "type": "bullet",
+            "text": "Contractor licences"
+          },
+          {
+            "type": "bullet",
+            "text": "Pen name registration"
+          },
+          {
+            "type": "bullet",
+            "text": "Business and tax records"
+          },
+          {
+            "type": "text",
+            "text": "Specific requirements vary by country and publishing route."
+          }
+        ]
+      },
+      {
+        "number": 97,
+        "title": "Order and inspect proofs",
+        "content": [
+          {
+            "type": "text",
+            "text": "Check the actual print product for:"
+          },
+          {
+            "type": "bullet",
+            "text": "Cover alignment"
+          },
+          {
+            "type": "bullet",
+            "text": "Spine width"
+          },
+          {
+            "type": "bullet",
+            "text": "Colour"
+          },
+          {
+            "type": "bullet",
+            "text": "Cropping"
+          },
+          {
+            "type": "bullet",
+            "text": "Margins"
+          },
+          {
+            "type": "bullet",
+            "text": "Font size"
+          },
+          {
+            "type": "bullet",
+            "text": "Image quality"
+          },
+          {
+            "type": "bullet",
+            "text": "Blank pages"
+          },
+          {
+            "type": "bullet",
+            "text": "Page order"
+          },
+          {
+            "type": "bullet",
+            "text": "Headers"
+          },
+          {
+            "type": "bullet",
+            "text": "Scene breaks"
+          },
+          {
+            "type": "bullet",
+            "text": "Typographical errors"
+          },
+          {
+            "type": "text",
+            "text": "Never assume a correct digital file guarantees a correct printed book."
+          }
+        ]
+      },
+      {
+        "number": 98,
+        "title": "Upload the final editions",
+        "content": [
+          {
+            "type": "text",
+            "text": "Verify each format independently."
+          },
+          {
+            "type": "text",
+            "text": "Do not assume the ebook, paperback and hardback use identical production files."
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "Production Package for Every Intended Edition",
+    "gate": "Each edition has been independently proofed, checked and approved for upload.",
+    "deliverable_system_supplied": true,
+    "gate_system_supplied": true,
+    "template": "templates/extra/27_Proofing_Checklist.md"
+  },
+  {
+    "id": "21",
+    "title": "Prepare the Launch",
+    "steps": [
+      {
+        "number": 99,
+        "title": "Define the book’s positioning",
+        "content": [
+          {
+            "type": "text",
+            "text": "Answer:"
+          },
+          {
+            "type": "bullet",
+            "text": "Who is most likely to enjoy it?"
+          },
+          {
+            "type": "bullet",
+            "text": "What familiar reading experience does it offer?"
+          },
+          {
+            "type": "bullet",
+            "text": "What makes its combination distinctive?"
+          },
+          {
+            "type": "bullet",
+            "text": "What emotional promise does it make?"
+          },
+          {
+            "type": "bullet",
+            "text": "Which themes and story elements are most marketable?"
+          }
+        ]
+      },
+      {
+        "number": 100,
+        "title": "Prepare author assets",
+        "content": [
+          {
+            "type": "text",
+            "text": "Create:"
+          },
+          {
+            "type": "bullet",
+            "text": "Author biography"
+          },
+          {
+            "type": "bullet",
+            "text": "Professional photograph or suitable author image"
+          },
+          {
+            "type": "bullet",
+            "text": "Website or landing page"
+          },
+          {
+            "type": "bullet",
+            "text": "Mailing-list signup"
+          },
+          {
+            "type": "bullet",
+            "text": "Book description"
+          },
+          {
+            "type": "bullet",
+            "text": "Cover images"
+          },
+          {
+            "type": "bullet",
+            "text": "Retail graphics"
+          },
+          {
+            "type": "bullet",
+            "text": "Sample chapter"
+          },
+          {
+            "type": "bullet",
+            "text": "Media sheet"
+          },
+          {
+            "type": "bullet",
+            "text": "Contact details"
+          },
+          {
+            "type": "bullet",
+            "text": "Social profile information where relevant"
+          }
+        ]
+      },
+      {
+        "number": 101,
+        "title": "Prepare advance readers",
+        "content": [
+          {
+            "type": "text",
+            "text": "Advance readers may help identify final problems and provide early reviews where permitted."
+          },
+          {
+            "type": "text",
+            "text": "Provide:"
+          },
+          {
+            "type": "bullet",
+            "text": "Correct edition"
+          },
+          {
+            "type": "bullet",
+            "text": "Clear publication date"
+          },
+          {
+            "type": "bullet",
+            "text": "Review guidance"
+          },
+          {
+            "type": "bullet",
+            "text": "Disclosure expectations"
+          },
+          {
+            "type": "bullet",
+            "text": "Simple review links when available"
+          },
+          {
+            "type": "bullet",
+            "text": "A polite reminder rather than pressure"
+          },
+          {
+            "type": "text",
+            "text": "Never purchase dishonest reviews or attempt to control what reviewers say."
+          }
+        ]
+      },
+      {
+        "number": 102,
+        "title": "Create launch content",
+        "content": [
+          {
+            "type": "text",
+            "text": "Prepare in advance:"
+          },
+          {
+            "type": "bullet",
+            "text": "Book announcement"
+          },
+          {
+            "type": "bullet",
+            "text": "Cover reveal"
+          },
+          {
+            "type": "bullet",
+            "text": "Premise post"
+          },
+          {
+            "type": "bullet",
+            "text": "Character introduction"
+          },
+          {
+            "type": "bullet",
+            "text": "Worldbuilding feature"
+          },
+          {
+            "type": "bullet",
+            "text": "Sample passage"
+          },
+          {
+            "type": "bullet",
+            "text": "Launch-day message"
+          },
+          {
+            "type": "bullet",
+            "text": "Reader discussion questions"
+          },
+          {
+            "type": "bullet",
+            "text": "Behind-the-scenes article"
+          },
+          {
+            "type": "bullet",
+            "text": "Mailing-list emails"
+          }
+        ]
+      },
+      {
+        "number": 103,
+        "title": "Plan the launch period",
+        "content": [
+          {
+            "type": "text",
+            "text": "A practical sequence is:"
+          },
+          {
+            "type": "subheading",
+            "text": "Before launch"
+          },
+          {
+            "type": "bullet",
+            "text": "Finalise files",
+            "subheading": "Before launch"
+          },
+          {
+            "type": "bullet",
+            "text": "Approve proofs",
+            "subheading": "Before launch"
+          },
+          {
+            "type": "bullet",
+            "text": "Prepare sales pages",
+            "subheading": "Before launch"
+          },
+          {
+            "type": "bullet",
+            "text": "Contact advance readers",
+            "subheading": "Before launch"
+          },
+          {
+            "type": "bullet",
+            "text": "Build promotional assets",
+            "subheading": "Before launch"
+          },
+          {
+            "type": "bullet",
+            "text": "Test links",
+            "subheading": "Before launch"
+          },
+          {
+            "type": "bullet",
+            "text": "Confirm pricing and availability",
+            "subheading": "Before launch"
+          },
+          {
+            "type": "subheading",
+            "text": "Launch week"
+          },
+          {
+            "type": "bullet",
+            "text": "Notify existing readers",
+            "subheading": "Launch week"
+          },
+          {
+            "type": "bullet",
+            "text": "Publish prepared content",
+            "subheading": "Launch week"
+          },
+          {
+            "type": "bullet",
+            "text": "Monitor retailer pages",
+            "subheading": "Launch week"
+          },
+          {
+            "type": "bullet",
+            "text": "Correct technical problems",
+            "subheading": "Launch week"
+          },
+          {
+            "type": "bullet",
+            "text": "Thank supporters",
+            "subheading": "Launch week"
+          },
+          {
+            "type": "bullet",
+            "text": "Avoid constant repetitive promotion",
+            "subheading": "Launch week"
+          },
+          {
+            "type": "subheading",
+            "text": "After launch"
+          },
+          {
+            "type": "bullet",
+            "text": "Continue useful content",
+            "subheading": "After launch"
+          },
+          {
+            "type": "bullet",
+            "text": "Gather reader responses",
+            "subheading": "After launch"
+          },
+          {
+            "type": "bullet",
+            "text": "Test marketing methods",
+            "subheading": "After launch"
+          },
+          {
+            "type": "bullet",
+            "text": "Update descriptions where genuinely necessary",
+            "subheading": "After launch"
+          },
+          {
+            "type": "bullet",
+            "text": "Begin focusing attention on the next book",
+            "subheading": "After launch"
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "complete Launch Plan",
+    "gate": "The book can be purchased, the files have been checked, and readers can clearly understand what it offers.",
+    "template": "templates/core/22_Launch_Plan.md"
+  },
+  {
+    "id": "22",
+    "title": "Manage the Published Book",
+    "steps": [
+      {
+        "number": 104,
+        "title": "Archive the final edition",
+        "content": [
+          {
+            "type": "text",
+            "text": "Retain:"
+          },
+          {
+            "type": "bullet",
+            "text": "Final manuscript"
+          },
+          {
+            "type": "bullet",
+            "text": "Source files"
+          },
+          {
+            "type": "bullet",
+            "text": "Cover files"
+          },
+          {
+            "type": "bullet",
+            "text": "Formatting files"
+          },
+          {
+            "type": "bullet",
+            "text": "Proof copies"
+          },
+          {
+            "type": "bullet",
+            "text": "Contracts"
+          },
+          {
+            "type": "bullet",
+            "text": "Permissions"
+          },
+          {
+            "type": "bullet",
+            "text": "ISBN records"
+          },
+          {
+            "type": "bullet",
+            "text": "Metadata"
+          },
+          {
+            "type": "bullet",
+            "text": "Sales descriptions"
+          },
+          {
+            "type": "bullet",
+            "text": "Publication dates"
+          },
+          {
+            "type": "bullet",
+            "text": "Contractor agreements"
+          }
+        ]
+      },
+      {
+        "number": 105,
+        "title": "Track performance sensibly",
+        "content": [
+          {
+            "type": "text",
+            "text": "Monitor:"
+          },
+          {
+            "type": "bullet",
+            "text": "Sales by format"
+          },
+          {
+            "type": "bullet",
+            "text": "Read-through into later books"
+          },
+          {
+            "type": "bullet",
+            "text": "Mailing-list growth"
+          },
+          {
+            "type": "bullet",
+            "text": "Review patterns"
+          },
+          {
+            "type": "bullet",
+            "text": "Advertising cost where used"
+          },
+          {
+            "type": "bullet",
+            "text": "Retailer availability"
+          },
+          {
+            "type": "bullet",
+            "text": "Direct reader feedback"
+          },
+          {
+            "type": "bullet",
+            "text": "Returns or production problems"
+          },
+          {
+            "type": "text",
+            "text": "Do not rewrite the book because of one negative review."
+          }
+        ]
+      },
+      {
+        "number": 106,
+        "title": "Correct genuine errors",
+        "content": [
+          {
+            "type": "text",
+            "text": "For later editions, keep a correction register:"
+          },
+          {
+            "type": "bullet",
+            "text": "Error"
+          },
+          {
+            "type": "bullet",
+            "text": "Location"
+          },
+          {
+            "type": "bullet",
+            "text": "Required correction"
+          },
+          {
+            "type": "bullet",
+            "text": "Date corrected"
+          },
+          {
+            "type": "bullet",
+            "text": "Formats updated"
+          },
+          {
+            "type": "bullet",
+            "text": "New edition required or not"
+          }
+        ]
+      },
+      {
+        "number": 107,
+        "title": "Feed discoveries into the next book",
+        "content": [
+          {
+            "type": "text",
+            "text": "Update:"
+          },
+          {
+            "type": "bullet",
+            "text": "Series bible"
+          },
+          {
+            "type": "bullet",
+            "text": "Character states"
+          },
+          {
+            "type": "bullet",
+            "text": "Timeline"
+          },
+          {
+            "type": "bullet",
+            "text": "Unresolved mysteries"
+          },
+          {
+            "type": "bullet",
+            "text": "Setup/payoff ledger"
+          },
+          {
+            "type": "bullet",
+            "text": "World changes"
+          },
+          {
+            "type": "bullet",
+            "text": "Reader promises"
+          },
+          {
+            "type": "bullet",
+            "text": "Consequences from Book One"
+          },
+          {
+            "type": "text",
+            "text": "Then begin the next book at the premise stage rather than simply continuing from the final chapter."
+          }
+        ]
+      }
+    ],
+    "intro": [],
+    "deliverable": "Edition Archive, Performance Register and Updated Series Ledgers",
+    "gate": "The published edition is archived, genuine errors are tracked and discoveries have been carried into the next book.",
+    "deliverable_system_supplied": true,
+    "gate_system_supplied": true,
+    "template": "templates/extra/28_Published_Book_Control.md"
+  }
+]

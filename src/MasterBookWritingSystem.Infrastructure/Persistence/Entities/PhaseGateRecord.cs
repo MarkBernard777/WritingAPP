@@ -1,12 +1,12 @@
-namespace MasterBookWritingSystem.Core.Domain.Workflow;
+namespace MasterBookWritingSystem.Infrastructure.Persistence.Entities;
 
-public sealed class PhaseGate
+public sealed class PhaseGateRecord
 {
-    public required Guid Id { get; init; }
+    public Guid Id { get; set; }
 
-    public required Guid ProjectId { get; init; }
+    public Guid ProjectId { get; set; }
 
-    public required string PhaseId { get; init; }
+    public required string PhaseId { get; set; }
 
     public bool IsPassed { get; set; }
 
