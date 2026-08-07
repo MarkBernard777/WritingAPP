@@ -1,0 +1,86 @@
+﻿<Window x:Class="MasterBookWritingSystem.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:nav="clr-namespace:MasterBookWritingSystem.App.Navigation"
+        mc:Ignorable="d"
+        Title="{Binding ApplicationTitle}"
+        Height="720"
+        Width="1180"
+        MinHeight="560"
+        MinWidth="900">
+    <DockPanel>
+        <Border DockPanel.Dock="Top"
+                Background="#1F2933"
+                Padding="16,12">
+            <TextBlock Text="{Binding ApplicationTitle}"
+                       Foreground="White"
+                       FontSize="18"
+                       FontWeight="SemiBold" />
+        </Border>
+
+        <Border DockPanel.Dock="Left"
+                Background="#E4E7EB"
+                Width="220"
+                Padding="12">
+            <StackPanel>
+                <TextBlock Text="Navigate"
+                           FontWeight="SemiBold"
+                           Margin="8,4,8,12"
+                           Opacity="0.7" />
+
+                <RadioButton Content="Dashboard"
+                             GroupName="Nav"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Command="{Binding NavigateCommand}"
+                             CommandParameter="{x:Static nav:AppSection.Dashboard}"
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Dashboard, Mode=OneWay}" />
+                <RadioButton Content="Workflow"
+                             GroupName="Nav"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Command="{Binding NavigateCommand}"
+                             CommandParameter="{x:Static nav:AppSection.Workflow}"
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Workflow, Mode=OneWay}" />
+                <RadioButton Content="Documents"
+                             GroupName="Nav"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Command="{Binding NavigateCommand}"
+                             CommandParameter="{x:Static nav:AppSection.Documents}"
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Documents, Mode=OneWay}" />
+                <RadioButton Content="Manuscript"
+                             GroupName="Nav"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Command="{Binding NavigateCommand}"
+                             CommandParameter="{x:Static nav:AppSection.Manuscript}"
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Manuscript, Mode=OneWay}" />
+                <RadioButton Content="Story Data"
+                             GroupName="Nav"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Command="{Binding NavigateCommand}"
+                             CommandParameter="{x:Static nav:AppSection.StoryData}"
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=StoryData, Mode=OneWay}" />
+                <RadioButton Content="Tools"
+                             GroupName="Nav"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Command="{Binding NavigateCommand}"
+                             CommandParameter="{x:Static nav:AppSection.Tools}"
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Tools, Mode=OneWay}" />
+                <RadioButton Content="Publishing"
+                             GroupName="Nav"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Command="{Binding NavigateCommand}"
+                             CommandParameter="{x:Static nav:AppSection.Publishing}"
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Publishing, Mode=OneWay}" />
+                <RadioButton Content="Settings"
+                             GroupName="Nav"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Command="{Binding NavigateCommand}"
+                             CommandParameter="{x:Static nav:AppSection.Settings}"
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Settings, Mode=OneWay}" />
+            </StackPanel>
+        </Border>
+
+        <ContentControl Content="{Binding CurrentViewModel}" />
+    </DockPanel>
+</Window>

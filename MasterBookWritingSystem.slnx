@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MasterBookWritingSystem.App/MasterBookWritingSystem.App.csproj" />
+    <Project Path="src/MasterBookWritingSystem.Core/MasterBookWritingSystem.Core.csproj" />
+    <Project Path="src/MasterBookWritingSystem.Infrastructure/MasterBookWritingSystem.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MasterBookWritingSystem.Tests/MasterBookWritingSystem.Tests.csproj" />
+  </Folder>
+</Solution>
