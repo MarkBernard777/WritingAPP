@@ -40,6 +40,12 @@ public sealed class ProjectDbContext : DbContext
 
     public DbSet<IdeaScoreRecord> IdeaScores => Set<IdeaScoreRecord>();
 
+    public DbSet<SubmissionRecord> Submissions => Set<SubmissionRecord>();
+
+    public DbSet<LaunchItemRecord> LaunchItems => Set<LaunchItemRecord>();
+
+    public DbSet<RightsAndContractRecord> RightsAndContracts => Set<RightsAndContractRecord>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ProjectRecord>(entity =>
@@ -255,6 +261,58 @@ public sealed class ProjectDbContext : DbContext
             entity.Property(score => score.Decision).HasMaxLength(100);
             entity.HasIndex(score => score.IdeaId).IsUnique();
             entity.HasIndex(score => score.ProjectId);
+        });
+
+        modelBuilder.Entity<SubmissionRecord>(entity =>
+        {
+            entity.ToTable("Submissions");
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.Name).HasMaxLength(500).IsRequired();
+            entity.Property(item => item.AgencyOrPublisher).HasMaxLength(500);
+            entity.Property(item => item.Website).HasMaxLength(1000);
+            entity.Property(item => item.Fit).HasMaxLength(2000);
+            entity.Property(item => item.Requirements).HasMaxLength(4000);
+            entity.Property(item => item.MaterialSent).HasMaxLength(2000);
+            entity.Property(item => item.Response).HasConversion<int>();
+            entity.Property(item => item.Outcome).HasConversion<int>();
+            entity.Property(item => item.RouteAffinity).HasConversion<int>();
+            entity.HasIndex(item => new { item.ProjectId, item.Name });
+            entity.HasIndex(item => new { item.ProjectId, item.Outcome });
+            entity.HasIndex(item => new { item.ProjectId, item.RouteAffinity });
+        });
+
+        modelBuilder.Entity<LaunchItemRecord>(entity =>
+        {
+            entity.ToTable("LaunchItems");
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.Phase).HasMaxLength(200);
+            entity.Property(item => item.Channel).HasMaxLength(200);
+            entity.Property(item => item.Asset).HasMaxLength(500).IsRequired();
+            entity.Property(item => item.Audience).HasMaxLength(500);
+            entity.Property(item => item.Owner).HasMaxLength(200);
+            entity.Property(item => item.Link).HasMaxLength(1000);
+            entity.Property(item => item.Result).HasMaxLength(4000);
+            entity.Property(item => item.Status).HasConversion<int>();
+            entity.Property(item => item.RouteAffinity).HasConversion<int>();
+            entity.HasIndex(item => new { item.ProjectId, item.Date });
+            entity.HasIndex(item => new { item.ProjectId, item.Status });
+        });
+
+        modelBuilder.Entity<RightsAndContractRecord>(entity =>
+        {
+            entity.ToTable("RightsAndContracts");
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.Party).HasMaxLength(500).IsRequired();
+            entity.Property(item => item.RightOrService).HasMaxLength(500).IsRequired();
+            entity.Property(item => item.Territory).HasMaxLength(200);
+            entity.Property(item => item.Format).HasMaxLength(200);
+            entity.Property(item => item.Payment).HasPrecision(18, 2);
+            entity.Property(item => item.PaymentNotes).HasMaxLength(2000);
+            entity.Property(item => item.Restrictions).HasMaxLength(4000);
+            entity.Property(item => item.AgreementFile).HasMaxLength(1000);
+            entity.Property(item => item.Status).HasConversion<int>();
+            entity.HasIndex(item => new { item.ProjectId, item.Party });
+            entity.HasIndex(item => new { item.ProjectId, item.Status });
         });
     }
 }

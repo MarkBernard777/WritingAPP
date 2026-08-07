@@ -5,6 +5,7 @@ using MasterBookWritingSystem.Infrastructure.Documents;
 using MasterBookWritingSystem.Infrastructure.Manuscript;
 using MasterBookWritingSystem.Infrastructure.Paths;
 using MasterBookWritingSystem.Infrastructure.Persistence;
+using MasterBookWritingSystem.Infrastructure.Publishing;
 using MasterBookWritingSystem.Infrastructure.Story;
 using MasterBookWritingSystem.Infrastructure.Tools;
 using MasterBookWritingSystem.Infrastructure.Workflow;
@@ -30,6 +31,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddSingleton<ISnapshotService, SnapshotService>();
         services.AddSingleton<IPortablePackageService, PortablePackageService>();
         services.AddSingleton<IStoryDataService, StoryDataService>();
+        services.AddSingleton<IPublishingService, PublishingService>();
         services.AddSingleton<IWorkflowService, WorkflowService>();
         services.AddSingleton<IDashboardService, DashboardService>();
         return services;

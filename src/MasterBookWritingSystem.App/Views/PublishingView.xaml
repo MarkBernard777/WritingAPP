@@ -1,6 +1,283 @@
 <UserControl x:Class="MasterBookWritingSystem.App.Views.PublishingView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:views="clr-namespace:MasterBookWritingSystem.App.Views">
-    <views:PlaceholderView />
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,8">
+            <Button DockPanel.Dock="Right"
+                    Content="Refresh"
+                    Width="90"
+                    Command="{Binding RefreshCommand}" />
+            <TextBlock Text="Publishing"
+                       FontSize="26"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center" />
+        </DockPanel>
+
+        <Border Grid.Row="1"
+                Background="#F3F6FA"
+                BorderBrush="#D0D7E2"
+                BorderThickness="1"
+                Padding="12,10"
+                Margin="0,0,0,10"
+                Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel>
+                <TextBlock Text="{Binding ActiveRouteLabel}"
+                           FontSize="16"
+                           FontWeight="SemiBold" />
+                <TextBlock Text="{Binding SubmissionsRouteNote}"
+                           TextWrapping="Wrap"
+                           Margin="0,4,0,0"
+                           Foreground="#445" />
+                <WrapPanel Margin="0,8,0,0">
+                    <Button Content="Publishing Plan (20)"
+                            Margin="0,0,8,4"
+                            Padding="10,4"
+                            Command="{Binding OpenPublishingPlanCommand}" />
+                    <Button Content="Launch Plan (22)"
+                            Margin="0,0,8,4"
+                            Padding="10,4"
+                            Command="{Binding OpenLaunchPlanCommand}" />
+                    <Button Content="Rights Register (23)"
+                            Margin="0,0,8,4"
+                            Padding="10,4"
+                            Command="{Binding OpenRightsRegisterCommand}" />
+                    <Button Content="11 Publishing folder"
+                            Margin="0,0,8,4"
+                            Padding="10,4"
+                            Command="{Binding OpenPublishingFolderCommand}" />
+                    <Button Content="12 Marketing folder"
+                            Margin="0,0,8,4"
+                            Padding="10,4"
+                            Command="{Binding OpenMarketingFolderCommand}" />
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Grid.Row="2"
+                   Text="{Binding StatusMessage}"
+                   TextWrapping="Wrap"
+                   Margin="0,0,0,8"
+                   Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}" />
+
+        <TabControl Grid.Row="3"
+                    Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TabItem Header="Submissions">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                            <TextBlock Text="Filter by outcome" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding OutcomeFilterOptions}"
+                                      SelectedItem="{Binding SelectedOutcomeFilter}"
+                                      Margin="0,4,0,8" />
+                            <CheckBox Content="Include inactive-route submissions"
+                                      IsChecked="{Binding ShowInactiveSubmissions}" />
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Add" Width="70" Command="{Binding AddSubmissionCommand}" Margin="0,0,8,0" />
+                            <Button Content="Delete" Width="70" Command="{Binding DeleteSubmissionCommand}" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding Submissions}"
+                                 SelectedItem="{Binding SelectedSubmission}"
+                                 DisplayMemberPath="DisplayName" />
+                    </DockPanel>
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                                  DataContext="{Binding SubmissionEditor}">
+                        <StackPanel>
+                            <TextBlock Text="Name *" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Agency or publisher" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding AgencyOrPublisher, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Website / project-relative link" FontWeight="SemiBold" />
+                            <DockPanel Margin="0,4,0,8">
+                                <Button DockPanel.Dock="Right"
+                                        Content="Open"
+                                        Width="70"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding DataContext.OpenSubmissionLinkCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                                <TextBox Text="{Binding Website, UpdateSourceTrigger=PropertyChanged}" />
+                            </DockPanel>
+                            <TextBlock Text="Fit" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Fit, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                            <TextBlock Text="Requirements" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Requirements, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                            <TextBlock Text="Material sent" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding MaterialSent, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Sent date (yyyy-MM-dd)" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding SentDateText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Follow-up date (yyyy-MM-dd)" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding FollowUpDateText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Response" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding DataContext.ResponseOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      SelectedItem="{Binding Response}"
+                                      Margin="0,4,0,8" />
+                            <TextBlock Text="Outcome" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding DataContext.OutcomeOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      SelectedItem="{Binding Outcome}"
+                                      Margin="0,4,0,8" />
+                            <TextBlock Text="Route affinity" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding DataContext.RouteOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      SelectedItem="{Binding RouteAffinity}"
+                                      Margin="0,4,0,8" />
+                            <Button Content="Save submission"
+                                    HorizontalAlignment="Left"
+                                    Padding="12,6"
+                                    Command="{Binding DataContext.SaveSubmissionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Launch Items">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                            <TextBlock Text="Filter by status" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding LaunchStatusFilterOptions}"
+                                      SelectedItem="{Binding SelectedLaunchStatusFilter}"
+                                      Margin="0,4,0,8" />
+                            <TextBlock Text="Filter by route" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding LaunchRouteFilterOptions}"
+                                      SelectedItem="{Binding SelectedLaunchRouteFilter}"
+                                      Margin="0,4,0,8" />
+                            <CheckBox Content="Sort by date descending"
+                                      IsChecked="{Binding LaunchSortDescending}" />
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Add" Width="70" Command="{Binding AddLaunchItemCommand}" Margin="0,0,8,0" />
+                            <Button Content="Delete" Width="70" Command="{Binding DeleteLaunchItemCommand}" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding LaunchItems}"
+                                 SelectedItem="{Binding SelectedLaunchItem}"
+                                 DisplayMemberPath="DisplayName" />
+                    </DockPanel>
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                                  DataContext="{Binding LaunchEditor}">
+                        <StackPanel>
+                            <TextBlock Text="Date (yyyy-MM-dd)" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding DateText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Phase" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Phase, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Channel" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Channel, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Asset *" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Asset, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Audience" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Audience, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Owner" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Owner, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Link (project-relative or URL)" FontWeight="SemiBold" />
+                            <DockPanel Margin="0,4,0,8">
+                                <Button DockPanel.Dock="Right"
+                                        Content="Open"
+                                        Width="70"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding DataContext.OpenLaunchLinkCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                                <TextBox Text="{Binding Link, UpdateSourceTrigger=PropertyChanged}" />
+                            </DockPanel>
+                            <TextBlock Text="Status" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding DataContext.LaunchStatusOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      SelectedItem="{Binding Status}"
+                                      Margin="0,4,0,8" />
+                            <TextBlock Text="Result" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Result, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                            <TextBlock Text="Route affinity (Unspecified = all routes)" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding DataContext.LaunchRouteFilterOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      SelectedItem="{Binding RouteAffinity}"
+                                      Margin="0,4,0,8" />
+                            <Button Content="Save launch item"
+                                    HorizontalAlignment="Left"
+                                    Padding="12,6"
+                                    Command="{Binding DataContext.SaveLaunchItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Rights &amp; Contracts">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                            <TextBlock Text="Filter by status" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding RightsStatusFilterOptions}"
+                                      SelectedItem="{Binding SelectedRightsStatusFilter}"
+                                      Margin="0,4,0,8" />
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Add" Width="70" Command="{Binding AddRightsContractCommand}" Margin="0,0,8,0" />
+                            <Button Content="Delete" Width="70" Command="{Binding DeleteRightsContractCommand}" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding RightsContracts}"
+                                 SelectedItem="{Binding SelectedRightsContract}"
+                                 DisplayMemberPath="DisplayName" />
+                    </DockPanel>
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                                  DataContext="{Binding RightsEditor}">
+                        <StackPanel>
+                            <TextBlock Text="Party *" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Party, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Right or service *" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding RightOrService, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Territory" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Territory, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Format" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Format, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Start (yyyy-MM-dd)" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding StartDateText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="End or reversion (yyyy-MM-dd)" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding EndDateText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Payment (number)" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding PaymentText, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Payment notes" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding PaymentNotes, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" />
+                            <TextBlock Text="Restrictions" FontWeight="SemiBold" />
+                            <TextBox Text="{Binding Restrictions, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,8" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40" />
+                            <TextBlock Text="Agreement file (project-relative)" FontWeight="SemiBold" />
+                            <DockPanel Margin="0,4,0,8">
+                                <Button DockPanel.Dock="Right"
+                                        Content="Open"
+                                        Width="70"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding DataContext.OpenAgreementFileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                                <TextBox Text="{Binding AgreementFile, UpdateSourceTrigger=PropertyChanged}" />
+                            </DockPanel>
+                            <TextBlock Text="Status" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding DataContext.RightsStatusOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      SelectedItem="{Binding Status}"
+                                      Margin="0,4,0,8" />
+                            <Button Content="Save rights/contract"
+                                    HorizontalAlignment="Left"
+                                    Padding="12,6"
+                                    Command="{Binding DataContext.SaveRightsContractCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <TextBlock Grid.Row="4"
+                   Text="{Binding StatusMessage}"
+                   TextWrapping="Wrap"
+                   Margin="0,8,0,0"
+                   Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}}" />
+    </Grid>
 </UserControl>
