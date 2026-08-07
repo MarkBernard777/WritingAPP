@@ -121,6 +121,14 @@ Write-Host "dotnet restore..."
 dotnet restore $repoRoot
 if ($LASTEXITCODE -ne 0) { throw "dotnet restore failed ($LASTEXITCODE)." }
 
+Write-Host "dotnet restore app (Release win-x64)..."
+dotnet restore $appCsproj `
+    -r win-x64 `
+    -p:Configuration=Release
+if ($LASTEXITCODE -ne 0) {
+    throw "dotnet restore app win-x64 failed ($LASTEXITCODE)."
+}
+
 Write-Host "dotnet build -c Release..."
 if (Test-Path -LiteralPath $solution) {
     dotnet build $solution -c Release --no-restore
