@@ -23,6 +23,7 @@ public partial class ManuscriptViewModel : ObservableObject
     private bool _suppressDirty;
     private bool _restoringSelection;
     private Guid? _loadedChapterId;
+    private int _editorSessionVersion;
 
     public ManuscriptViewModel(
         IProjectService projectService,
@@ -84,6 +85,11 @@ public partial class ManuscriptViewModel : ObservableObject
 
     [ObservableProperty]
     private string _saveStateDisplay = "Clean";
+
+    /// <summary>
+    /// Increments when chapter/project content is rebased so the prose TextBox can clear its native undo stack.
+    /// </summary>
+    public int EditorSessionVersion => _editorSessionVersion;
 
     partial void OnSelectedChapterChanged(ChapterListItemViewModel? value)
     {
@@ -534,6 +540,8 @@ public partial class ManuscriptViewModel : ObservableObject
         WordCount = ManuscriptTextAnalytics.CountWords(content);
         PreviewHtml = MarkdownPreviewRenderer.ToHtmlDocument(content);
         RefreshBracketNotes(content);
+        _editorSessionVersion++;
+        OnPropertyChanged(nameof(EditorSessionVersion));
     }
 
     private void RefreshBracketNotes(string markdown)

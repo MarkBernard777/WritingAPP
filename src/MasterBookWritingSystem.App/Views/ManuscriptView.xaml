@@ -8,10 +8,25 @@
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0" Margin="0,0,0,12">
-            <Button DockPanel.Dock="Right"
-                    Content="Refresh"
-                    Width="90"
-                    Command="{Binding RefreshCommand}" />
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="Undo"
+                        Width="70"
+                        Margin="0,0,6,0"
+                        Command="ApplicationCommands.Undo"
+                        CommandTarget="{Binding ElementName=MarkdownEditor}"
+                        ToolTip="Undo manuscript text (Ctrl+Z)"
+                        AutomationProperties.Name="Undo manuscript text" />
+                <Button Content="Redo"
+                        Width="70"
+                        Margin="0,0,6,0"
+                        Command="ApplicationCommands.Redo"
+                        CommandTarget="{Binding ElementName=MarkdownEditor}"
+                        ToolTip="Redo manuscript text (Ctrl+Y)"
+                        AutomationProperties.Name="Redo manuscript text" />
+                <Button Content="Refresh"
+                        Width="90"
+                        Command="{Binding RefreshCommand}" />
+            </StackPanel>
             <TextBlock Text="Manuscript"
                        FontSize="26"
                        FontWeight="SemiBold"
@@ -100,14 +115,18 @@
                     </Grid.ColumnDefinitions>
                     <DockPanel Grid.Column="0" Margin="0,0,8,0">
                         <TextBlock DockPanel.Dock="Top" Text="Markdown" FontWeight="SemiBold" Margin="0,0,0,6" />
-                        <TextBox Text="{Binding MarkdownText, UpdateSourceTrigger=PropertyChanged}"
+                        <TextBox x:Name="MarkdownEditor"
+                                 Text="{Binding MarkdownText, UpdateSourceTrigger=PropertyChanged}"
                                  AcceptsReturn="True"
                                  AcceptsTab="True"
                                  TextWrapping="Wrap"
                                  VerticalScrollBarVisibility="Auto"
                                  HorizontalScrollBarVisibility="Auto"
                                  FontFamily="Consolas"
-                                 FontSize="13" />
+                                 FontSize="13"
+                                 IsUndoEnabled="True"
+                                 UndoLimit="100"
+                                 AutomationProperties.Name="Manuscript markdown editor" />
                     </DockPanel>
                     <DockPanel Grid.Column="1">
                         <TextBlock DockPanel.Dock="Top" Text="Preview" FontWeight="SemiBold" Margin="0,0,0,6" />

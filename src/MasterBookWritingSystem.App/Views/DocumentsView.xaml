@@ -1,6 +1,10 @@
 <UserControl x:Class="MasterBookWritingSystem.App.Views.DocumentsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.InputBindings>
+        <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCommand}" />
+        <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCommand}" />
+    </UserControl.InputBindings>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -8,10 +12,23 @@
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0" Margin="0,0,0,12">
-            <Button DockPanel.Dock="Right"
-                    Content="Refresh"
-                    Width="90"
-                    Command="{Binding RefreshCommand}" />
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="Undo"
+                        Width="70"
+                        Margin="0,0,6,0"
+                        Command="{Binding UndoCommand}"
+                        ToolTip="{Binding UndoTooltip}"
+                        AutomationProperties.Name="{Binding UndoTooltip}" />
+                <Button Content="Redo"
+                        Width="70"
+                        Margin="0,0,6,0"
+                        Command="{Binding RedoCommand}"
+                        ToolTip="{Binding RedoTooltip}"
+                        AutomationProperties.Name="{Binding RedoTooltip}" />
+                <Button Content="Refresh"
+                        Width="90"
+                        Command="{Binding RefreshCommand}" />
+            </StackPanel>
             <TextBlock Text="Working Documents"
                        FontSize="26"
                        FontWeight="SemiBold"
@@ -115,7 +132,12 @@
                                                          Margin="0,6,0,0"
                                                          MinHeight="40"
                                                          TextWrapping="Wrap"
-                                                         AcceptsReturn="True" />
+                                                         AcceptsReturn="True"
+                                                         IsUndoEnabled="True"
+                                                         UndoLimit="100"
+                                                         AutomationProperties.Name="{Binding Label}"
+                                                         GotFocus="FieldEditor_GotFocus"
+                                                         LostFocus="FieldEditor_LostFocus" />
                                             </StackPanel>
                                             <Button Grid.Column="1"
                                                     Content="Save"
@@ -135,7 +157,12 @@
                              Height="100"
                              TextWrapping="Wrap"
                              AcceptsReturn="True"
-                             VerticalScrollBarVisibility="Auto" />
+                             VerticalScrollBarVisibility="Auto"
+                             IsUndoEnabled="True"
+                             UndoLimit="100"
+                             AutomationProperties.Name="Document notes"
+                             GotFocus="NotesEditor_GotFocus"
+                             LostFocus="NotesEditor_LostFocus" />
                     <Button Content="Save notes"
                             HorizontalAlignment="Left"
                             Margin="0,8,0,0"

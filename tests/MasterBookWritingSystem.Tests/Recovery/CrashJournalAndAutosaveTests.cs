@@ -167,6 +167,31 @@ public sealed class CrashJournalAndAutosaveTests : IDisposable
     }
 
     [Fact]
+    public async Task UndoNewestState_DoesNotResurrectClearedJournal()
+    {
+        var project = await CreateAsync("UndoJournal");
+        var chapter = await _chapters.CreateAsync(project.Id, "Chapter");
+        var entryId = RecoveryJournalIds.Create(
+            project.Id,
+            RecoveryEntityType.ManuscriptChapter,
+            chapter.Id);
+
+        _autosave.DebounceDelay = TimeSpan.FromMilliseconds(40);
+        _autosave.ScheduleManuscriptSave(project.Id, chapter.Id, "edited");
+        await WaitForAsync(() => !_autosave.HasPendingWork, TimeSpan.FromSeconds(3));
+        Assert.Equal("edited", await _chapters.LoadContentAsync(project.Id, chapter.Id));
+        Assert.Null(await _journal.GetAsync(project.Id, entryId));
+
+        // Simulate undo restoring prior prose: newest draft is autosaved; cleared journal stays cleared after success.
+        _autosave.ScheduleManuscriptSave(project.Id, chapter.Id, "original");
+        await WaitForAsync(() => !_autosave.HasPendingWork, TimeSpan.FromSeconds(3));
+
+        Assert.Equal("original", await _chapters.LoadContentAsync(project.Id, chapter.Id));
+        Assert.Null(await _journal.GetAsync(project.Id, entryId));
+        Assert.False(await _journal.HasRecoverableEntriesAsync(project.Id));
+    }
+
+    [Fact]
     public async Task ListAsync_ExposesInspectionApiForRecoverySlice()
     {
         var project = await CreateAsync("Inspect");

@@ -2,10 +2,12 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MasterBookWritingSystem.App.Editing;
 using MasterBookWritingSystem.App.Navigation;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Domain.Documents;
 using MasterBookWritingSystem.Core.Domain.Story;
+using MasterBookWritingSystem.Core.Editing;
 using MasterBookWritingSystem.Core.Recovery;
 using MasterBookWritingSystem.Core.Story;
 
@@ -20,6 +22,7 @@ public partial class DocumentsViewModel : ObservableObject
     private readonly INavigationService _navigation;
     private readonly IEditorAutosaveService _autosave;
     private readonly ISaveStateService _saveState;
+    private readonly StructuredDocumentEditTracker _editTracker = new();
     private readonly Dictionary<Guid, Character> _charactersById = [];
     private bool _suppressAutosave;
 
@@ -79,6 +82,16 @@ public partial class DocumentsViewModel : ObservableObject
     [ObservableProperty]
     private string _saveStateDisplay = "Clean";
 
+    [ObservableProperty]
+    private string _undoTooltip = "Undo";
+
+    [ObservableProperty]
+    private string _redoTooltip = "Redo";
+
+    public bool CanUndoEdit => NativeTextUndoRouter.CanUndo() || _editTracker.CanUndo;
+
+    public bool CanRedoEdit => NativeTextUndoRouter.CanRedo() || _editTracker.CanRedo;
+
     partial void OnSelectedDocumentChanged(DocumentListItemViewModel? value)
         => _ = LoadSelectedAsync();
 
@@ -89,14 +102,82 @@ public partial class DocumentsViewModel : ObservableObject
             return;
         }
 
-        var project = _projectService.ActiveProject;
-        var document = SelectedDocument;
-        if (project is null || document is null)
+        // Autosave tracks the newest draft immediately; model undo commits on notes focus leave.
+        ScheduleNotesAutosave(value);
+    }
+
+    public void BeginFieldEdit(DocumentFieldItemViewModel field)
+    {
+        // Baseline is whatever the tracker last committed for this field.
+        _ = field;
+    }
+
+    public void EndFieldEdit(DocumentFieldItemViewModel field)
+    {
+        if (_suppressAutosave || field is null)
         {
             return;
         }
 
-        _autosave.ScheduleDocumentNotesSave(project.Id, document.Id, value);
+        if (_editTracker.SetField(field.Key, field.Value))
+        {
+            NotifyUndoState();
+        }
+    }
+
+    public void BeginNotesEdit()
+    {
+    }
+
+    public void EndNotesEdit()
+    {
+        if (_suppressAutosave)
+        {
+            return;
+        }
+
+        if (_editTracker.SetNotes(Notes))
+        {
+            NotifyUndoState();
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanUndoEdit))]
+    private void Undo()
+    {
+        if (NativeTextUndoRouter.TryUndo())
+        {
+            NotifyUndoState();
+            return;
+        }
+
+        if (!_editTracker.TryUndo(out var application) || application is null)
+        {
+            NotifyUndoState();
+            return;
+        }
+
+        ApplyStructuredEdit(application);
+        NotifyUndoState();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRedoEdit))]
+    private void Redo()
+    {
+        if (NativeTextUndoRouter.TryRedo())
+        {
+            NotifyUndoState();
+            return;
+        }
+
+        if (!_editTracker.TryRedo(out var application) || application is null)
+        {
+            NotifyUndoState();
+            return;
+        }
+
+        ApplyStructuredEdit(application);
+        NotifyUndoState();
     }
 
     [RelayCommand]
@@ -107,6 +188,8 @@ public partial class DocumentsViewModel : ObservableObject
         Documents.Clear();
         Fields.Clear();
         SceneInventory.Clear();
+        _editTracker.Reset([], string.Empty);
+        NotifyUndoState();
 
         if (project is null)
         {
@@ -231,6 +314,8 @@ public partial class DocumentsViewModel : ObservableObject
             _suppressAutosave = true;
             Notes = string.Empty;
             _suppressAutosave = false;
+            _editTracker.Reset([], string.Empty);
+            NotifyUndoState();
             return;
         }
 
@@ -246,6 +331,7 @@ public partial class DocumentsViewModel : ObservableObject
             ValidationMessage =
                 "Detailed scene editing uses the shared scene inventory in Story Data. "
                 + "Optional document notes can still be saved below.";
+            _editTracker.Reset([], document.Notes);
         }
         else
         {
@@ -256,20 +342,64 @@ public partial class DocumentsViewModel : ObservableObject
                 Fields.Add(item);
             }
 
+            _editTracker.Reset(
+                document.Fields.Select(item => new KeyValuePair<string, string>(item.Key, item.Value)),
+                document.Notes);
             await RefreshValidationAsync().ConfigureAwait(true);
         }
 
+        NotifyUndoState();
         SyncSaveState();
     }
 
     private void OnFieldPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName != nameof(DocumentFieldItemViewModel.Value)
-            || sender is not DocumentFieldItemViewModel field)
+            || sender is not DocumentFieldItemViewModel field
+            || _suppressAutosave)
         {
             return;
         }
 
+        // Autosave tracks the newest draft immediately; model undo commits on field focus leave.
+        ScheduleFieldAutosave(field.Key, field.Value);
+    }
+
+    private void ApplyStructuredEdit(StructuredEditApplication application)
+    {
+        _suppressAutosave = true;
+        try
+        {
+            if (application.Target == StructuredEditTarget.Notes)
+            {
+                Notes = application.Value;
+            }
+            else if (application.FieldKey is { } key)
+            {
+                var field = Fields.FirstOrDefault(item => item.Key == key);
+                if (field is not null)
+                {
+                    field.Value = application.Value;
+                }
+            }
+        }
+        finally
+        {
+            _suppressAutosave = false;
+        }
+
+        if (application.Target == StructuredEditTarget.Notes)
+        {
+            ScheduleNotesAutosave(application.Value);
+        }
+        else if (application.FieldKey is { } fieldKey)
+        {
+            ScheduleFieldAutosave(fieldKey, application.Value);
+        }
+    }
+
+    private void ScheduleFieldAutosave(string fieldKey, string value)
+    {
         var project = _projectService.ActiveProject;
         var document = SelectedDocument;
         if (project is null || document is null)
@@ -277,7 +407,33 @@ public partial class DocumentsViewModel : ObservableObject
             return;
         }
 
-        _autosave.ScheduleDocumentFieldSave(project.Id, document.Id, field.Key, field.Value);
+        _autosave.ScheduleDocumentFieldSave(project.Id, document.Id, fieldKey, value);
+    }
+
+    private void ScheduleNotesAutosave(string value)
+    {
+        var project = _projectService.ActiveProject;
+        var document = SelectedDocument;
+        if (project is null || document is null)
+        {
+            return;
+        }
+
+        _autosave.ScheduleDocumentNotesSave(project.Id, document.Id, value);
+    }
+
+    private void NotifyUndoState()
+    {
+        UndoTooltip = _editTracker.CanUndo
+            ? "Undo last structured edit (Ctrl+Z)"
+            : "Nothing to undo";
+        RedoTooltip = _editTracker.CanRedo
+            ? "Redo last structured edit (Ctrl+Y)"
+            : "Nothing to redo";
+        OnPropertyChanged(nameof(CanUndoEdit));
+        OnPropertyChanged(nameof(CanRedoEdit));
+        UndoCommand.NotifyCanExecuteChanged();
+        RedoCommand.NotifyCanExecuteChanged();
     }
 
     private void SyncSaveState()

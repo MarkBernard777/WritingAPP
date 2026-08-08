@@ -29,9 +29,20 @@ public partial class ManuscriptView : UserControl
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(ManuscriptViewModel.PreviewHtml) && _boundViewModel is not null)
+        if (_boundViewModel is null)
+        {
+            return;
+        }
+
+        if (e.PropertyName == nameof(ManuscriptViewModel.PreviewHtml))
         {
             UpdatePreview(_boundViewModel.PreviewHtml);
+        }
+        else if (e.PropertyName == nameof(ManuscriptViewModel.EditorSessionVersion))
+        {
+            // Rebased chapter/project content must not keep the previous chapter's native undo units.
+            MarkdownEditor.UndoLimit = 0;
+            MarkdownEditor.UndoLimit = 100;
         }
     }
 
