@@ -11,6 +11,13 @@ public sealed class CreateProjectDialogResult
     public string NorthStar { get; init; } = string.Empty;
 }
 
+public sealed class DialogChoice
+{
+    public required Guid Id { get; init; }
+
+    public required string Label { get; init; }
+}
+
 public interface IProjectDialogService
 {
     string? PickFolder(string description);
@@ -20,6 +27,10 @@ public interface IProjectDialogService
     void ShowMessage(string message, string caption);
 
     bool Confirm(string message, string caption);
+
+    string? PromptText(string title, string prompt, string? initialValue = null);
+
+    DialogChoice? PromptChoice(string title, string prompt, IReadOnlyList<DialogChoice> choices);
 
     string? PickOpenFile(string title, string filter);
 

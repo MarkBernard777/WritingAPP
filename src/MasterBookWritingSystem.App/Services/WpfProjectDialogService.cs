@@ -42,6 +42,29 @@ public sealed class WpfProjectDialogService : IProjectDialogService
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning) == MessageBoxResult.Yes;
 
+    public string? PromptText(string title, string prompt, string? initialValue = null)
+    {
+        var dialog = new Dialogs.PromptTextDialog(title, prompt, initialValue)
+        {
+            Owner = Application.Current?.MainWindow,
+        };
+        return dialog.ShowDialog() == true ? dialog.Value.Trim() : null;
+    }
+
+    public DialogChoice? PromptChoice(string title, string prompt, IReadOnlyList<DialogChoice> choices)
+    {
+        if (choices.Count == 0)
+        {
+            return null;
+        }
+
+        var dialog = new Dialogs.PromptChoiceDialog(title, prompt, choices)
+        {
+            Owner = Application.Current?.MainWindow,
+        };
+        return dialog.ShowDialog() == true ? dialog.SelectedChoice : null;
+    }
+
     public string? PickOpenFile(string title, string filter)
     {
         var dialog = new OpenFileDialog

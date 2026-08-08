@@ -9,6 +9,9 @@ public sealed class ManuscriptHierarchy
 
     public required IReadOnlyList<BookNode> Books { get; init; }
 
+    /// <summary>Chapters with <c>PartId == null</c> (intentionally ungrouped).</summary>
+    public required IReadOnlyList<ChapterNode> UngroupedChapters { get; init; }
+
     public required IReadOnlyList<Scene> UnassignedScenes { get; init; }
 }
 

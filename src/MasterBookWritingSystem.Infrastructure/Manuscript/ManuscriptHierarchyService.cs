@@ -104,10 +104,15 @@ public sealed class ManuscriptHierarchyService : IManuscriptHierarchyService
             };
         }).ToList();
 
+        var ungroupedChapters = BuildChapterNodes(
+            chapters.Where(chapter => chapter.PartId is null),
+            scenesByChapter);
+
         return new ManuscriptHierarchy
         {
             ProjectId = projectId,
             Books = bookNodes,
+            UngroupedChapters = ungroupedChapters,
             UnassignedScenes = unassigned,
         };
     }

@@ -5,6 +5,7 @@ using MasterBookWritingSystem.App.Navigation;
 using MasterBookWritingSystem.App.Services;
 using MasterBookWritingSystem.Core.Accessibility;
 using MasterBookWritingSystem.Core.Abstractions;
+using MasterBookWritingSystem.Core.Hierarchy;
 using MasterBookWritingSystem.Core.Manuscript;
 using MasterBookWritingSystem.Core.Recovery;
 using MasterBookWritingSystem.Infrastructure.Manuscript;
@@ -16,6 +17,7 @@ public partial class ManuscriptViewModel : ObservableObject
     private readonly IProjectService _projectService;
     private readonly IChapterService _chapterService;
     private readonly IStoryDataService _storyData;
+    private readonly IManuscriptHierarchyService _hierarchy;
     private readonly INavigationService _navigation;
     private readonly IProjectDialogService _dialogs;
     private readonly IEditorAutosaveService _autosave;
@@ -24,14 +26,17 @@ public partial class ManuscriptViewModel : ObservableObject
     private bool _suppressDirty;
     private bool _restoringSelection;
     private Guid? _loadedChapterId;
+    private Guid? _contextSceneId;
     private int _editorSessionVersion;
     private CancellationTokenSource? _previewDebounceCts;
+    private CancellationTokenSource? _refreshCts;
     private static readonly TimeSpan PreviewDebounceDelay = TimeSpan.FromMilliseconds(250);
 
     public ManuscriptViewModel(
         IProjectService projectService,
         IChapterService chapterService,
         IStoryDataService storyData,
+        IManuscriptHierarchyService hierarchy,
         INavigationService navigation,
         IProjectDialogService dialogs,
         IEditorAutosaveService autosave,
@@ -40,6 +45,7 @@ public partial class ManuscriptViewModel : ObservableObject
         _projectService = projectService;
         _chapterService = chapterService;
         _storyData = storyData;
+        _hierarchy = hierarchy;
         _navigation = navigation;
         _dialogs = dialogs;
         _autosave = autosave;
@@ -49,6 +55,8 @@ public partial class ManuscriptViewModel : ObservableObject
         SyncSaveState();
         _ = RefreshAsync();
     }
+
+    public ObservableCollection<HierarchyNodeViewModel> HierarchyRoots { get; } = [];
 
     public ObservableCollection<ChapterListItemViewModel> Chapters { get; } = [];
 
@@ -61,6 +69,9 @@ public partial class ManuscriptViewModel : ObservableObject
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
+
+    [ObservableProperty]
+    private HierarchyNodeViewModel? _selectedNode;
 
     [ObservableProperty]
     private ChapterListItemViewModel? _selectedChapter;
@@ -92,19 +103,64 @@ public partial class ManuscriptViewModel : ObservableObject
     [ObservableProperty]
     private string _saveStateAccessibleName = "Save status: Clean";
 
-    /// <summary>
-    /// Increments when chapter/project content is rebased so the prose TextBox can clear its native undo stack.
-    /// </summary>
+    [ObservableProperty]
+    private string _hierarchyFilter = string.Empty;
+
+    [ObservableProperty]
+    private bool _isLeftPanelCollapsed;
+
+    [ObservableProperty]
+    private bool _isRightPanelCollapsed;
+
+    [ObservableProperty]
+    private string _contextTitle = "Context";
+
+    [ObservableProperty]
+    private string _contextSummary = "Select a chapter or scene to see metadata.";
+
+    [ObservableProperty]
+    private string _contextDetail = string.Empty;
+
+    [ObservableProperty]
+    private string _contextStatusText = string.Empty;
+
+    [ObservableProperty]
+    private bool _canMoveSelectedUp;
+
+    [ObservableProperty]
+    private bool _canMoveSelectedDown;
+
+    [ObservableProperty]
+    private bool _canMoveSelectedTo;
+
     public int EditorSessionVersion => _editorSessionVersion;
 
-    partial void OnSelectedChapterChanged(ChapterListItemViewModel? value)
+    public string LeftPanelToggleLabel => IsLeftPanelCollapsed ? "Show hierarchy" : "Hide hierarchy";
+
+    public string RightPanelToggleLabel => IsRightPanelCollapsed ? "Show context" : "Hide context";
+
+    partial void OnIsLeftPanelCollapsedChanged(bool value)
+        => OnPropertyChanged(nameof(LeftPanelToggleLabel));
+
+    partial void OnIsRightPanelCollapsedChanged(bool value)
+        => OnPropertyChanged(nameof(RightPanelToggleLabel));
+
+    partial void OnHierarchyFilterChanged(string value) => ApplyHierarchyFilter();
+
+    partial void OnSelectedNodeChanged(HierarchyNodeViewModel? value)
     {
         if (_restoringSelection)
         {
             return;
         }
 
-        _ = SwitchChapterAsync(value);
+        _ = OnHierarchySelectionAsync(value);
+    }
+
+    partial void OnSelectedChapterChanged(ChapterListItemViewModel? value)
+    {
+        // Kept for compile/list compatibility; hierarchy selection drives editor loading.
+        _ = value;
     }
 
     partial void OnMarkdownTextChanged(string value)
@@ -145,7 +201,6 @@ public partial class ManuscriptViewModel : ObservableObject
                 return;
             }
 
-            // Markdig/HTML generation off the UI thread; apply results on the dispatcher context.
             var html = await Task.Run(
                     () => MarkdownPreviewRenderer.ToHtmlDocument(markdown),
                     cancellationToken)
@@ -160,9 +215,14 @@ public partial class ManuscriptViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            // Newer keystroke superseded this preview pass.
         }
     }
+
+    [RelayCommand]
+    private void ToggleLeftPanel() => IsLeftPanelCollapsed = !IsLeftPanelCollapsed;
+
+    [RelayCommand]
+    private void ToggleRightPanel() => IsRightPanelCollapsed = !IsRightPanelCollapsed;
 
     [RelayCommand]
     private async Task RefreshAsync()
@@ -172,32 +232,50 @@ public partial class ManuscriptViewModel : ObservableObject
             return;
         }
 
+        _refreshCts?.Cancel();
+        _refreshCts?.Dispose();
+        _refreshCts = new CancellationTokenSource();
+        var cancellationToken = _refreshCts.Token;
+
         var project = _projectService.ActiveProject;
         HasProject = project is not null;
-        Chapters.Clear();
-        BracketNotes.Clear();
-        LinkedScenes.Clear();
-        SelectedLinkedScene = null;
-        _loadedChapterId = null;
-        SetEditorContent(string.Empty, markClean: true);
-        ChapterTitle = string.Empty;
-
         if (project is null)
         {
+            HierarchyRoots.Clear();
+            Chapters.Clear();
+            BracketNotes.Clear();
+            LinkedScenes.Clear();
+            SelectedLinkedScene = null;
+            SelectedNode = null;
             SelectedChapter = null;
+            _loadedChapterId = null;
+            _contextSceneId = null;
+            SetEditorContent(string.Empty, markClean: true);
+            ChapterTitle = string.Empty;
+            ClearContext();
             StatusMessage = "Open or create a project to edit the manuscript.";
+            UpdateMoveCommandStates();
             return;
         }
 
         try
         {
-            foreach (var chapter in await _chapterService.GetAllAsync(project.Id).ConfigureAwait(true))
+            await ReloadHierarchyAsync(
+                    selectKind: SelectedNode?.Kind,
+                    selectId: SelectedNode?.Id,
+                    preserveExpansion: true,
+                    cancellationToken)
+                .ConfigureAwait(true);
+            if (cancellationToken.IsCancellationRequested)
             {
-                Chapters.Add(new ChapterListItemViewModel(chapter));
+                return;
             }
 
-            SelectedChapter = Chapters.FirstOrDefault();
             StatusMessage = string.Empty;
+        }
+        catch (OperationCanceledException)
+        {
+            StatusMessage = "Refresh cancelled.";
         }
         catch (Exception ex)
         {
@@ -221,9 +299,11 @@ public partial class ManuscriptViewModel : ObservableObject
 
         try
         {
-            var created = await _chapterService.CreateAsync(project.Id, $"Chapter {Chapters.Count + 1}")
+            var created = await _chapterService
+                .CreateAsync(project.Id, $"Chapter {Chapters.Count + 1}")
                 .ConfigureAwait(true);
-            await ReloadListAsync(selectId: created.Id).ConfigureAwait(true);
+            await ReloadHierarchyAsync(HierarchyNodeKind.Chapter, created.Id, preserveExpansion: true)
+                .ConfigureAwait(true);
             StatusMessage = "Chapter created.";
         }
         catch (Exception ex)
@@ -236,8 +316,8 @@ public partial class ManuscriptViewModel : ObservableObject
     private async Task RenameChapterAsync()
     {
         var project = _projectService.ActiveProject;
-        var selected = SelectedChapter;
-        if (project is null || selected is null)
+        var chapterId = _loadedChapterId;
+        if (project is null || chapterId is null)
         {
             return;
         }
@@ -250,9 +330,10 @@ public partial class ManuscriptViewModel : ObservableObject
 
         try
         {
-            var renamed = await _chapterService.RenameAsync(project.Id, selected.Id, ChapterTitle)
+            var renamed = await _chapterService.RenameAsync(project.Id, chapterId.Value, ChapterTitle)
                 .ConfigureAwait(true);
-            selected.Apply(renamed);
+            await ReloadHierarchyAsync(HierarchyNodeKind.Chapter, renamed.Id, preserveExpansion: true)
+                .ConfigureAwait(true);
             StatusMessage = "Chapter renamed.";
         }
         catch (Exception ex)
@@ -265,23 +346,25 @@ public partial class ManuscriptViewModel : ObservableObject
     private async Task DeleteChapterAsync()
     {
         var project = _projectService.ActiveProject;
-        var selected = SelectedChapter;
-        if (project is null || selected is null)
+        var node = SelectedNode;
+        if (project is null || node is null || node.Kind != HierarchyNodeKind.Chapter)
         {
+            StatusMessage = "Select a chapter to delete.";
             return;
         }
 
-        if (!_dialogs.Confirm($"Delete chapter '{selected.Title}'? This removes the markdown file.", "Delete Chapter"))
+        if (!_dialogs.Confirm($"Delete chapter '{node.Title}'? This removes the markdown file.", "Delete Chapter"))
         {
             return;
         }
 
         try
         {
-            await _chapterService.DeleteAsync(project.Id, selected.Id).ConfigureAwait(true);
+            await _chapterService.DeleteAsync(project.Id, node.Id).ConfigureAwait(true);
             IsDirty = false;
             _loadedChapterId = null;
-            await ReloadListAsync(selectId: null).ConfigureAwait(true);
+            await ReloadHierarchyAsync(selectKind: null, selectId: null, preserveExpansion: true)
+                .ConfigureAwait(true);
             StatusMessage = "Chapter deleted.";
         }
         catch (Exception ex)
@@ -291,25 +374,26 @@ public partial class ManuscriptViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task MoveChapterUpAsync()
+    private async Task AddBookAsync()
     {
         var project = _projectService.ActiveProject;
-        var selected = SelectedChapter;
-        if (project is null || selected is null)
+        if (project is null)
         {
             return;
         }
 
-        if (IsDirty && !ConfirmDiscard())
+        var title = _dialogs.PromptText("New Book", "Book title:", "Book");
+        if (title is null)
         {
             return;
         }
 
         try
         {
-            await _chapterService.MoveUpAsync(project.Id, selected.Id).ConfigureAwait(true);
-            await ReloadListAsync(selectId: selected.Id).ConfigureAwait(true);
-            StatusMessage = "Chapter moved up.";
+            var book = await _hierarchy.CreateBookAsync(project.Id, title).ConfigureAwait(true);
+            await ReloadHierarchyAsync(HierarchyNodeKind.Book, book.Id, preserveExpansion: true)
+                .ConfigureAwait(true);
+            StatusMessage = "Book created.";
         }
         catch (Exception ex)
         {
@@ -318,25 +402,316 @@ public partial class ManuscriptViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task MoveChapterDownAsync()
+    private async Task AddPartAsync()
     {
         var project = _projectService.ActiveProject;
-        var selected = SelectedChapter;
-        if (project is null || selected is null)
+        var node = SelectedNode;
+        if (project is null)
         {
             return;
         }
 
-        if (IsDirty && !ConfirmDiscard())
+        var bookId = node?.Kind switch
+        {
+            HierarchyNodeKind.Book => node.Id,
+            HierarchyNodeKind.Part => node.ParentId,
+            HierarchyNodeKind.Chapter => FindAncestorBookId(node),
+            _ => HierarchyRoots.FirstOrDefault(item => item.Kind == HierarchyNodeKind.Book)?.Id,
+        };
+        if (bookId is null)
+        {
+            StatusMessage = "Select a book (or item inside a book) before adding a part.";
+            return;
+        }
+
+        var title = _dialogs.PromptText("New Part", "Part title:", "Part");
+        if (title is null)
         {
             return;
         }
 
         try
         {
-            await _chapterService.MoveDownAsync(project.Id, selected.Id).ConfigureAwait(true);
-            await ReloadListAsync(selectId: selected.Id).ConfigureAwait(true);
-            StatusMessage = "Chapter moved down.";
+            var part = await _hierarchy.CreatePartAsync(project.Id, bookId.Value, title).ConfigureAwait(true);
+            await ReloadHierarchyAsync(HierarchyNodeKind.Part, part.Id, preserveExpansion: true)
+                .ConfigureAwait(true);
+            StatusMessage = "Part created.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
+    }
+
+    [RelayCommand]
+    private async Task RenameSelectedAsync()
+    {
+        var project = _projectService.ActiveProject;
+        var node = SelectedNode;
+        if (project is null || node is null)
+        {
+            return;
+        }
+
+        if (node.Kind is HierarchyNodeKind.Scene or HierarchyNodeKind.UnassignedGroup)
+        {
+            StatusMessage = "Rename scenes in Story Data. Select a book, part, or chapter here.";
+            return;
+        }
+
+        if (node.Kind == HierarchyNodeKind.Chapter)
+        {
+            await RenameChapterAsync().ConfigureAwait(true);
+            return;
+        }
+
+        var title = _dialogs.PromptText($"Rename {node.Kind}", "New title:", node.Title);
+        if (title is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (node.Kind == HierarchyNodeKind.Book)
+            {
+                await _hierarchy.RenameBookAsync(project.Id, node.Id, title).ConfigureAwait(true);
+            }
+            else if (node.Kind == HierarchyNodeKind.Part)
+            {
+                await _hierarchy.RenamePartAsync(project.Id, node.Id, title).ConfigureAwait(true);
+            }
+
+            await ReloadHierarchyAsync(node.Kind, node.Id, preserveExpansion: true).ConfigureAwait(true);
+            StatusMessage = $"{node.Kind} renamed.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteSelectedAsync()
+    {
+        var project = _projectService.ActiveProject;
+        var node = SelectedNode;
+        if (project is null || node is null)
+        {
+            return;
+        }
+
+        if (node.Kind == HierarchyNodeKind.Chapter)
+        {
+            await DeleteChapterAsync().ConfigureAwait(true);
+            return;
+        }
+
+        if (node.Kind == HierarchyNodeKind.Book)
+        {
+            if (!_dialogs.Confirm(
+                    $"Delete book '{node.Title}'? Parts must be moved or removed first (child protection).",
+                    "Delete Book"))
+            {
+                return;
+            }
+
+            try
+            {
+                await _hierarchy.DeleteBookAsync(project.Id, node.Id).ConfigureAwait(true);
+                await ReloadHierarchyAsync(null, null, preserveExpansion: true).ConfigureAwait(true);
+                StatusMessage = "Book deleted.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                _dialogs.ShowMessage(ex.Message, "Cannot Delete Book");
+                StatusMessage = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = ex.Message;
+            }
+
+            return;
+        }
+
+        if (node.Kind == HierarchyNodeKind.Part)
+        {
+            if (!_dialogs.Confirm(
+                    $"Delete part '{node.Title}'? Chapters are protected until moved or unassigned.",
+                    "Delete Part"))
+            {
+                return;
+            }
+
+            try
+            {
+                await _hierarchy.DeletePartAsync(project.Id, node.Id).ConfigureAwait(true);
+                await ReloadHierarchyAsync(null, null, preserveExpansion: true).ConfigureAwait(true);
+                StatusMessage = "Part deleted.";
+            }
+            catch (InvalidOperationException)
+            {
+                if (!_dialogs.Confirm(
+                        "This part still has chapters. Unassign those chapters (keep files) and delete the part?",
+                        "Unassign Chapters and Delete Part"))
+                {
+                    StatusMessage = "Delete cancelled — chapters remain protected.";
+                    return;
+                }
+
+                try
+                {
+                    await _hierarchy.DeletePartAsync(
+                            project.Id,
+                            node.Id,
+                            new HierarchyDeletionPolicy { UnassignChapters = true })
+                        .ConfigureAwait(true);
+                    await ReloadHierarchyAsync(null, null, preserveExpansion: true).ConfigureAwait(true);
+                    StatusMessage = "Part deleted; chapters unassigned.";
+                }
+                catch (Exception ex)
+                {
+                    StatusMessage = ex.Message;
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = ex.Message;
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task MoveSelectedUpAsync() => await MoveSelectedAsync(-1).ConfigureAwait(true);
+
+    [RelayCommand]
+    private async Task MoveSelectedDownAsync() => await MoveSelectedAsync(1).ConfigureAwait(true);
+
+    [RelayCommand]
+    private async Task MoveSelectedToAsync()
+    {
+        var project = _projectService.ActiveProject;
+        var node = SelectedNode;
+        if (project is null || node is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (node.Kind == HierarchyNodeKind.Chapter)
+            {
+                var parts = Flatten(HierarchyRoots)
+                    .Where(item => item.Kind == HierarchyNodeKind.Part)
+                    .Select(item => new DialogChoice { Id = item.Id, Label = item.DisplayName })
+                    .ToList();
+                var choice = _dialogs.PromptChoice("Move Chapter To Part", "Choose a destination part:", parts);
+                if (choice is null)
+                {
+                    return;
+                }
+
+                if (IsDirty && !ConfirmDiscard())
+                {
+                    return;
+                }
+
+                await _hierarchy.MoveChapterToPartAsync(project.Id, node.Id, choice.Id).ConfigureAwait(true);
+                await ReloadHierarchyAsync(HierarchyNodeKind.Chapter, node.Id, preserveExpansion: true)
+                    .ConfigureAwait(true);
+                StatusMessage = "Chapter moved to part.";
+                return;
+            }
+
+            if (node.Kind == HierarchyNodeKind.Scene)
+            {
+                var chapters = Flatten(HierarchyRoots)
+                    .Where(item => item.Kind == HierarchyNodeKind.Chapter)
+                    .Select(item => new DialogChoice { Id = item.Id, Label = item.DisplayName })
+                    .ToList();
+                var choice = _dialogs.PromptChoice("Move Scene To Chapter", "Choose a destination chapter:", chapters);
+                if (choice is null)
+                {
+                    return;
+                }
+
+                await _hierarchy.MoveSceneToChapterAsync(project.Id, node.Id, choice.Id).ConfigureAwait(true);
+                await ReloadHierarchyAsync(HierarchyNodeKind.Scene, node.Id, preserveExpansion: true)
+                    .ConfigureAwait(true);
+                StatusMessage = "Scene moved to chapter.";
+                return;
+            }
+
+            StatusMessage = "Move To applies to chapters and scenes.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
+    }
+
+    [RelayCommand]
+    private async Task HandleHierarchyDropAsync(HierarchyDropRequest? request)
+    {
+        if (request is null)
+        {
+            return;
+        }
+
+        var project = _projectService.ActiveProject;
+        if (project is null)
+        {
+            return;
+        }
+
+        var source = FindNode(request.SourceKind, request.SourceId);
+        var target = FindNode(request.TargetKind, request.TargetId);
+        if (source is null || target is null)
+        {
+            StatusMessage = "Drop failed: item not found.";
+            return;
+        }
+
+        var action = ManuscriptHierarchyInteractions.ClassifyDrop(
+            source.Kind,
+            source.Id,
+            target.Kind,
+            target.Id,
+            source.ParentId,
+            target.ParentId);
+        if (!ManuscriptHierarchyInteractions.IsValidDrop(action))
+        {
+            StatusMessage = "That drop is not allowed. Use Move Up/Down or Move To.";
+            return;
+        }
+
+        try
+        {
+            switch (action)
+            {
+                case HierarchyDropAction.MoveChapterToPart:
+                    if (IsDirty && !ConfirmDiscard())
+                    {
+                        return;
+                    }
+
+                    await _hierarchy.MoveChapterToPartAsync(project.Id, source.Id, target.Id)
+                        .ConfigureAwait(true);
+                    break;
+                case HierarchyDropAction.AssignSceneToChapter:
+                    await _hierarchy.MoveSceneToChapterAsync(project.Id, source.Id, target.Id)
+                        .ConfigureAwait(true);
+                    break;
+                case HierarchyDropAction.ReorderBefore:
+                    await ReorderSiblingTowardAsync(project.Id, source, target).ConfigureAwait(true);
+                    break;
+                default:
+                    return;
+            }
+
+            await ReloadHierarchyAsync(source.Kind, source.Id, preserveExpansion: true).ConfigureAwait(true);
+            StatusMessage = "Hierarchy updated.";
         }
         catch (Exception ex)
         {
@@ -348,8 +723,8 @@ public partial class ManuscriptViewModel : ObservableObject
     private async Task SaveChapterAsync()
     {
         var project = _projectService.ActiveProject;
-        var selected = SelectedChapter;
-        if (project is null || selected is null)
+        var chapterId = _loadedChapterId;
+        if (project is null || chapterId is null)
         {
             return;
         }
@@ -357,9 +732,17 @@ public partial class ManuscriptViewModel : ObservableObject
         try
         {
             _saveState.Report(SaveState.Saving, "Saving…");
-            var saved = await _chapterService.SaveContentAsync(project.Id, selected.Id, MarkdownText)
+            var saved = await _chapterService.SaveContentAsync(project.Id, chapterId.Value, MarkdownText)
                 .ConfigureAwait(true);
-            selected.Apply(saved);
+            var chapterItem = Chapters.FirstOrDefault(item => item.Id == saved.Id);
+            chapterItem?.Apply(saved);
+            var chapterNode = FindNode(HierarchyNodeKind.Chapter, saved.Id);
+            if (chapterNode is not null)
+            {
+                chapterNode.WordCount = saved.WordCount;
+                chapterNode.Title = saved.Title;
+            }
+
             SetEditorContent(MarkdownText, markClean: true);
             await _saveState.RefreshRecoveryAvailabilityAsync(project.Id).ConfigureAwait(true);
             if (_saveState.State != SaveState.RecoveryAvailable)
@@ -392,6 +775,7 @@ public partial class ManuscriptViewModel : ObservableObject
             return;
         }
 
+        SyncCompileFlagsFromTree();
         var selectedIds = Chapters
             .Where(item => item.IsSelectedForCompile)
             .OrderBy(item => item.SequenceNumber)
@@ -419,10 +803,155 @@ public partial class ManuscriptViewModel : ObservableObject
         }
     }
 
-    private async Task SwitchChapterAsync(ChapterListItemViewModel? value)
+    [RelayCommand]
+    private void OpenContextInStoryData()
     {
-        if (value?.Id == _loadedChapterId)
+        if (_contextSceneId is { } sceneId)
         {
+            _navigation.NavigateToStoryDataScene(sceneId);
+            return;
+        }
+
+        if (SelectedLinkedScene is not null)
+        {
+            _navigation.NavigateToStoryDataScene(SelectedLinkedScene.Id);
+            return;
+        }
+
+        StatusMessage = "Select a scene to open in Story Data.";
+    }
+
+    [RelayCommand]
+    private void OpenLinkedSceneInStoryData() => OpenContextInStoryData();
+
+    private async Task MoveSelectedAsync(int direction)
+    {
+        var project = _projectService.ActiveProject;
+        var node = SelectedNode;
+        if (project is null || node is null)
+        {
+            return;
+        }
+
+        if (node.Kind is HierarchyNodeKind.Chapter && IsDirty && !ConfirmDiscard())
+        {
+            return;
+        }
+
+        try
+        {
+            switch (node.Kind)
+            {
+                case HierarchyNodeKind.Book:
+                    await _hierarchy.MoveBookAsync(project.Id, node.Id, direction).ConfigureAwait(true);
+                    break;
+                case HierarchyNodeKind.Part:
+                    await _hierarchy.MovePartAsync(project.Id, node.Id, direction).ConfigureAwait(true);
+                    break;
+                case HierarchyNodeKind.Chapter:
+                    if (direction < 0)
+                    {
+                        await _chapterService.MoveUpAsync(project.Id, node.Id).ConfigureAwait(true);
+                    }
+                    else
+                    {
+                        await _chapterService.MoveDownAsync(project.Id, node.Id).ConfigureAwait(true);
+                    }
+
+                    break;
+                case HierarchyNodeKind.Scene:
+                    await _hierarchy.MoveSceneAsync(project.Id, node.Id, direction).ConfigureAwait(true);
+                    break;
+                default:
+                    StatusMessage = "Nothing to move.";
+                    return;
+            }
+
+            await ReloadHierarchyAsync(node.Kind, node.Id, preserveExpansion: true).ConfigureAwait(true);
+            StatusMessage = direction < 0 ? "Moved up." : "Moved down.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
+    }
+
+    private async Task ReorderSiblingTowardAsync(
+        Guid projectId,
+        HierarchyNodeViewModel source,
+        HierarchyNodeViewModel target)
+    {
+        var siblings = source.Kind switch
+        {
+            HierarchyNodeKind.Book => HierarchyRoots.Where(item => item.Kind == HierarchyNodeKind.Book).ToList(),
+            _ => FindParent(source)?.Children.Where(item => item.Kind == source.Kind).ToList()
+                 ?? [],
+        };
+        var sourceIndex = siblings.FindIndex(item => item.Id == source.Id);
+        var targetIndex = siblings.FindIndex(item => item.Id == target.Id);
+        if (sourceIndex < 0 || targetIndex < 0 || sourceIndex == targetIndex)
+        {
+            return;
+        }
+
+        var direction = targetIndex < sourceIndex ? -1 : 1;
+        var steps = Math.Abs(targetIndex - sourceIndex);
+        for (var step = 0; step < steps; step++)
+        {
+            switch (source.Kind)
+            {
+                case HierarchyNodeKind.Book:
+                    await _hierarchy.MoveBookAsync(projectId, source.Id, direction).ConfigureAwait(true);
+                    break;
+                case HierarchyNodeKind.Part:
+                    await _hierarchy.MovePartAsync(projectId, source.Id, direction).ConfigureAwait(true);
+                    break;
+                case HierarchyNodeKind.Chapter:
+                    if (direction < 0)
+                    {
+                        await _chapterService.MoveUpAsync(projectId, source.Id).ConfigureAwait(true);
+                    }
+                    else
+                    {
+                        await _chapterService.MoveDownAsync(projectId, source.Id).ConfigureAwait(true);
+                    }
+
+                    break;
+                case HierarchyNodeKind.Scene:
+                    await _hierarchy.MoveSceneAsync(projectId, source.Id, direction).ConfigureAwait(true);
+                    break;
+            }
+        }
+    }
+
+    private async Task OnHierarchySelectionAsync(HierarchyNodeViewModel? node)
+    {
+        UpdateMoveCommandStates();
+        if (node is null)
+        {
+            ClearContext();
+            return;
+        }
+
+        var selection = ManuscriptHierarchyInteractions.ResolveSelection(
+            node.Kind,
+            node.Id,
+            node.EditorChapterId);
+
+        UpdateContextPanel(node);
+
+        if (selection.EditorChapterId is { } chapterId)
+        {
+            await EnsureChapterLoadedAsync(chapterId, selection.ContextSceneId).ConfigureAwait(true);
+        }
+    }
+
+    private async Task EnsureChapterLoadedAsync(Guid chapterId, Guid? contextSceneId)
+    {
+        if (chapterId == _loadedChapterId)
+        {
+            _contextSceneId = contextSceneId;
+            SelectLinkedScene(contextSceneId);
             return;
         }
 
@@ -440,36 +969,428 @@ public partial class ManuscriptViewModel : ObservableObject
             if (IsDirty && !ConfirmDiscard())
             {
                 _restoringSelection = true;
-                SelectedChapter = Chapters.FirstOrDefault(item => item.Id == _loadedChapterId);
+                SelectedNode = FindNode(HierarchyNodeKind.Chapter, _loadedChapterId ?? Guid.Empty)
+                    ?? SelectedNode;
                 _restoringSelection = false;
+                UpdateMoveCommandStates();
                 return;
             }
         }
 
         var project = _projectService.ActiveProject;
-        if (project is null || value is null)
+        if (project is null)
         {
-            ChapterTitle = string.Empty;
-            _loadedChapterId = null;
-            LinkedScenes.Clear();
-            SelectedLinkedScene = null;
-            SetEditorContent(string.Empty, markClean: true);
             return;
         }
 
         try
         {
-            ChapterTitle = value.Title;
-            var content = await _chapterService.LoadContentAsync(project.Id, value.Id).ConfigureAwait(true);
+            var chapter = Chapters.FirstOrDefault(item => item.Id == chapterId)
+                ?? new ChapterListItemViewModel(
+                    await _chapterService.GetAsync(project.Id, chapterId).ConfigureAwait(true));
+            SelectedChapter = Chapters.FirstOrDefault(item => item.Id == chapterId) ?? chapter;
+            ChapterTitle = chapter.Title;
+            var content = await _chapterService.LoadContentAsync(project.Id, chapterId).ConfigureAwait(true);
             SetEditorContent(content, markClean: true);
-            _loadedChapterId = value.Id;
-            await LoadLinkedScenesAsync(project.Id, value.Id).ConfigureAwait(true);
+            _loadedChapterId = chapterId;
+            _contextSceneId = contextSceneId;
+            await LoadLinkedScenesAsync(project.Id, chapterId).ConfigureAwait(true);
+            SelectLinkedScene(contextSceneId);
             StatusMessage = string.Empty;
             SyncSaveState();
         }
         catch (Exception ex)
         {
             StatusMessage = ex.Message;
+        }
+    }
+
+    private void SelectLinkedScene(Guid? sceneId)
+    {
+        SelectedLinkedScene = sceneId is null
+            ? LinkedScenes.FirstOrDefault()
+            : LinkedScenes.FirstOrDefault(item => item.Id == sceneId) ?? LinkedScenes.FirstOrDefault();
+    }
+
+    private async Task ReloadHierarchyAsync(
+        HierarchyNodeKind? selectKind,
+        Guid? selectId,
+        bool preserveExpansion,
+        CancellationToken cancellationToken = default)
+    {
+        var project = _projectService.ActiveProject
+            ?? throw new InvalidOperationException("Open a project before loading the hierarchy.");
+
+        var expanded = preserveExpansion
+            ? ManuscriptHierarchyInteractions.CaptureExpanded(
+                Flatten(HierarchyRoots).Select(node => (node.Kind, node.Id, node.IsExpanded)))
+            : null;
+        var compileFlags = Flatten(HierarchyRoots)
+            .Where(node => node.Kind == HierarchyNodeKind.Chapter)
+            .ToDictionary(node => node.Id, node => node.IsSelectedForCompile);
+
+        var tree = await _hierarchy.GetHierarchyAsync(project.Id, cancellationToken).ConfigureAwait(true);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        HierarchyRoots.Clear();
+        Chapters.Clear();
+
+        foreach (var book in tree.Books)
+        {
+            var bookNode = new HierarchyNodeViewModel(
+                HierarchyNodeKind.Book,
+                book.Id,
+                book.Title,
+                book.SequenceNumber,
+                parentId: null)
+            {
+                IsExpanded = ManuscriptHierarchyInteractions.ShouldExpand(
+                    HierarchyNodeKind.Book, book.Id, expanded, defaultExpanded: true),
+            };
+
+            foreach (var part in book.Parts)
+            {
+                var partNode = new HierarchyNodeViewModel(
+                    HierarchyNodeKind.Part,
+                    part.Id,
+                    part.Title,
+                    part.SequenceNumber,
+                    parentId: book.Id)
+                {
+                    IsExpanded = ManuscriptHierarchyInteractions.ShouldExpand(
+                        HierarchyNodeKind.Part, part.Id, expanded, defaultExpanded: true),
+                };
+
+                foreach (var chapter in part.Chapters)
+                {
+                    var chapterNode = new HierarchyNodeViewModel(
+                        HierarchyNodeKind.Chapter,
+                        chapter.Id,
+                        chapter.Title,
+                        chapter.SequenceNumber,
+                        parentId: part.Id,
+                        editorChapterId: chapter.Id,
+                        relativeMarkdownPath: chapter.RelativeMarkdownPath,
+                        wordCount: 0)
+                    {
+                        IsExpanded = ManuscriptHierarchyInteractions.ShouldExpand(
+                            HierarchyNodeKind.Chapter, chapter.Id, expanded, defaultExpanded: true),
+                        IsSelectedForCompile = !compileFlags.TryGetValue(chapter.Id, out var flag) || flag,
+                    };
+
+                    var chapterListItem = new ChapterListItemViewModel(
+                        new Core.Domain.Manuscript.Chapter
+                        {
+                            Id = chapter.Id,
+                            ProjectId = chapter.ProjectId,
+                            PartId = chapter.PartId,
+                            SequenceNumber = chapter.SequenceNumber,
+                            Title = chapter.Title,
+                            RelativeMarkdownPath = chapter.RelativeMarkdownPath,
+                        })
+                    {
+                        IsSelectedForCompile = chapterNode.IsSelectedForCompile,
+                    };
+                    Chapters.Add(chapterListItem);
+
+                    foreach (var scene in chapter.Scenes)
+                    {
+                        chapterNode.Children.Add(
+                            new HierarchyNodeViewModel(
+                                HierarchyNodeKind.Scene,
+                                scene.Id,
+                                scene.Title,
+                                scene.SequenceNumber,
+                                parentId: chapter.Id,
+                                editorChapterId: chapter.Id,
+                                scene: scene)
+                            {
+                                IsExpanded = false,
+                            });
+                    }
+
+                    partNode.Children.Add(chapterNode);
+                }
+
+                bookNode.Children.Add(partNode);
+            }
+
+            HierarchyRoots.Add(bookNode);
+        }
+
+        if (tree.UngroupedChapters.Count > 0
+            || selectKind == HierarchyNodeKind.UngroupedChaptersGroup)
+        {
+            var ungrouped = new HierarchyNodeViewModel(
+                HierarchyNodeKind.UngroupedChaptersGroup,
+                ManuscriptHierarchyInteractions.UngroupedChaptersGroupId,
+                "Ungrouped chapters",
+                0,
+                parentId: null)
+            {
+                IsExpanded = ManuscriptHierarchyInteractions.ShouldExpand(
+                    HierarchyNodeKind.UngroupedChaptersGroup,
+                    ManuscriptHierarchyInteractions.UngroupedChaptersGroupId,
+                    expanded,
+                    defaultExpanded: true),
+            };
+            foreach (var chapter in tree.UngroupedChapters)
+            {
+                var chapterNode = new HierarchyNodeViewModel(
+                    HierarchyNodeKind.Chapter,
+                    chapter.Id,
+                    chapter.Title,
+                    chapter.SequenceNumber,
+                    parentId: ManuscriptHierarchyInteractions.UngroupedChaptersGroupId,
+                    editorChapterId: chapter.Id,
+                    relativeMarkdownPath: chapter.RelativeMarkdownPath)
+                {
+                    IsExpanded = ManuscriptHierarchyInteractions.ShouldExpand(
+                        HierarchyNodeKind.Chapter, chapter.Id, expanded, defaultExpanded: true),
+                    IsSelectedForCompile = !compileFlags.TryGetValue(chapter.Id, out var flag) || flag,
+                };
+                if (Chapters.All(item => item.Id != chapter.Id))
+                {
+                    Chapters.Add(new ChapterListItemViewModel(
+                        new Core.Domain.Manuscript.Chapter
+                        {
+                            Id = chapter.Id,
+                            ProjectId = chapter.ProjectId,
+                            PartId = chapter.PartId,
+                            SequenceNumber = chapter.SequenceNumber,
+                            Title = chapter.Title,
+                            RelativeMarkdownPath = chapter.RelativeMarkdownPath,
+                        })
+                    {
+                        IsSelectedForCompile = chapterNode.IsSelectedForCompile,
+                    });
+                }
+
+                foreach (var scene in chapter.Scenes)
+                {
+                    chapterNode.Children.Add(
+                        new HierarchyNodeViewModel(
+                            HierarchyNodeKind.Scene,
+                            scene.Id,
+                            scene.Title,
+                            scene.SequenceNumber,
+                            parentId: chapter.Id,
+                            editorChapterId: chapter.Id,
+                            scene: scene));
+                }
+
+                ungrouped.Children.Add(chapterNode);
+            }
+
+            HierarchyRoots.Add(ungrouped);
+        }
+
+        if (tree.UnassignedScenes.Count > 0
+            || selectKind == HierarchyNodeKind.UnassignedGroup
+            || selectKind == HierarchyNodeKind.Scene)
+        {
+            var unassigned = new HierarchyNodeViewModel(
+                HierarchyNodeKind.UnassignedGroup,
+                ManuscriptHierarchyInteractions.UnassignedGroupId,
+                "Unassigned scenes",
+                0,
+                parentId: null)
+            {
+                IsExpanded = ManuscriptHierarchyInteractions.ShouldExpand(
+                    HierarchyNodeKind.UnassignedGroup,
+                    ManuscriptHierarchyInteractions.UnassignedGroupId,
+                    expanded,
+                    defaultExpanded: true),
+            };
+            foreach (var scene in tree.UnassignedScenes)
+            {
+                unassigned.Children.Add(
+                    new HierarchyNodeViewModel(
+                        HierarchyNodeKind.Scene,
+                        scene.Id,
+                        scene.Title,
+                        scene.SequenceNumber,
+                        parentId: ManuscriptHierarchyInteractions.UnassignedGroupId,
+                        editorChapterId: null,
+                        scene: scene));
+            }
+
+            HierarchyRoots.Add(unassigned);
+        }
+
+        var chapterRecords = await _chapterService.GetAllAsync(project.Id, cancellationToken)
+            .ConfigureAwait(true);
+        foreach (var record in chapterRecords)
+        {
+            var node = FindNode(HierarchyNodeKind.Chapter, record.Id);
+            if (node is not null)
+            {
+                node.WordCount = record.WordCount;
+            }
+
+            var listItem = Chapters.FirstOrDefault(item => item.Id == record.Id);
+            listItem?.Apply(record);
+        }
+
+        ApplyHierarchyFilter();
+
+        _restoringSelection = true;
+        SelectedNode = selectKind is { } kind && selectId is { } id
+            ? FindNode(kind, id) ?? FirstChapterNode()
+            : SelectedNode is not null
+                ? FindNode(SelectedNode.Kind, SelectedNode.Id) ?? FirstChapterNode()
+                : FirstChapterNode();
+        _restoringSelection = false;
+
+        if (SelectedNode is not null)
+        {
+            await OnHierarchySelectionAsync(SelectedNode).ConfigureAwait(true);
+        }
+        else
+        {
+            SelectedChapter = null;
+            _loadedChapterId = null;
+            SetEditorContent(string.Empty, markClean: true);
+            ClearContext();
+        }
+
+        UpdateMoveCommandStates();
+    }
+
+    private void ApplyHierarchyFilter()
+    {
+        foreach (var root in HierarchyRoots)
+        {
+            ApplyFilterRecursive(root);
+        }
+    }
+
+    private bool ApplyFilterRecursive(HierarchyNodeViewModel node)
+    {
+        var childVisible = false;
+        foreach (var child in node.Children)
+        {
+            childVisible |= ApplyFilterRecursive(child);
+        }
+
+        var selfMatch = ManuscriptHierarchyInteractions.MatchesFilter(HierarchyFilter, node.Title, node.DisplayName);
+        node.IsVisible = selfMatch || childVisible || string.IsNullOrWhiteSpace(HierarchyFilter);
+        if (node.IsVisible && childVisible && !string.IsNullOrWhiteSpace(HierarchyFilter))
+        {
+            node.IsExpanded = true;
+        }
+
+        return node.IsVisible;
+    }
+
+    private void SyncCompileFlagsFromTree()
+    {
+        foreach (var chapterNode in Flatten(HierarchyRoots).Where(node => node.Kind == HierarchyNodeKind.Chapter))
+        {
+            var item = Chapters.FirstOrDefault(chapter => chapter.Id == chapterNode.Id);
+            if (item is not null)
+            {
+                item.IsSelectedForCompile = chapterNode.IsSelectedForCompile;
+            }
+        }
+    }
+
+    private void UpdateContextPanel(HierarchyNodeViewModel node)
+    {
+        ContextTitle = node.DisplayName;
+        ContextStatusText = node.Kind.ToString();
+        if (node.Kind == HierarchyNodeKind.Scene && node.Scene is { } scene)
+        {
+            ContextSummary = $"{scene.Status} · POV linked · Seq {scene.SequenceNumber}";
+            ContextDetail =
+                $"Goal: {scene.Goal}\nOpposition: {scene.Opposition}\nStakes: {scene.Stakes}\n" +
+                $"Location: {scene.Location}\nTime: {scene.Time}\nMain event: {scene.MainEvent}";
+            return;
+        }
+
+        if (node.Kind == HierarchyNodeKind.Chapter)
+        {
+            ContextSummary = $"{node.WordCount} words · {node.Children.Count} scene(s)";
+            ContextDetail = $"Path: {node.RelativeMarkdownPath}\nSelect a scene for outline metadata, or open Story Data.";
+            return;
+        }
+
+        ContextSummary = $"{node.Kind} selected";
+        ContextDetail = "Use Add / Rename / Delete and Move commands to manage the hierarchy. Chapter prose stays in Markdown files.";
+    }
+
+    private void ClearContext()
+    {
+        ContextTitle = "Context";
+        ContextSummary = "Select a chapter or scene to see metadata.";
+        ContextDetail = string.Empty;
+        ContextStatusText = string.Empty;
+    }
+
+    private void UpdateMoveCommandStates()
+    {
+        var node = SelectedNode;
+        if (node is null
+            || node.Kind is HierarchyNodeKind.UnassignedGroup
+                or HierarchyNodeKind.UngroupedChaptersGroup)
+        {
+            CanMoveSelectedUp = false;
+            CanMoveSelectedDown = false;
+            CanMoveSelectedTo = false;
+            return;
+        }
+
+        var siblings = node.Kind == HierarchyNodeKind.Book
+            ? HierarchyRoots.Where(item => item.Kind == HierarchyNodeKind.Book).ToList()
+            : FindParent(node)?.Children.Where(item => item.Kind == node.Kind).ToList()
+              ?? [];
+        var index = siblings.FindIndex(item => item.Id == node.Id);
+        CanMoveSelectedUp = index > 0;
+        CanMoveSelectedDown = index >= 0 && index < siblings.Count - 1;
+        CanMoveSelectedTo = node.Kind is HierarchyNodeKind.Chapter or HierarchyNodeKind.Scene;
+    }
+
+    private HierarchyNodeViewModel? FirstChapterNode()
+        => Flatten(HierarchyRoots).FirstOrDefault(node => node.Kind == HierarchyNodeKind.Chapter);
+
+    private HierarchyNodeViewModel? FindNode(HierarchyNodeKind kind, Guid id)
+        => Flatten(HierarchyRoots).FirstOrDefault(node => node.Kind == kind && node.Id == id);
+
+    private HierarchyNodeViewModel? FindParent(HierarchyNodeViewModel node)
+    {
+        if (node.ParentId is null)
+        {
+            return null;
+        }
+
+        return Flatten(HierarchyRoots).FirstOrDefault(item => item.Id == node.ParentId);
+    }
+
+    private Guid? FindAncestorBookId(HierarchyNodeViewModel node)
+    {
+        var current = node;
+        while (current is not null)
+        {
+            if (current.Kind == HierarchyNodeKind.Book)
+            {
+                return current.Id;
+            }
+
+            current = FindParent(current);
+        }
+
+        return null;
+    }
+
+    private static IEnumerable<HierarchyNodeViewModel> Flatten(IEnumerable<HierarchyNodeViewModel> roots)
+    {
+        foreach (var root in roots)
+        {
+            yield return root;
+            foreach (var child in Flatten(root.Children))
+            {
+                yield return child;
+            }
         }
     }
 
@@ -518,19 +1439,6 @@ public partial class ManuscriptViewModel : ObservableObject
         SaveStateAccessibleName = SaveStateAccessibility.FormatAccessibleName(_saveState.State, _saveState.Message);
     }
 
-    [RelayCommand]
-    private void OpenLinkedSceneInStoryData()
-    {
-        var scene = SelectedLinkedScene;
-        if (scene is null)
-        {
-            StatusMessage = "Select a linked scene first.";
-            return;
-        }
-
-        _navigation.NavigateToStoryDataScene(scene.Id);
-    }
-
     private async Task LoadLinkedScenesAsync(Guid projectId, Guid chapterId)
     {
         LinkedScenes.Clear();
@@ -543,37 +1451,6 @@ public partial class ManuscriptViewModel : ObservableObject
         {
             LinkedScenes.Add(new LinkedSceneItemViewModel(scene));
         }
-
-        SelectedLinkedScene = LinkedScenes.FirstOrDefault();
-    }
-
-    private async Task ReloadListAsync(Guid? selectId)
-    {
-        var project = _projectService.ActiveProject;
-        if (project is null)
-        {
-            return;
-        }
-
-        var selectedForCompile = Chapters
-            .Where(item => item.IsSelectedForCompile)
-            .Select(item => item.Id)
-            .ToHashSet();
-
-        Chapters.Clear();
-        foreach (var chapter in await _chapterService.GetAllAsync(project.Id).ConfigureAwait(true))
-        {
-            var item = new ChapterListItemViewModel(chapter)
-            {
-                IsSelectedForCompile = selectedForCompile.Count == 0 || selectedForCompile.Contains(chapter.Id),
-            };
-            Chapters.Add(item);
-        }
-
-        _loadedChapterId = null;
-        SelectedChapter = selectId is null
-            ? Chapters.FirstOrDefault()
-            : Chapters.FirstOrDefault(item => item.Id == selectId) ?? Chapters.FirstOrDefault();
     }
 
     private void SetEditorContent(string content, bool markClean)
@@ -605,6 +1482,17 @@ public partial class ManuscriptViewModel : ObservableObject
             "Unsaved Changes");
 }
 
+public sealed class HierarchyDropRequest
+{
+    public required HierarchyNodeKind SourceKind { get; init; }
+
+    public required Guid SourceId { get; init; }
+
+    public required HierarchyNodeKind TargetKind { get; init; }
+
+    public required Guid TargetId { get; init; }
+}
+
 public partial class ChapterListItemViewModel : ObservableObject
 {
     public ChapterListItemViewModel(Core.Domain.Manuscript.Chapter chapter)
@@ -614,9 +1502,12 @@ public partial class ChapterListItemViewModel : ObservableObject
         Title = chapter.Title;
         WordCount = chapter.WordCount;
         RelativeMarkdownPath = chapter.RelativeMarkdownPath;
+        PartId = chapter.PartId;
     }
 
     public Guid Id { get; }
+
+    public Guid? PartId { get; private set; }
 
     public string RelativeMarkdownPath { get; private set; }
 
@@ -640,6 +1531,7 @@ public partial class ChapterListItemViewModel : ObservableObject
         Title = chapter.Title;
         WordCount = chapter.WordCount;
         RelativeMarkdownPath = chapter.RelativeMarkdownPath;
+        PartId = chapter.PartId;
         OnPropertyChanged(nameof(DisplayName));
     }
 }

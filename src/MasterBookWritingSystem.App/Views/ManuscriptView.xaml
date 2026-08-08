@@ -1,32 +1,74 @@
 <UserControl x:Class="MasterBookWritingSystem.App.Views.ManuscriptView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid Margin="20">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:MasterBookWritingSystem.App.ViewModels">
+    <UserControl.Resources>
+        <HierarchicalDataTemplate DataType="{x:Type vm:HierarchyNodeViewModel}"
+                                  ItemsSource="{Binding Children}">
+            <StackPanel Orientation="Horizontal"
+                        Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        MinHeight="28">
+                <Border Width="18" Height="18" Margin="0,0,6,0" CornerRadius="2"
+                        Background="{DynamicResource AppBorderBrush}"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Glyph}"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+                <CheckBox Margin="0,0,6,0"
+                          VerticalAlignment="Center"
+                          IsChecked="{Binding IsSelectedForCompile, Mode=TwoWay}"
+                          Visibility="{Binding IsChapter, Converter={StaticResource BooleanToVisibilityConverter}}"
+                          AutomationProperties.Name="Include chapter in compile" />
+                <TextBlock Text="{Binding DisplayName}"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap"
+                           MaxWidth="220"
+                           AutomationProperties.Name="{Binding AccessibleName}" />
+            </StackPanel>
+        </HierarchicalDataTemplate>
+    </UserControl.Resources>
+
+    <Grid Margin="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <DockPanel Grid.Row="0" Margin="0,0,0,12">
+        <DockPanel Grid.Row="0" Margin="0,0,0,10">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="{Binding LeftPanelToggleLabel}"
+                        MinWidth="110"
+                        Margin="0,0,6,0"
+                        Command="{Binding ToggleLeftPanelCommand}"
+                        AutomationProperties.Name="{Binding LeftPanelToggleLabel}"
+                        ToolTip="Collapse or expand the hierarchy panel without losing selection state." />
+                <Button Content="{Binding RightPanelToggleLabel}"
+                        MinWidth="110"
+                        Margin="0,0,6,0"
+                        Command="{Binding ToggleRightPanelCommand}"
+                        AutomationProperties.Name="{Binding RightPanelToggleLabel}"
+                        ToolTip="Collapse or expand the context panel without losing selection state." />
                 <Button Content="Undo"
-                        Width="70"
+                        MinWidth="64"
                         Margin="0,0,6,0"
                         Command="ApplicationCommands.Undo"
                         CommandTarget="{Binding ElementName=MarkdownEditor}"
                         ToolTip="Undo manuscript text (Ctrl+Z)"
                         AutomationProperties.Name="Undo manuscript text" />
                 <Button Content="Redo"
-                        Width="70"
+                        MinWidth="64"
                         Margin="0,0,6,0"
                         Command="ApplicationCommands.Redo"
                         CommandTarget="{Binding ElementName=MarkdownEditor}"
                         ToolTip="Redo manuscript text (Ctrl+Y)"
                         AutomationProperties.Name="Redo manuscript text" />
                 <Button Content="Refresh"
-                        Width="90"
+                        MinWidth="80"
                         Command="{Binding RefreshCommand}"
-                        AutomationProperties.Name="Refresh manuscript" />
+                        AutomationProperties.Name="Refresh manuscript hierarchy" />
             </StackPanel>
             <TextBlock Text="Manuscript"
                        FontSize="26"
@@ -41,90 +83,132 @@
 
         <Grid Grid.Row="1" Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" MinWidth="0" />
+                <ColumnDefinition Width="*" MinWidth="280" />
+                <ColumnDefinition Width="Auto" MinWidth="0" />
             </Grid.ColumnDefinitions>
 
-            <DockPanel Grid.Column="0" Margin="0,0,12,0">
-                <StackPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
-                    <WrapPanel>
-                        <Button Content="Add" Width="64" Margin="0,0,6,6" Command="{Binding AddChapterCommand}"
-                                AutomationProperties.Name="Add chapter" />
-                        <Button Content="Delete" Width="64" Margin="0,0,6,6" Command="{Binding DeleteChapterCommand}"
-                                AutomationProperties.Name="Delete chapter" />
-                        <Button Content="Up" Width="48" Margin="0,0,6,6" Command="{Binding MoveChapterUpCommand}"
-                                AutomationProperties.Name="Move chapter up"
-                                AutomationProperties.HelpText="Keyboard alternative to reordering chapters with the pointer."
-                                ToolTip="Move selected chapter up (keyboard alternative to drag reorder)" />
-                        <Button Content="Down" Width="56" Margin="0,0,6,6" Command="{Binding MoveChapterDownCommand}"
-                                AutomationProperties.Name="Move chapter down"
-                                AutomationProperties.HelpText="Keyboard alternative to reordering chapters with the pointer."
-                                ToolTip="Move selected chapter down (keyboard alternative to drag reorder)" />
-                    </WrapPanel>
-                    <TextBlock Text="Compile export file" FontWeight="SemiBold" Margin="0,8,0,4" />
-                    <TextBox Text="{Binding ExportFileName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,6"
-                             AutomationProperties.Name="Compile export file name" />
-                    <Button Content="Compile selected"
-                            Padding="10,6"
-                            Command="{Binding CompileSelectedCommand}"
-                            AutomationProperties.Name="Compile selected chapters" />
-                </StackPanel>
-                <Border Style="{StaticResource PanelBorderStyle}">
-                    <ListBox ItemsSource="{Binding Chapters}"
-                             SelectedItem="{Binding SelectedChapter}"
-                             BorderThickness="0"
-                             Background="Transparent"
-                             AutomationProperties.Name="Chapter list"
-                             AutomationProperties.HelpText="Select a chapter. Use Up and Down buttons to reorder with the keyboard.">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <DockPanel Margin="0,4">
-                                    <CheckBox DockPanel.Dock="Left"
-                                              IsChecked="{Binding IsSelectedForCompile}"
-                                              VerticalAlignment="Center"
-                                              Margin="0,0,8,0" />
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding DisplayName}" TextWrapping="Wrap" />
-                                        <TextBlock Opacity="0.7" FontSize="11">
-                                            <Run Text="{Binding WordCount, Mode=OneWay}" />
-                                            <Run Text=" words" />
-                                        </TextBlock>
-                                    </StackPanel>
-                                </DockPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </Border>
-            </DockPanel>
+            <!-- Left: hierarchy -->
+            <Border Grid.Column="0"
+                    Margin="0,0,8,0"
+                    Style="{StaticResource PanelBorderStyle}"
+                    Width="300"
+                    Visibility="{Binding IsLeftPanelCollapsed, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="8">
+                        <TextBlock Text="Hierarchy" FontWeight="SemiBold" Margin="0,0,0,6" />
+                        <TextBox Text="{Binding HierarchyFilter, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,8"
+                                 AutomationProperties.Name="Filter hierarchy"
+                                 AutomationProperties.HelpText="Filter books, parts, chapters and scenes by title." />
+                        <WrapPanel>
+                            <Button Content="Book" MinWidth="56" MinHeight="28" Margin="0,0,4,4"
+                                    Command="{Binding AddBookCommand}"
+                                    AutomationProperties.Name="Add book" />
+                            <Button Content="Part" MinWidth="56" MinHeight="28" Margin="0,0,4,4"
+                                    Command="{Binding AddPartCommand}"
+                                    AutomationProperties.Name="Add part" />
+                            <Button Content="Chapter" MinWidth="68" MinHeight="28" Margin="0,0,4,4"
+                                    Command="{Binding AddChapterCommand}"
+                                    AutomationProperties.Name="Add chapter" />
+                            <Button Content="Rename" MinWidth="64" MinHeight="28" Margin="0,0,4,4"
+                                    Command="{Binding RenameSelectedCommand}"
+                                    AutomationProperties.Name="Rename selected hierarchy item" />
+                            <Button Content="Delete" MinWidth="64" MinHeight="28" Margin="0,0,4,4"
+                                    Command="{Binding DeleteSelectedCommand}"
+                                    AutomationProperties.Name="Delete selected hierarchy item" />
+                        </WrapPanel>
+                        <WrapPanel>
+                            <Button Content="Up" MinWidth="48" MinHeight="28" Margin="0,0,4,4"
+                                    Command="{Binding MoveSelectedUpCommand}"
+                                    IsEnabled="{Binding CanMoveSelectedUp}"
+                                    AutomationProperties.Name="Move selected item up"
+                                    AutomationProperties.HelpText="Keyboard alternative to drag-and-drop reordering."
+                                    ToolTip="Move selected item up" />
+                            <Button Content="Down" MinWidth="56" MinHeight="28" Margin="0,0,4,4"
+                                    Command="{Binding MoveSelectedDownCommand}"
+                                    IsEnabled="{Binding CanMoveSelectedDown}"
+                                    AutomationProperties.Name="Move selected item down"
+                                    AutomationProperties.HelpText="Keyboard alternative to drag-and-drop reordering."
+                                    ToolTip="Move selected item down" />
+                            <Button Content="Move To…" MinWidth="80" MinHeight="28" Margin="0,0,4,4"
+                                    Command="{Binding MoveSelectedToCommand}"
+                                    IsEnabled="{Binding CanMoveSelectedTo}"
+                                    AutomationProperties.Name="Move selected item to another parent"
+                                    AutomationProperties.HelpText="Keyboard alternative to dragging a chapter onto a part or a scene onto a chapter."
+                                    ToolTip="Move chapter to part, or scene to chapter" />
+                        </WrapPanel>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Bottom" Margin="8">
+                        <TextBlock Text="Compile export file" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <TextBox Text="{Binding ExportFileName, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,6"
+                                 AutomationProperties.Name="Compile export file name" />
+                        <Button Content="Compile selected"
+                                Padding="10,6"
+                                MinHeight="32"
+                                Command="{Binding CompileSelectedCommand}"
+                                AutomationProperties.Name="Compile selected chapters" />
+                    </StackPanel>
+                    <TreeView x:Name="HierarchyTree"
+                              ItemsSource="{Binding HierarchyRoots}"
+                              BorderThickness="0"
+                              Background="Transparent"
+                              Margin="4,0"
+                              AllowDrop="True"
+                              PreviewMouseMove="HierarchyTree_OnPreviewMouseMove"
+                              PreviewMouseLeftButtonDown="HierarchyTree_OnPreviewMouseLeftButtonDown"
+                              DragOver="HierarchyTree_OnDragOver"
+                              Drop="HierarchyTree_OnDrop"
+                              SelectedItemChanged="HierarchyTree_OnSelectedItemChanged"
+                              AutomationProperties.Name="Manuscript hierarchy"
+                              AutomationProperties.HelpText="Books, parts, chapters and scenes. Use Up, Down and Move To as keyboard alternatives to drag-and-drop.">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="TreeViewItem">
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                                <Setter Property="Visibility" Value="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                <Setter Property="Padding" Value="2" />
+                                <Setter Property="MinHeight" Value="28" />
+                                <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}" />
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                    </TreeView>
+                </DockPanel>
+            </Border>
 
-            <Grid Grid.Column="1">
+            <!-- Centre: editor -->
+            <Grid Grid.Column="1" Margin="0,0,8,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="120" />
-                    <RowDefinition Height="120" />
+                    <RowDefinition Height="*" MinHeight="180" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <DockPanel Grid.Row="0" Margin="0,0,0,8">
                     <Button DockPanel.Dock="Right"
                             Content="Save"
-                            Width="80"
+                            MinWidth="80"
+                            MinHeight="32"
                             Margin="8,0,0,0"
-                            Command="{Binding SaveChapterCommand}" />
+                            Command="{Binding SaveChapterCommand}"
+                            AutomationProperties.Name="Save chapter" />
                     <Button DockPanel.Dock="Right"
                             Content="Rename"
-                            Width="80"
-                            Command="{Binding RenameChapterCommand}" />
+                            MinWidth="80"
+                            MinHeight="32"
+                            Command="{Binding RenameChapterCommand}"
+                            AutomationProperties.Name="Rename loaded chapter" />
                     <TextBox Text="{Binding ChapterTitle, UpdateSourceTrigger=PropertyChanged}"
                              Margin="0,0,8,0"
-                             VerticalContentAlignment="Center" />
+                             MinHeight="32"
+                             VerticalContentAlignment="Center"
+                             AutomationProperties.Name="Chapter title" />
                 </DockPanel>
 
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" MinWidth="140" />
+                        <ColumnDefinition Width="*" MinWidth="140" />
                     </Grid.ColumnDefinitions>
                     <DockPanel Grid.Column="0" Margin="0,0,8,0">
                         <TextBlock DockPanel.Dock="Top" Text="Markdown" FontWeight="SemiBold" Margin="0,0,0,6" />
@@ -149,30 +233,7 @@
                     </DockPanel>
                 </Grid>
 
-                <DockPanel Grid.Row="2" Margin="0,12,0,0">
-                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
-                        <Button DockPanel.Dock="Right"
-                                Content="Open in Story Data"
-                                Padding="10,4"
-                                Command="{Binding OpenLinkedSceneInStoryDataCommand}" />
-                        <TextBlock Text="Linked scenes (read-only)"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center" />
-                    </DockPanel>
-                    <ListBox ItemsSource="{Binding LinkedScenes}"
-                             SelectedItem="{Binding SelectedLinkedScene}"
-                             DisplayMemberPath="DisplayName"
-                             BorderBrush="{DynamicResource AppBorderBrush}" />
-                </DockPanel>
-
-                <DockPanel Grid.Row="3" Margin="0,12,0,0">
-                    <TextBlock DockPanel.Dock="Top" Text="Bracket notes" FontWeight="SemiBold" Margin="0,0,0,6" />
-                    <ListBox ItemsSource="{Binding BracketNotes}"
-                             DisplayMemberPath="Display"
-                             BorderBrush="{DynamicResource AppBorderBrush}" />
-                </DockPanel>
-
-                <DockPanel Grid.Row="4" Margin="0,10,0,0">
+                <DockPanel Grid.Row="2" Margin="0,10,0,0">
                     <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center">
                         <Run Text="{Binding WordCount, Mode=OneWay}" />
                         <Run Text=" words" />
@@ -197,6 +258,58 @@
                                AutomationProperties.Name="Manuscript status message" />
                 </DockPanel>
             </Grid>
+
+            <!-- Right: context -->
+            <Border Grid.Column="2"
+                    Style="{StaticResource PanelBorderStyle}"
+                    Width="280"
+                    Visibility="{Binding IsRightPanelCollapsed, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}">
+                <DockPanel Margin="10">
+                    <TextBlock DockPanel.Dock="Top" Text="Context" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8" />
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="{Binding ContextTitle}"
+                               FontWeight="SemiBold"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,4"
+                               AutomationProperties.Name="Context title" />
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="{Binding ContextStatusText}"
+                               Opacity="0.75"
+                               Margin="0,0,0,8"
+                               AutomationProperties.Name="Context status" />
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="{Binding ContextSummary}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,8"
+                               AutomationProperties.Name="Context summary" />
+                    <Button DockPanel.Dock="Bottom"
+                            Content="Open in Story Data"
+                            Margin="0,8,0,0"
+                            MinHeight="32"
+                            Command="{Binding OpenContextInStoryDataCommand}"
+                            AutomationProperties.Name="Open selected scene in Story Data" />
+                    <DockPanel DockPanel.Dock="Bottom" Margin="0,8,0,0" MaxHeight="140">
+                        <TextBlock DockPanel.Dock="Top" Text="Linked scenes" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <ListBox ItemsSource="{Binding LinkedScenes}"
+                                 SelectedItem="{Binding SelectedLinkedScene}"
+                                 DisplayMemberPath="DisplayName"
+                                 BorderBrush="{DynamicResource AppBorderBrush}"
+                                 AutomationProperties.Name="Linked scenes for loaded chapter" />
+                    </DockPanel>
+                    <DockPanel DockPanel.Dock="Bottom" Margin="0,8,0,0" MaxHeight="120">
+                        <TextBlock DockPanel.Dock="Top" Text="Bracket notes" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <ListBox ItemsSource="{Binding BracketNotes}"
+                                 DisplayMemberPath="Display"
+                                 BorderBrush="{DynamicResource AppBorderBrush}"
+                                 AutomationProperties.Name="Bracket notes in chapter" />
+                    </DockPanel>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <TextBlock Text="{Binding ContextDetail}"
+                                   TextWrapping="Wrap"
+                                   AutomationProperties.Name="Context detail" />
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
         </Grid>
     </Grid>
 </UserControl>
