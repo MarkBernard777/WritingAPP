@@ -7,7 +7,8 @@
                 <Button DockPanel.Dock="Right"
                         Content="Refresh"
                         Width="90"
-                        Command="{Binding RefreshCommand}" />
+                        Command="{Binding RefreshCommand}"
+                        AutomationProperties.Name="Refresh dashboard" />
                 <TextBlock Text="Project Dashboard"
                            FontSize="26"
                            FontWeight="SemiBold"
@@ -15,12 +16,12 @@
             </DockPanel>
 
             <TextBlock Text="{Binding StatusMessage}"
-                       Foreground="#9B2C2C"
+                       Style="{StaticResource StatusLiveTextStyle}"
                        Margin="0,0,0,12"
-                       TextWrapping="Wrap" />
+                       AutomationProperties.Name="Dashboard status message" />
 
             <Border Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
-                    Background="#F7FAFC"
+                    Background="{DynamicResource AppPanelBackgroundBrush}"
                     Padding="20"
                     CornerRadius="8">
                 <TextBlock Text="No project is open. Use Create Project or Open Project in the header."
@@ -42,13 +43,13 @@
                 <TextBlock Text="{Binding NorthStar}" TextWrapping="Wrap" Margin="0,4,0,20" />
 
                 <UniformGrid Columns="4" Margin="0,0,0,20">
-                    <Border Background="#EDF2F7" Padding="12" Margin="0,0,8,0" CornerRadius="6">
+                    <Border Background="{DynamicResource AppMetricCardBrush}" Padding="12" Margin="0,0,8,0" CornerRadius="6">
                         <StackPanel>
                             <TextBlock Text="Phases" Opacity="0.7" />
                             <TextBlock Text="{Binding ApplicablePhaseCount}" FontSize="22" FontWeight="SemiBold" />
                         </StackPanel>
                     </Border>
-                    <Border Background="#EDF2F7" Padding="12" Margin="0,0,8,0" CornerRadius="6">
+                    <Border Background="{DynamicResource AppMetricCardBrush}" Padding="12" Margin="0,0,8,0" CornerRadius="6">
                         <StackPanel>
                             <TextBlock Text="Steps done" Opacity="0.7" />
                             <TextBlock FontSize="22" FontWeight="SemiBold">
@@ -58,13 +59,13 @@
                             </TextBlock>
                         </StackPanel>
                     </Border>
-                    <Border Background="#EDF2F7" Padding="12" Margin="0,0,8,0" CornerRadius="6">
+                    <Border Background="{DynamicResource AppMetricCardBrush}" Padding="12" Margin="0,0,8,0" CornerRadius="6">
                         <StackPanel>
                             <TextBlock Text="Gates passed" Opacity="0.7" />
                             <TextBlock Text="{Binding PassedGateCount}" FontSize="22" FontWeight="SemiBold" />
                         </StackPanel>
                     </Border>
-                    <Border Background="#EDF2F7" Padding="12" CornerRadius="6">
+                    <Border Background="{DynamicResource AppMetricCardBrush}" Padding="12" CornerRadius="6">
                         <StackPanel>
                             <TextBlock Text="Word count" Opacity="0.7" />
                             <TextBlock Text="{Binding WordCount}" FontSize="22" FontWeight="SemiBold" />

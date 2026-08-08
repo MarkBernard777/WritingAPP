@@ -196,10 +196,9 @@
                        Opacity="0.75"
                        AutomationProperties.Name="Recovery progress message" />
             <TextBlock Text="{Binding StatusMessage}"
-                       Foreground="#276749"
-                       TextWrapping="Wrap"
-                       Margin="0,4,0,0"
-                       AutomationProperties.Name="Recovery status message" />
+                       Style="{StaticResource StatusLiveTextStyle}"
+                       AutomationProperties.Name="Recovery Centre status message"
+                       Margin="0,4,0,0" />
         </StackPanel>
     </Grid>
 </UserControl>

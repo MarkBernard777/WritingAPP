@@ -6,7 +6,7 @@ namespace MasterBookWritingSystem.App.Services;
 
 public interface IRecentProjectsStore
 {
-    IReadOnlyList<string> GetRecent();
+    Task<IReadOnlyList<string>> GetRecentAsync(CancellationToken cancellationToken = default);
 
     Task AddAsync(string projectRootPath, CancellationToken cancellationToken = default);
 }
@@ -21,7 +21,7 @@ public sealed class RecentProjectsStore : IRecentProjectsStore
         _paths = paths;
     }
 
-    public IReadOnlyList<string> GetRecent()
+    public async Task<IReadOnlyList<string>> GetRecentAsync(CancellationToken cancellationToken = default)
     {
         var file = GetFilePath();
         if (!File.Exists(file))
@@ -31,7 +31,7 @@ public sealed class RecentProjectsStore : IRecentProjectsStore
 
         try
         {
-            var json = File.ReadAllText(file);
+            var json = await File.ReadAllTextAsync(file, cancellationToken).ConfigureAwait(false);
             return JsonSerializer.Deserialize<List<string>>(json) ?? [];
         }
         catch
@@ -45,7 +45,7 @@ public sealed class RecentProjectsStore : IRecentProjectsStore
         ArgumentException.ThrowIfNullOrWhiteSpace(projectRootPath);
         Directory.CreateDirectory(_paths.LocalAppDataDirectory);
 
-        var recent = GetRecent()
+        var recent = (await GetRecentAsync(cancellationToken).ConfigureAwait(false))
             .Where(path => !string.Equals(path, projectRootPath, StringComparison.OrdinalIgnoreCase))
             .Prepend(Path.GetFullPath(projectRootPath))
             .Take(10)

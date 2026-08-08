@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Backup;
@@ -189,7 +190,8 @@ public sealed class RecoveryCentreService : IRecoveryCentreService
         CancellationToken cancellationToken = default)
     {
         _ = Path.GetFullPath(projectRootPath);
-        var info = await InspectSnapshotAsync(snapshotDirectoryPath, cancellationToken).ConfigureAwait(false);
+        var info = await InspectSnapshotAsync(snapshotDirectoryPath, validateChecksums: true, cancellationToken)
+            .ConfigureAwait(false);
         return new SnapshotRestorePreview
         {
             SnapshotName = info.Name,
@@ -254,7 +256,8 @@ public sealed class RecoveryCentreService : IRecoveryCentreService
                 progress?.Report(new OperationProgress { Message = "Staging snapshot…", PercentComplete = 30 });
                 Directory.CreateDirectory(staging);
                 await CopyDirectoryAsync(snapshotDirectoryPath, staging, cancellationToken).ConfigureAwait(false);
-                var staged = await InspectSnapshotAsync(staging, cancellationToken).ConfigureAwait(false);
+                var staged = await InspectSnapshotAsync(staging, validateChecksums: true, cancellationToken)
+                    .ConfigureAwait(false);
                 if (!staged.IsValid)
                 {
                     return new RecoveryActionResult
@@ -882,7 +885,8 @@ public sealed class RecoveryCentreService : IRecoveryCentreService
                      .OrderByDescending(item => item))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var info = await InspectSnapshotAsync(path, cancellationToken).ConfigureAwait(false);
+            var info = await InspectSnapshotAsync(path, validateChecksums: false, cancellationToken)
+                .ConfigureAwait(false);
             results.Add(new RecoverySnapshotItem
             {
                 Name = info.Name,
@@ -943,7 +947,10 @@ public sealed class RecoveryCentreService : IRecoveryCentreService
         return results.OrderByDescending(item => item.UpdatedUtc).ToList();
     }
 
-    private static async Task<SnapshotInfo> InspectSnapshotAsync(string directory, CancellationToken cancellationToken)
+    private static async Task<SnapshotInfo> InspectSnapshotAsync(
+        string directory,
+        bool validateChecksums,
+        CancellationToken cancellationToken)
     {
         var errors = new List<string>();
         var name = Path.GetFileName(directory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
@@ -963,7 +970,8 @@ public sealed class RecoveryCentreService : IRecoveryCentreService
         SnapshotManifest manifest;
         try
         {
-            var json = await File.ReadAllTextAsync(manifestPath, cancellationToken).ConfigureAwait(false);
+            var json = await File.ReadAllTextAsync(manifestPath, Encoding.UTF8, cancellationToken)
+                .ConfigureAwait(false);
             manifest = ManifestSerializer.DeserializeSnapshot(json);
         }
         catch (Exception ex)
@@ -1003,6 +1011,11 @@ public sealed class RecoveryCentreService : IRecoveryCentreService
             if (!File.Exists(absolute))
             {
                 errors.Add($"Missing file: {entry.RelativePath}");
+                continue;
+            }
+
+            if (!validateChecksums)
+            {
                 continue;
             }
 

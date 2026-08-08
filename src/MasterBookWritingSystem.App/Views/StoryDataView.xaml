@@ -11,7 +11,8 @@
             <Button DockPanel.Dock="Right"
                     Content="Refresh"
                     Width="90"
-                    Command="{Binding RefreshCommand}" />
+                    Command="{Binding RefreshCommand}"
+                    AutomationProperties.Name="Refresh story data" />
             <TextBlock Text="Story Data"
                        FontSize="26"
                        FontWeight="SemiBold"
@@ -20,8 +21,9 @@
 
         <TextBlock Grid.Row="1"
                    Text="{Binding StatusMessage}"
+                   Style="{StaticResource StatusLiveTextStyle}"
                    Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
-                   TextWrapping="Wrap" />
+                   AutomationProperties.Name="Story data status message" />
 
         <Grid Grid.Row="1" Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
@@ -29,8 +31,10 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TabControl SelectedIndex="{Binding SelectedTabIndex}">
-                <TabItem Header="Characters">
+            <TabControl SelectedIndex="{Binding SelectedTabIndex}"
+                        AutomationProperties.Name="Story data sections">
+                <TabItem Header="Characters"
+                         AutomationProperties.Name="Characters tab">
                     <Grid Margin="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="280" />
@@ -277,9 +281,9 @@
 
             <TextBlock Grid.Row="1"
                        Text="{Binding StatusMessage}"
-                       Foreground="#276749"
+                       Style="{StaticResource StatusLiveTextStyle}"
                        Margin="0,12,0,0"
-                       TextWrapping="Wrap" />
+                       AutomationProperties.Name="Story data status message" />
         </Grid>
     </Grid>
 </UserControl>

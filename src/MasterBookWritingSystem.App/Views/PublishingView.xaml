@@ -22,8 +22,8 @@
         </DockPanel>
 
         <Border Grid.Row="1"
-                Background="#F3F6FA"
-                BorderBrush="#D0D7E2"
+                Background="{DynamicResource AppPanelBackgroundBrush}"
+                BorderBrush="{DynamicResource AppBorderBrush}"
                 BorderThickness="1"
                 Padding="12,10"
                 Margin="0,0,0,10"
@@ -35,7 +35,7 @@
                 <TextBlock Text="{Binding SubmissionsRouteNote}"
                            TextWrapping="Wrap"
                            Margin="0,4,0,0"
-                           Foreground="#445" />
+                           Foreground="{DynamicResource AppSecondaryForegroundBrush}" />
                 <WrapPanel Margin="0,8,0,0">
                     <Button Content="Publishing Plan (20)"
                             Margin="0,0,8,4"
@@ -67,11 +67,13 @@
 
         <TextBlock Grid.Row="2"
                    Text="{Binding StatusMessage}"
-                   TextWrapping="Wrap"
+                   Style="{StaticResource StatusLiveTextStyle}"
                    Margin="0,0,0,8"
+                   AutomationProperties.Name="Publishing status message"
                    Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}" />
 
         <TabControl Grid.Row="3"
+                    AutomationProperties.Name="Publishing sections"
                     Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}}">
             <TabItem Header="Submissions">
                 <Grid Margin="8">
@@ -523,8 +525,9 @@
 
         <TextBlock Grid.Row="4"
                    Text="{Binding StatusMessage}"
-                   TextWrapping="Wrap"
+                   Style="{StaticResource StatusLiveTextStyle}"
                    Margin="0,8,0,0"
+                   AutomationProperties.Name="Publishing status message"
                    Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Grid>
 </UserControl>

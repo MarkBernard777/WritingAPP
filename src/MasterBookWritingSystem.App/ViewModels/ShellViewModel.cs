@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MasterBookWritingSystem.App.Navigation;
 using MasterBookWritingSystem.App.Services;
+using MasterBookWritingSystem.Core.Accessibility;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Backup;
 using MasterBookWritingSystem.Core.Recovery;
@@ -63,6 +64,9 @@ public partial class ShellViewModel : ObservableObject
 
     [ObservableProperty]
     private string _saveStateDisplay = "Clean";
+
+    [ObservableProperty]
+    private string _saveStateAccessibleName = "Save status: Clean";
 
     [RelayCommand]
     private void Navigate(AppSection section) => _navigationService.NavigateTo(section);
@@ -205,5 +209,8 @@ public partial class ShellViewModel : ObservableObject
     }
 
     private void SyncSaveState()
-        => SaveStateDisplay = _saveState.Message;
+    {
+        SaveStateDisplay = SaveStateAccessibility.FormatDisplay(_saveState.State, _saveState.Message);
+        SaveStateAccessibleName = SaveStateAccessibility.FormatAccessibleName(_saveState.State, _saveState.Message);
+    }
 }

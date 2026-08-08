@@ -164,7 +164,9 @@
         </TabControl>
 
         <StackPanel Grid.Row="2" Margin="0,10,0,0">
-            <TextBlock Text="{Binding StatusMessage}" Foreground="#276749" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding StatusMessage}"
+                       Style="{StaticResource StatusLiveTextStyle}"
+                       AutomationProperties.Name="Tools status message" />
             <TextBlock Text="{Binding ToolExplanation}" Opacity="0.75" TextWrapping="Wrap" Margin="0,4,0,0" />
         </StackPanel>
     </Grid>

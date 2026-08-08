@@ -9,110 +9,136 @@
         Height="720"
         Width="1180"
         MinHeight="560"
-        MinWidth="900">
+        MinWidth="900"
+        Background="{DynamicResource AppWindowBackgroundBrush}"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        AutomationProperties.Name="{Binding ApplicationTitle}">
     <DockPanel>
         <Border DockPanel.Dock="Top"
-                Background="#1F2933"
-                Padding="16,12">
+                Background="{DynamicResource AppChromeBackgroundBrush}"
+                Padding="16,12"
+                AutomationProperties.Name="Project commands">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <Button Content="Create Project"
                             Margin="0,0,8,0"
-                            Padding="10,4"
-                            Command="{Binding CreateProjectCommand}" />
+                            Command="{Binding CreateProjectCommand}"
+                            AutomationProperties.Name="Create Project"
+                            AutomationProperties.HelpText="Create a new portable book project folder." />
                     <Button Content="Open Project"
                             Margin="0,0,8,0"
-                            Padding="10,4"
-                            Command="{Binding OpenProjectCommand}" />
+                            Command="{Binding OpenProjectCommand}"
+                            AutomationProperties.Name="Open Project"
+                            AutomationProperties.HelpText="Open an existing project folder that contains project.mbws." />
                     <Button Content="Close Project"
-                            Padding="10,4"
-                            Command="{Binding CloseProjectCommand}" />
+                            Command="{Binding CloseProjectCommand}"
+                            AutomationProperties.Name="Close Project" />
                 </StackPanel>
                 <StackPanel>
                     <TextBlock Text="{Binding ApplicationTitle}"
-                               Foreground="White"
+                               Foreground="{DynamicResource AppChromeForegroundBrush}"
                                FontSize="18"
                                FontWeight="SemiBold" />
                     <TextBlock Text="{Binding ActiveProjectCaption}"
-                               Foreground="#CBD5E0"
+                               Foreground="{DynamicResource AppChromeForegroundBrush}"
+                               Opacity="0.9"
                                FontSize="12"
                                Margin="0,4,0,0"
-                               TextTrimming="CharacterEllipsis" />
+                               TextTrimming="CharacterEllipsis"
+                               AutomationProperties.Name="{Binding ActiveProjectCaption}" />
                 </StackPanel>
             </DockPanel>
         </Border>
 
         <Border DockPanel.Dock="Bottom"
-                Background="#EDF2F7"
-                Padding="12,8">
+                Background="{DynamicResource AppPanelBackgroundBrush}"
+                Padding="12,8"
+                AutomationProperties.Name="Application status bar">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Right"
+                <TextBlock x:Name="ShellSaveStateText"
+                           DockPanel.Dock="Right"
                            Text="{Binding SaveStateDisplay}"
-                           FontWeight="SemiBold"
+                           Style="{StaticResource SaveStateLiveTextStyle}"
+                           AutomationProperties.Name="{Binding SaveStateAccessibleName}"
                            Margin="16,0,0,0"
                            VerticalAlignment="Center" />
-                <TextBlock Text="{Binding StatusMessage}" Opacity="0.8" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding StatusMessage}"
+                           Style="{StaticResource StatusLiveTextStyle}"
+                           Opacity="0.9"
+                           AutomationProperties.Name="Application status message" />
             </DockPanel>
         </Border>
 
         <Border DockPanel.Dock="Left"
-                Background="#E4E7EB"
+                Background="{DynamicResource AppPanelBackgroundBrush}"
                 Width="220"
-                Padding="12">
-            <StackPanel>
+                MinWidth="180"
+                Padding="12"
+                AutomationProperties.Name="Primary navigation">
+            <StackPanel KeyboardNavigation.TabNavigation="Once"
+                        KeyboardNavigation.DirectionalNavigation="Cycle">
                 <TextBlock Text="Navigate"
                            FontWeight="SemiBold"
                            Margin="8,4,8,12"
-                           Opacity="0.7" />
+                           Foreground="{DynamicResource AppSecondaryForegroundBrush}" />
 
                 <RadioButton Content="Dashboard"
                              GroupName="Nav"
                              Style="{StaticResource NavRadioButtonStyle}"
                              Command="{Binding NavigateCommand}"
                              CommandParameter="{x:Static nav:AppSection.Dashboard}"
-                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Dashboard, Mode=OneWay}" />
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Dashboard, Mode=OneWay}"
+                             AutomationProperties.Name="Navigate to Dashboard" />
                 <RadioButton Content="Workflow"
                              GroupName="Nav"
                              Style="{StaticResource NavRadioButtonStyle}"
                              Command="{Binding NavigateCommand}"
                              CommandParameter="{x:Static nav:AppSection.Workflow}"
-                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Workflow, Mode=OneWay}" />
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Workflow, Mode=OneWay}"
+                             AutomationProperties.Name="Navigate to Workflow" />
                 <RadioButton Content="Documents"
                              GroupName="Nav"
                              Style="{StaticResource NavRadioButtonStyle}"
                              Command="{Binding NavigateCommand}"
                              CommandParameter="{x:Static nav:AppSection.Documents}"
-                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Documents, Mode=OneWay}" />
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Documents, Mode=OneWay}"
+                             AutomationProperties.Name="Navigate to Documents" />
                 <RadioButton Content="Manuscript"
                              GroupName="Nav"
                              Style="{StaticResource NavRadioButtonStyle}"
                              Command="{Binding NavigateCommand}"
                              CommandParameter="{x:Static nav:AppSection.Manuscript}"
-                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Manuscript, Mode=OneWay}" />
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Manuscript, Mode=OneWay}"
+                             AutomationProperties.Name="Navigate to Manuscript" />
                 <RadioButton Content="Story Data"
                              GroupName="Nav"
                              Style="{StaticResource NavRadioButtonStyle}"
                              Command="{Binding NavigateCommand}"
                              CommandParameter="{x:Static nav:AppSection.StoryData}"
-                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=StoryData, Mode=OneWay}" />
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=StoryData, Mode=OneWay}"
+                             AutomationProperties.Name="Navigate to Story Data" />
                 <RadioButton Content="Tools"
                              GroupName="Nav"
                              Style="{StaticResource NavRadioButtonStyle}"
                              Command="{Binding NavigateCommand}"
                              CommandParameter="{x:Static nav:AppSection.Tools}"
-                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Tools, Mode=OneWay}" />
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Tools, Mode=OneWay}"
+                             AutomationProperties.Name="Navigate to Tools" />
                 <RadioButton Content="Publishing"
                              GroupName="Nav"
                              Style="{StaticResource NavRadioButtonStyle}"
                              Command="{Binding NavigateCommand}"
                              CommandParameter="{x:Static nav:AppSection.Publishing}"
-                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Publishing, Mode=OneWay}" />
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Publishing, Mode=OneWay}"
+                             AutomationProperties.Name="Navigate to Publishing" />
                 <RadioButton Content="Backup &amp; Export"
                              GroupName="Nav"
                              Style="{StaticResource NavRadioButtonStyle}"
                              Command="{Binding NavigateCommand}"
                              CommandParameter="{x:Static nav:AppSection.Settings}"
-                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Settings, Mode=OneWay}" />
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Settings, Mode=OneWay}"
+                             AutomationProperties.Name="Navigate to Backup and Export" />
                 <RadioButton Content="Recovery Centre"
                              GroupName="Nav"
                              Style="{StaticResource NavRadioButtonStyle}"
@@ -123,6 +149,7 @@
             </StackPanel>
         </Border>
 
-        <ContentControl Content="{Binding CurrentViewModel}" />
+        <ContentControl Content="{Binding CurrentViewModel}"
+                        AutomationProperties.Name="Main content" />
     </DockPanel>
 </Window>

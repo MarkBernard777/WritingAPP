@@ -1,3 +1,4 @@
+using System.Text;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Backup;
 using Microsoft.Data.Sqlite;
@@ -147,7 +148,9 @@ public sealed class SnapshotService : ISnapshotService
                      .OrderByDescending(path => path))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            results.Add(await InspectSnapshotAsync(directory, cancellationToken).ConfigureAwait(false));
+            // Listing uses metadata + file presence only; checksum validation is for inspect/restore.
+            results.Add(await InspectSnapshotAsync(directory, validateChecksums: false, cancellationToken)
+                .ConfigureAwait(false));
         }
 
         return results;
@@ -159,7 +162,8 @@ public sealed class SnapshotService : ISnapshotService
         CancellationToken cancellationToken = default)
     {
         _ = ProjectRootGuard.RequireActiveRoot(_projects, projectId);
-        var info = await InspectSnapshotAsync(snapshotDirectoryPath, cancellationToken).ConfigureAwait(false);
+        var info = await InspectSnapshotAsync(snapshotDirectoryPath, validateChecksums: true, cancellationToken)
+            .ConfigureAwait(false);
         return new SnapshotRestorePreview
         {
             SnapshotName = info.Name,
@@ -225,7 +229,8 @@ public sealed class SnapshotService : ISnapshotService
                 throw new InvalidOperationException("Staged snapshot is missing its manifest.");
             }
 
-            var stagedInfo = await InspectSnapshotAsync(staging, cancellationToken).ConfigureAwait(false);
+            var stagedInfo = await InspectSnapshotAsync(staging, validateChecksums: true, cancellationToken)
+                .ConfigureAwait(false);
             if (!stagedInfo.IsValid)
             {
                 return new SnapshotRestoreResult
@@ -384,7 +389,10 @@ public sealed class SnapshotService : ISnapshotService
             .ConfigureAwait(false);
     }
 
-    private async Task<SnapshotInfo> InspectSnapshotAsync(string directory, CancellationToken cancellationToken)
+    private async Task<SnapshotInfo> InspectSnapshotAsync(
+        string directory,
+        bool validateChecksums,
+        CancellationToken cancellationToken)
     {
         var errors = new List<string>();
         var name = Path.GetFileName(directory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
@@ -404,7 +412,8 @@ public sealed class SnapshotService : ISnapshotService
         SnapshotManifest manifest;
         try
         {
-            var json = await File.ReadAllTextAsync(manifestPath, cancellationToken).ConfigureAwait(false);
+            var json = await File.ReadAllTextAsync(manifestPath, Encoding.UTF8, cancellationToken)
+                .ConfigureAwait(false);
             manifest = ManifestSerializer.DeserializeSnapshot(json);
         }
         catch (Exception ex)
@@ -444,6 +453,11 @@ public sealed class SnapshotService : ISnapshotService
             if (!File.Exists(absolute))
             {
                 errors.Add($"Missing file: {entry.RelativePath}");
+                continue;
+            }
+
+            if (!validateChecksums)
+            {
                 continue;
             }
 

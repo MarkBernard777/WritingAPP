@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MasterBookWritingSystem.App.Navigation;
 using MasterBookWritingSystem.App.Services;
+using MasterBookWritingSystem.Core.Accessibility;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Manuscript;
 using MasterBookWritingSystem.Core.Recovery;
@@ -24,6 +25,8 @@ public partial class ManuscriptViewModel : ObservableObject
     private bool _restoringSelection;
     private Guid? _loadedChapterId;
     private int _editorSessionVersion;
+    private CancellationTokenSource? _previewDebounceCts;
+    private static readonly TimeSpan PreviewDebounceDelay = TimeSpan.FromMilliseconds(250);
 
     public ManuscriptViewModel(
         IProjectService projectService,
@@ -86,6 +89,9 @@ public partial class ManuscriptViewModel : ObservableObject
     [ObservableProperty]
     private string _saveStateDisplay = "Clean";
 
+    [ObservableProperty]
+    private string _saveStateAccessibleName = "Save status: Clean";
+
     /// <summary>
     /// Increments when chapter/project content is rebased so the prose TextBox can clear its native undo stack.
     /// </summary>
@@ -110,14 +116,51 @@ public partial class ManuscriptViewModel : ObservableObject
 
         IsDirty = !string.Equals(value, _savedContent, StringComparison.Ordinal);
         WordCount = ManuscriptTextAnalytics.CountWords(value);
-        PreviewHtml = MarkdownPreviewRenderer.ToHtmlDocument(value);
-        RefreshBracketNotes(value);
+        SchedulePreviewUpdate(value);
 
         var project = _projectService.ActiveProject;
         var chapterId = _loadedChapterId;
         if (IsDirty && project is not null && chapterId is { } id)
         {
             _autosave.ScheduleManuscriptSave(project.Id, id, value);
+        }
+    }
+
+    private void SchedulePreviewUpdate(string markdown)
+    {
+        _previewDebounceCts?.Cancel();
+        _previewDebounceCts?.Dispose();
+        var cts = new CancellationTokenSource();
+        _previewDebounceCts = cts;
+        _ = UpdatePreviewAfterDelayAsync(markdown, cts.Token);
+    }
+
+    private async Task UpdatePreviewAfterDelayAsync(string markdown, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(PreviewDebounceDelay, cancellationToken).ConfigureAwait(true);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            // Markdig/HTML generation off the UI thread; apply results on the dispatcher context.
+            var html = await Task.Run(
+                    () => MarkdownPreviewRenderer.ToHtmlDocument(markdown),
+                    cancellationToken)
+                .ConfigureAwait(true);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            PreviewHtml = html;
+            RefreshBracketNotes(markdown);
+        }
+        catch (OperationCanceledException)
+        {
+            // Newer keystroke superseded this preview pass.
         }
     }
 
@@ -470,7 +513,10 @@ public partial class ManuscriptViewModel : ObservableObject
     }
 
     private void SyncSaveState()
-        => SaveStateDisplay = _saveState.Message;
+    {
+        SaveStateDisplay = SaveStateAccessibility.FormatDisplay(_saveState.State, _saveState.Message);
+        SaveStateAccessibleName = SaveStateAccessibility.FormatAccessibleName(_saveState.State, _saveState.Message);
+    }
 
     [RelayCommand]
     private void OpenLinkedSceneInStoryData()

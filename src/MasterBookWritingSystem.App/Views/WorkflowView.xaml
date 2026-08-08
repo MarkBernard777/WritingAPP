@@ -39,7 +39,7 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0"
-                    Background="#F7FAFC"
+                    Background="{DynamicResource AppPanelBackgroundBrush}"
                     Padding="8"
                     Margin="0,0,12,0"
                     CornerRadius="6">
@@ -69,7 +69,7 @@
                     <ItemsControl ItemsSource="{Binding Steps}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderBrush="#E2E8F0"
+                                <Border BorderBrush="{DynamicResource AppBorderBrush}"
                                         BorderThickness="0,0,0,1"
                                         Padding="0,8">
                                     <Grid>
@@ -89,7 +89,7 @@
                                             <TextBlock Text="Done"
                                                        HorizontalAlignment="Center"
                                                        Visibility="{Binding IsComplete, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                       Foreground="#276749"
+                                                       Foreground="{DynamicResource AppStatusBrush}"
                                                        FontWeight="SemiBold" />
                                             <Button Content="Complete"
                                                     Padding="10,4"
@@ -103,7 +103,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <Border Background="#EDF2F7" Padding="16" Margin="0,20,0,0" CornerRadius="6">
+                    <Border Background="{DynamicResource AppMetricCardBrush}" Padding="16" Margin="0,20,0,0" CornerRadius="6">
                         <StackPanel>
                             <TextBlock Text="Phase gate" FontWeight="SemiBold" FontSize="16" />
                             <TextBlock Text="{Binding GateStatement}"
@@ -122,7 +122,7 @@
                                      TextWrapping="Wrap"
                                      AcceptsReturn="True" />
                             <TextBlock Text="Gate passed"
-                                       Foreground="#276749"
+                                       Foreground="{DynamicResource AppStatusBrush}"
                                        FontWeight="SemiBold"
                                        Visibility="{Binding IsGatePassed, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <Button Content="Confirm and pass gate"
@@ -139,9 +139,9 @@
                     </Border>
 
                     <TextBlock Text="{Binding StatusMessage}"
-                               Foreground="#9B2C2C"
+                               Style="{StaticResource StatusLiveTextStyle}"
                                Margin="0,12,0,0"
-                               TextWrapping="Wrap" />
+                               AutomationProperties.Name="Workflow status message" />
                 </StackPanel>
             </ScrollViewer>
         </Grid>

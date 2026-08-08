@@ -1,0 +1,90 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--
+      Brushes resolve through SystemColors so high-contrast themes stay legible.
+      Semantic status uses text + LiveRegions; colour is secondary.
+    -->
+    <SolidColorBrush x:Key="AppWindowBackgroundBrush" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+    <SolidColorBrush x:Key="AppPanelBackgroundBrush" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
+    <SolidColorBrush x:Key="AppChromeBackgroundBrush" Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}" />
+    <SolidColorBrush x:Key="AppChromeForegroundBrush" Color="{DynamicResource {x:Static SystemColors.ActiveCaptionTextColorKey}}" />
+    <SolidColorBrush x:Key="AppSecondaryForegroundBrush" Color="{DynamicResource {x:Static SystemColors.GrayTextColorKey}}" />
+    <SolidColorBrush x:Key="AppPrimaryForegroundBrush" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
+    <SolidColorBrush x:Key="AppBorderBrush" Color="{DynamicResource {x:Static SystemColors.ControlDarkColorKey}}" />
+    <SolidColorBrush x:Key="AppStatusBrush" Color="{DynamicResource {x:Static SystemColors.WindowTextColorKey}}" />
+    <SolidColorBrush x:Key="AppWarningBrush" Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}" />
+    <SolidColorBrush x:Key="AppNavHoverBrush" Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}" />
+    <SolidColorBrush x:Key="AppNavSelectedBrush" Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}" />
+    <SolidColorBrush x:Key="AppMetricCardBrush" Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}" />
+
+    <Style x:Key="AccessibleFocusVisual">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle Margin="2"
+                               SnapsToDevicePixels="True"
+                               Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                               StrokeThickness="2"
+                               StrokeDashArray="1 2" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="Button">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource AccessibleFocusVisual}" />
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Padding" Value="10,4" />
+    </Style>
+
+    <Style TargetType="RadioButton">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource AccessibleFocusVisual}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppPrimaryForegroundBrush}" />
+    </Style>
+
+    <Style TargetType="TextBox">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource AccessibleFocusVisual}" />
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Foreground" Value="{DynamicResource AppPrimaryForegroundBrush}" />
+        <Setter Property="Background" Value="{DynamicResource AppWindowBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}" />
+    </Style>
+
+    <Style TargetType="ListBox">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource AccessibleFocusVisual}" />
+        <Setter Property="Background" Value="{DynamicResource AppWindowBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AppPrimaryForegroundBrush}" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    </Style>
+
+    <Style TargetType="ComboBox">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource AccessibleFocusVisual}" />
+        <Setter Property="MinHeight" Value="28" />
+    </Style>
+
+    <Style x:Key="StatusLiveTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource AppStatusBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="AutomationProperties.LiveSetting" Value="Polite" />
+    </Style>
+
+    <Style x:Key="SaveStateLiveTextStyle" TargetType="TextBlock" BasedOn="{StaticResource StatusLiveTextStyle}">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="AutomationProperties.Name" Value="Save status" />
+        <Setter Property="AutomationProperties.HelpText" Value="Reports Saving, Saved, Save failed, or Recovery available." />
+    </Style>
+
+    <Style x:Key="WarningLiveTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource AppWarningBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="AutomationProperties.LiveSetting" Value="Polite" />
+    </Style>
+
+    <Style x:Key="PanelBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource AppPanelBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AppBorderBrush}" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="8" />
+    </Style>
+</ResourceDictionary>

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MasterBookWritingSystem.App.Editing;
 using MasterBookWritingSystem.App.Navigation;
+using MasterBookWritingSystem.Core.Accessibility;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Domain.Documents;
 using MasterBookWritingSystem.Core.Domain.Story;
@@ -81,6 +82,9 @@ public partial class DocumentsViewModel : ObservableObject
 
     [ObservableProperty]
     private string _saveStateDisplay = "Clean";
+
+    [ObservableProperty]
+    private string _saveStateAccessibleName = "Save status: Clean";
 
     [ObservableProperty]
     private string _undoTooltip = "Undo";
@@ -437,7 +441,10 @@ public partial class DocumentsViewModel : ObservableObject
     }
 
     private void SyncSaveState()
-        => SaveStateDisplay = _saveState.Message;
+    {
+        SaveStateDisplay = SaveStateAccessibility.FormatDisplay(_saveState.State, _saveState.Message);
+        SaveStateAccessibleName = SaveStateAccessibility.FormatAccessibleName(_saveState.State, _saveState.Message);
+    }
 
     private async Task LoadSceneInventoryAsync(Guid projectId)
     {

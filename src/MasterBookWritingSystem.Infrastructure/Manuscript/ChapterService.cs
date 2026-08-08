@@ -1,4 +1,3 @@
-using System.Text;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Domain.Manuscript;
 using MasterBookWritingSystem.Core.Manuscript;
@@ -293,21 +292,33 @@ public sealed class ChapterService : IChapterService
                 $"Export file already exists: {relativePath}. Choose a different file name.");
         }
 
-        var builder = new StringBuilder();
-        foreach (var chapter in ordered)
-        {
-            var content = await _chapterFileStore.LoadAsync(rootPath, chapter, cancellationToken)
-                .ConfigureAwait(false);
-            if (builder.Length > 0)
-            {
-                builder.AppendLine().AppendLine("---").AppendLine();
-            }
+        // Stream chapter bodies to the export file so large compilations do not retain a full in-memory concatenate.
+        var totalWords = 0;
+        var first = true;
+        await AtomicFileWriter.WriteAsync(
+                absolutePath,
+                async (writer, token) =>
+                {
+                    foreach (var chapter in ordered)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        var content = await _chapterFileStore.LoadAsync(rootPath, chapter, token)
+                            .ConfigureAwait(false);
+                        if (!first)
+                        {
+                            await writer.WriteLineAsync().ConfigureAwait(false);
+                            await writer.WriteLineAsync("---").ConfigureAwait(false);
+                            await writer.WriteLineAsync().ConfigureAwait(false);
+                        }
 
-            builder.AppendLine(content.TrimEnd()).AppendLine();
-        }
-
-        var markdown = builder.ToString();
-        await AtomicFileWriter.WriteAllTextAsync(absolutePath, markdown, cancellationToken)
+                        first = false;
+                        var trimmed = content.TrimEnd();
+                        await writer.WriteLineAsync(trimmed).ConfigureAwait(false);
+                        await writer.WriteLineAsync().ConfigureAwait(false);
+                        totalWords += ManuscriptTextAnalytics.CountWords(trimmed);
+                    }
+                },
+                cancellationToken)
             .ConfigureAwait(false);
 
         return new ManuscriptCompileResult
@@ -315,7 +326,7 @@ public sealed class ChapterService : IChapterService
             AbsolutePath = absolutePath,
             RelativePath = relativePath,
             ChapterCount = ordered.Count,
-            WordCount = ManuscriptTextAnalytics.CountWords(markdown),
+            WordCount = totalWords,
         };
     }
 

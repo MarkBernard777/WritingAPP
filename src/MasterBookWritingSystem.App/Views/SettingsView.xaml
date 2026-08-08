@@ -9,7 +9,8 @@
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0" Margin="0,0,0,12">
-            <Button DockPanel.Dock="Right" Content="Refresh" Width="90" Command="{Binding RefreshCommand}" />
+            <Button DockPanel.Dock="Right" Content="Refresh" Width="90" Command="{Binding RefreshCommand}"
+                    AutomationProperties.Name="Refresh backup and export" />
             <TextBlock Text="Backup &amp; Export" FontSize="26" FontWeight="SemiBold" VerticalAlignment="Center" />
         </DockPanel>
 
@@ -59,9 +60,13 @@
                     <ListBox ItemsSource="{Binding Snapshots}"
                              SelectedItem="{Binding SelectedSnapshot}"
                              DisplayMemberPath="DisplayWithKind"
-                             Height="140"
-                             Margin="0,0,0,8" />
-                    <TextBlock Text="{Binding RestorePreview}" TextWrapping="Wrap" Opacity="0.85" Margin="0,0,0,12" />
+                             MinHeight="120"
+                             MaxHeight="220"
+                             Margin="0,0,0,8"
+                             AutomationProperties.Name="Snapshot list"
+                             AutomationProperties.HelpText="Select a snapshot, then Inspect or Restore. Inspect validates checksums." />
+                    <TextBlock Text="{Binding RestorePreview}" TextWrapping="Wrap" Opacity="0.85" Margin="0,0,0,12"
+                               AutomationProperties.Name="Snapshot restore preview" />
 
                     <TextBlock Text="Portable import" FontWeight="SemiBold" Margin="0,8,0,8" />
                     <Button Content="Import ZIP into new folder…" HorizontalAlignment="Left" Padding="12,6"
@@ -71,8 +76,13 @@
         </ScrollViewer>
 
         <StackPanel Grid.Row="2" Margin="0,12,0,0">
-            <TextBlock Text="{Binding ProgressMessage}" Opacity="0.7" />
-            <TextBlock Text="{Binding StatusMessage}" Foreground="#276749" TextWrapping="Wrap" Margin="0,4,0,0" />
+            <TextBlock Text="{Binding ProgressMessage}" Opacity="0.7"
+                       AutomationProperties.Name="Backup progress message"
+                       AutomationProperties.LiveSetting="Polite" />
+            <TextBlock Text="{Binding StatusMessage}"
+                       Style="{StaticResource StatusLiveTextStyle}"
+                       Margin="0,4,0,0"
+                       AutomationProperties.Name="Backup status message" />
         </StackPanel>
     </Grid>
 </UserControl>
