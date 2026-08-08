@@ -4,6 +4,7 @@ using MasterBookWritingSystem.Core.Backup;
 using MasterBookWritingSystem.Core.Domain;
 using MasterBookWritingSystem.Infrastructure.Documents;
 using MasterBookWritingSystem.Infrastructure.IO;
+using MasterBookWritingSystem.Infrastructure.Manuscript;
 using MasterBookWritingSystem.Infrastructure.Persistence.Entities;
 using MasterBookWritingSystem.Infrastructure.Workflow;
 using Microsoft.Data.Sqlite;
@@ -105,7 +106,7 @@ public sealed class ProjectService : IProjectService
             context.SchemaVersions.Add(new SchemaVersionRecord
             {
                 Version = ProjectSchema.CurrentVersion,
-                Name = ProjectSchema.PostPublicationTrackingMigrationName,
+                Name = ProjectSchema.ManuscriptHierarchyMigrationName,
                 AppliedUtc = now,
             });
 
@@ -127,6 +128,10 @@ public sealed class ProjectService : IProjectService
                     documentTemplates,
                     DocumentSeeder.FindSeedRoot(),
                     cancellationToken)
+                .ConfigureAwait(false);
+
+            await ManuscriptHierarchyBootstrap
+                .EnsureAsync(context, record.Id, record.Title, cancellationToken)
                 .ConfigureAwait(false);
 
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -191,6 +196,10 @@ public sealed class ProjectService : IProjectService
                     cancellationToken)
                 .ConfigureAwait(false);
 
+            await ManuscriptHierarchyBootstrap
+                .EnsureAsync(context, record.Id, record.Title, cancellationToken)
+                .ConfigureAwait(false);
+
             if (!await context.SchemaVersions
                     .AnyAsync(item => item.Version == ProjectSchema.CurrentVersion, cancellationToken)
                     .ConfigureAwait(false))
@@ -198,7 +207,7 @@ public sealed class ProjectService : IProjectService
                 context.SchemaVersions.Add(new SchemaVersionRecord
                 {
                     Version = ProjectSchema.CurrentVersion,
-                    Name = ProjectSchema.PostPublicationTrackingMigrationName,
+                    Name = ProjectSchema.ManuscriptHierarchyMigrationName,
                     AppliedUtc = DateTimeOffset.UtcNow,
                 });
                 await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

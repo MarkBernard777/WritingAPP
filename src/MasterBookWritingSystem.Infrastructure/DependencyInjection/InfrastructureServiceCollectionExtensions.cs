@@ -34,6 +34,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddSingleton<ISaveStateService, SaveStateService>();
         services.AddSingleton<IChapterFileStore, ChapterFileStore>();
         services.AddSingleton<IChapterService, ChapterService>();
+        services.AddSingleton<IManuscriptHierarchyService, ManuscriptHierarchyService>();
         services.AddSingleton<IDocumentService, DocumentService>();
         services.AddSingleton<IEditorAutosaveService, DebouncedEditorAutosaveService>();
         services.AddSingleton<IIdeaService, IdeaService>();

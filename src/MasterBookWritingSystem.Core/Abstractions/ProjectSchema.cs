@@ -2,7 +2,7 @@ namespace MasterBookWritingSystem.Core.Abstractions;
 
 public static class ProjectSchema
 {
-    public const int CurrentVersion = 7;
+    public const int CurrentVersion = 8;
 
     public const string InitialMigrationName = "InitialCreate";
 
@@ -17,4 +17,6 @@ public static class ProjectSchema
     public const string PublishingWorkflowMigrationName = "AddPublishingWorkflow";
 
     public const string PostPublicationTrackingMigrationName = "AddPostPublicationTracking";
+
+    public const string ManuscriptHierarchyMigrationName = "AddManuscriptHierarchyV12";
 }

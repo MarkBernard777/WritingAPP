@@ -55,6 +55,7 @@ public sealed class ChapterFileStore : IChapterFileStore
                 {
                     Id = chapter.Id,
                     ProjectId = chapter.ProjectId,
+                    PartId = chapter.PartId,
                     SequenceNumber = chapter.SequenceNumber,
                     Title = chapter.Title,
                     RelativeMarkdownPath = relativePath,
@@ -64,6 +65,7 @@ public sealed class ChapterFileStore : IChapterFileStore
             }
             else
             {
+                existing.PartId = chapter.PartId ?? existing.PartId;
                 existing.SequenceNumber = chapter.SequenceNumber;
                 existing.Title = chapter.Title;
                 existing.RelativeMarkdownPath = relativePath;

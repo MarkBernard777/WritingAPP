@@ -1,19 +1,16 @@
 namespace MasterBookWritingSystem.Core.Domain.Manuscript;
 
-public sealed class Chapter
+public sealed class Book
 {
     public required Guid Id { get; init; }
 
     public required Guid ProjectId { get; init; }
 
-    /// <summary>Optional part grouping. Null means unassigned to any part.</summary>
-    public Guid? PartId { get; set; }
-
     public required int SequenceNumber { get; set; }
 
     public required string Title { get; set; }
 
-    public required string RelativeMarkdownPath { get; set; }
+    public DateTimeOffset CreatedUtc { get; set; }
 
-    public int WordCount { get; set; }
+    public DateTimeOffset? LastEditedUtc { get; set; }
 }

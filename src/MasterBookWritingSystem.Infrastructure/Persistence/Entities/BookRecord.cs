@@ -1,24 +1,20 @@
 namespace MasterBookWritingSystem.Infrastructure.Persistence.Entities;
 
-public sealed class ChapterRecord
+public sealed class BookRecord
 {
     public Guid Id { get; set; }
 
     public Guid ProjectId { get; set; }
 
-    public Guid? PartId { get; set; }
-
     public int SequenceNumber { get; set; }
 
     public required string Title { get; set; }
 
-    public required string RelativeMarkdownPath { get; set; }
+    public DateTimeOffset CreatedUtc { get; set; }
 
-    public int WordCount { get; set; }
-
-    public string ContentHash { get; set; } = string.Empty;
+    public DateTimeOffset? LastEditedUtc { get; set; }
 
     public ProjectRecord? Project { get; set; }
 
-    public PartRecord? Part { get; set; }
+    public List<PartRecord> Parts { get; set; } = [];
 }

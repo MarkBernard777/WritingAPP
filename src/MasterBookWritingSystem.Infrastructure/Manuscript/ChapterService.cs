@@ -16,17 +16,20 @@ public sealed class ChapterService : IChapterService
     private readonly IChapterFileStore _chapterFileStore;
     private readonly ISnapshotService _snapshots;
     private readonly IRecoveryJournalService _journal;
+    private readonly IManuscriptHierarchyService _hierarchy;
 
     public ChapterService(
         IProjectService projectService,
         IChapterFileStore chapterFileStore,
         ISnapshotService snapshots,
-        IRecoveryJournalService journal)
+        IRecoveryJournalService journal,
+        IManuscriptHierarchyService hierarchy)
     {
         _projectService = projectService;
         _chapterFileStore = chapterFileStore;
         _snapshots = snapshots;
         _journal = journal;
+        _hierarchy = hierarchy;
     }
 
     public async Task<IReadOnlyList<Chapter>> GetAllAsync(
@@ -82,10 +85,15 @@ public sealed class ChapterService : IChapterService
         SqliteConnection.ClearAllPools();
         nextSequence++;
 
+        var defaultPartId = await _hierarchy
+            .GetDefaultPartIdAsync(projectId, cancellationToken)
+            .ConfigureAwait(false);
+
         var chapter = new Chapter
         {
             Id = Guid.NewGuid(),
             ProjectId = projectId,
+            PartId = defaultPartId,
             SequenceNumber = nextSequence,
             Title = title.Trim(),
             RelativeMarkdownPath = BuildRelativePath(nextSequence, title),
@@ -423,6 +431,7 @@ public sealed class ChapterService : IChapterService
     {
         Id = record.Id,
         ProjectId = record.ProjectId,
+        PartId = record.PartId,
         SequenceNumber = record.SequenceNumber,
         Title = record.Title,
         RelativeMarkdownPath = record.RelativeMarkdownPath,

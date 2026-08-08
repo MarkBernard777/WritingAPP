@@ -14,6 +14,10 @@ public sealed class ProjectDbContext : DbContext
 
     public DbSet<ChapterRecord> Chapters => Set<ChapterRecord>();
 
+    public DbSet<BookRecord> Books => Set<BookRecord>();
+
+    public DbSet<PartRecord> Parts => Set<PartRecord>();
+
     public DbSet<SchemaVersionRecord> SchemaVersions => Set<SchemaVersionRecord>();
 
     public DbSet<WorkflowPhaseRecord> WorkflowPhases => Set<WorkflowPhaseRecord>();
@@ -67,6 +71,31 @@ public sealed class ProjectDbContext : DbContext
             entity.Property(project => project.PublishingRoute).HasConversion<int>();
         });
 
+        modelBuilder.Entity<BookRecord>(entity =>
+        {
+            entity.ToTable("Books");
+            entity.HasKey(book => book.Id);
+            entity.Property(book => book.Title).HasMaxLength(500).IsRequired();
+            entity.HasIndex(book => new { book.ProjectId, book.SequenceNumber }).IsUnique();
+            entity.HasOne(book => book.Project)
+                .WithMany()
+                .HasForeignKey(book => book.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<PartRecord>(entity =>
+        {
+            entity.ToTable("Parts");
+            entity.HasKey(part => part.Id);
+            entity.Property(part => part.Title).HasMaxLength(500).IsRequired();
+            entity.HasIndex(part => new { part.BookId, part.SequenceNumber }).IsUnique();
+            entity.HasIndex(part => new { part.ProjectId, part.BookId });
+            entity.HasOne(part => part.Book)
+                .WithMany(book => book.Parts)
+                .HasForeignKey(part => part.BookId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
         modelBuilder.Entity<ChapterRecord>(entity =>
         {
             entity.ToTable("Chapters");
@@ -75,10 +104,15 @@ public sealed class ProjectDbContext : DbContext
             entity.Property(chapter => chapter.RelativeMarkdownPath).HasMaxLength(1000).IsRequired();
             entity.Property(chapter => chapter.ContentHash).HasMaxLength(128);
             entity.HasIndex(chapter => new { chapter.ProjectId, chapter.SequenceNumber }).IsUnique();
+            entity.HasIndex(chapter => chapter.PartId);
             entity.HasOne(chapter => chapter.Project)
                 .WithMany(project => project.Chapters)
                 .HasForeignKey(chapter => chapter.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(chapter => chapter.Part)
+                .WithMany(part => part.Chapters)
+                .HasForeignKey(chapter => chapter.PartId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<SchemaVersionRecord>(entity =>
@@ -245,7 +279,11 @@ public sealed class ProjectDbContext : DbContext
             entity.Property(scene => scene.SetupObligations).HasMaxLength(8000);
             entity.Property(scene => scene.PayoffObligations).HasMaxLength(8000);
             entity.Property(scene => scene.Status).HasConversion<int>();
-            entity.HasIndex(scene => new { scene.ProjectId, scene.SequenceNumber }).IsUnique();
+            entity.HasIndex(scene => new { scene.ProjectId, scene.ChapterId, scene.SequenceNumber });
+            entity.HasOne<ChapterRecord>()
+                .WithMany()
+                .HasForeignKey(scene => scene.ChapterId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<IdeaRecord>(entity =>

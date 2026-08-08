@@ -396,7 +396,13 @@ public sealed class StoryDataService : IStoryDataService
             .ConfigureAwait(false);
         await EnsureChapterExistsAsync(context, projectId, scene.ChapterId, cancellationToken)
             .ConfigureAwait(false);
-        await EnsureSceneSequenceAvailableAsync(context, projectId, scene.SequenceNumber, excludingId: null, cancellationToken)
+        await EnsureSceneSequenceAvailableAsync(
+                context,
+                projectId,
+                scene.ChapterId,
+                scene.SequenceNumber,
+                excludingId: null,
+                cancellationToken)
             .ConfigureAwait(false);
 
         var record = ToRecord(scene);
@@ -423,7 +429,13 @@ public sealed class StoryDataService : IStoryDataService
             .ConfigureAwait(false);
         await EnsureChapterExistsAsync(context, projectId, scene.ChapterId, cancellationToken)
             .ConfigureAwait(false);
-        await EnsureSceneSequenceAvailableAsync(context, projectId, scene.SequenceNumber, scene.Id, cancellationToken)
+        await EnsureSceneSequenceAvailableAsync(
+                context,
+                projectId,
+                scene.ChapterId,
+                scene.SequenceNumber,
+                scene.Id,
+                cancellationToken)
             .ConfigureAwait(false);
 
         var record = await context.Scenes
@@ -517,6 +529,7 @@ public sealed class StoryDataService : IStoryDataService
     private static async Task EnsureSceneSequenceAvailableAsync(
         ProjectDbContext context,
         Guid projectId,
+        Guid? chapterId,
         int sequenceNumber,
         Guid? excludingId,
         CancellationToken cancellationToken)
@@ -524,13 +537,15 @@ public sealed class StoryDataService : IStoryDataService
         var conflict = await context.Scenes
             .AnyAsync(
                 item => item.ProjectId == projectId
+                    && item.ChapterId == chapterId
                     && item.SequenceNumber == sequenceNumber
                     && (!excludingId.HasValue || item.Id != excludingId.Value),
                 cancellationToken)
             .ConfigureAwait(false);
         if (conflict)
         {
-            throw new InvalidOperationException($"Scene sequence {sequenceNumber} is already used in this project.");
+            var scope = chapterId is null ? "unassigned scenes" : $"chapter '{chapterId}'";
+            throw new InvalidOperationException($"Scene sequence {sequenceNumber} is already used in {scope}.");
         }
     }
 
