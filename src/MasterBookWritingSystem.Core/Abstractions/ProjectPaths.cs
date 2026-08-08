@@ -38,10 +38,16 @@ public static class ProjectPaths
         "13 Archive",
         Path.Combine("13 Archive", "Snapshots"),
         Path.Combine("13 Archive", "Snapshots", "Retired"),
+        Path.Combine("13 Archive", "ManuscriptVersions"),
         Path.Combine("13 Archive", "Recovery"),
         Path.Combine("13 Archive", "Recovery", "Journal"),
         Path.Combine("13 Archive", "Recovery", "Recovered"),
+        Path.Combine("13 Archive", "SearchReplaceRollback"),
         "Assets",
         "Exports",
     ];
+
+    public const string ManuscriptVersionsRelativeDirectory = "13 Archive/ManuscriptVersions";
+
+    public const string SearchReplaceRollbackRelativeDirectory = "13 Archive/SearchReplaceRollback";
 }

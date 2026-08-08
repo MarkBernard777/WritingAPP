@@ -24,6 +24,7 @@ public static class AppServiceCollectionExtensions
         services.AddTransient<SceneCorkboardViewModel>();
         services.AddTransient<ManuscriptViewModel>();
         services.AddTransient<StoryDataViewModel>();
+        services.AddTransient<ManuscriptMaintenanceViewModel>();
         services.AddTransient<ToolsViewModel>();
         services.AddTransient<PublishingViewModel>();
         services.AddTransient<SettingsViewModel>();

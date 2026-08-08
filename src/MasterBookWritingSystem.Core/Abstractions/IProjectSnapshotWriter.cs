@@ -9,6 +9,8 @@ public enum SafetySnapshotReason
     Restore = 2,
     CompilationOrExport = 3,
     StructuralHierarchyEdit = 4,
+    BulkSearchReplace = 5,
+    ManuscriptVersionRestore = 6,
 }
 
 public enum SafetySnapshotOutcome

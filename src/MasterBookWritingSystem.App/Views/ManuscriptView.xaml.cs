@@ -44,6 +44,7 @@ public partial class ManuscriptView : UserControl
             viewModel.FormatRequested += OnFormatRequested;
             viewModel.AssociateSelectionRequested += OnAssociateSelectionRequested;
             viewModel.CaretRequested += OnCaretRequested;
+            viewModel.SplitIndexRequested += OnSplitIndexRequested;
             UpdatePreview(viewModel.PreviewHtml);
             SyncTreeSelection(viewModel.SelectedNode);
         }
@@ -279,9 +280,26 @@ public partial class ManuscriptView : UserControl
             _boundViewModel.FormatRequested -= OnFormatRequested;
             _boundViewModel.AssociateSelectionRequested -= OnAssociateSelectionRequested;
             _boundViewModel.CaretRequested -= OnCaretRequested;
+            _boundViewModel.SplitIndexRequested -= OnSplitIndexRequested;
             _boundViewModel.Detach();
             _boundViewModel = null;
         }
+    }
+
+    private void OnSplitIndexRequested(object? sender, EventArgs e)
+    {
+        if (_boundViewModel is null)
+        {
+            return;
+        }
+
+        if (!MarkdownEditor.IsFocused)
+        {
+            MarkdownEditor.Focus();
+        }
+
+        var index = MarkdownEditor.SelectionStart;
+        _ = _boundViewModel.CompleteSplitAtCaretAsync(index);
     }
 
     private static HierarchyNodeViewModel? FindNodeFromVisual(DependencyObject? current)

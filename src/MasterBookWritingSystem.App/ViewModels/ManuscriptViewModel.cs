@@ -24,6 +24,7 @@ public partial class ManuscriptViewModel : ObservableObject
     private readonly IEditorAutosaveService _autosave;
     private readonly ISaveStateService _saveState;
     private readonly IStoryChangeNotifier _changes;
+    private readonly IChapterStructureService _structure;
     private string _savedContent = string.Empty;
     private bool _suppressDirty;
     private bool _restoringSelection;
@@ -44,7 +45,8 @@ public partial class ManuscriptViewModel : ObservableObject
         IEditorAutosaveService autosave,
         ISaveStateService saveState,
         SceneCorkboardViewModel corkboard,
-        IStoryChangeNotifier changes)
+        IStoryChangeNotifier changes,
+        IChapterStructureService structure)
     {
         _projectService = projectService;
         _chapterService = chapterService;
@@ -56,6 +58,7 @@ public partial class ManuscriptViewModel : ObservableObject
         _saveState = saveState;
         Corkboard = corkboard;
         _changes = changes;
+        _structure = structure;
         _autosave.SaveCompleted += OnAutosaveCompleted;
         _saveState.Changed += (_, _) => SyncSaveState();
         _changes.Changed += OnStoryChanged;
@@ -435,6 +438,96 @@ public partial class ManuscriptViewModel : ObservableObject
         });
         StatusMessage = $"Jumped to scene '{SelectedLinkedScene.Source.Title}'.";
     }
+
+    [RelayCommand]
+    private void SplitChapterAtCaret()
+        => SplitIndexRequested?.Invoke(this, EventArgs.Empty);
+
+    public async Task CompleteSplitAtCaretAsync(int splitIndex)
+    {
+        var project = _projectService.ActiveProject;
+        if (project is null || _loadedChapterId is not { } chapterId)
+        {
+            StatusMessage = "Load a chapter before splitting.";
+            return;
+        }
+
+        if (IsDirty)
+        {
+            await SaveChapterAsync().ConfigureAwait(true);
+        }
+
+        if (!_dialogs.Confirm(
+                "Split this chapter at the caret? A safety snapshot will be created. Scene regions that cross the caret are rejected.",
+                "Split chapter"))
+        {
+            return;
+        }
+
+        try
+        {
+            var result = await _structure
+                .SplitChapterAtAsync(project.Id, chapterId, splitIndex)
+                .ConfigureAwait(true);
+            await RefreshAsync().ConfigureAwait(true);
+            await FocusChapterAsync(result.LeftChapter.Id).ConfigureAwait(true);
+            StatusMessage = $"Split complete. New chapter '{result.RightChapter.Title}'.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
+    }
+
+    [RelayCommand]
+    private async Task MergeWithNextChapterAsync()
+    {
+        var project = _projectService.ActiveProject;
+        if (project is null || _loadedChapterId is not { } chapterId)
+        {
+            StatusMessage = "Load a chapter before merging.";
+            return;
+        }
+
+        if (IsDirty)
+        {
+            await SaveChapterAsync().ConfigureAwait(true);
+        }
+
+        var chapters = await _chapterService.GetAllAsync(project.Id).ConfigureAwait(true);
+        var left = chapters.FirstOrDefault(item => item.Id == chapterId);
+        var right = chapters
+            .Where(item => left is not null && item.SequenceNumber == left.SequenceNumber + 1)
+            .FirstOrDefault();
+        if (left is null || right is null)
+        {
+            StatusMessage = "No adjacent next chapter to merge.";
+            return;
+        }
+
+        if (!_dialogs.Confirm(
+                $"Merge '{left.Title}' with next chapter '{right.Title}'? A safety snapshot will be created.",
+                "Merge chapters"))
+        {
+            return;
+        }
+
+        try
+        {
+            var result = await _structure
+                .MergeAdjacentChaptersAsync(project.Id, left.Id, right.Id)
+                .ConfigureAwait(true);
+            await RefreshAsync().ConfigureAwait(true);
+            await FocusChapterAsync(result.SurvivingChapter.Id).ConfigureAwait(true);
+            StatusMessage = $"Merged into '{result.SurvivingChapter.Title}'.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
+    }
+
+    public event EventHandler? SplitIndexRequested;
 
     [RelayCommand]
     private async Task SaveSceneMetadataAsync()

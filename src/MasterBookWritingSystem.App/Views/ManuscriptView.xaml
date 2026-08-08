@@ -170,6 +170,14 @@
                                     AutomationProperties.Name="Move selected item to another parent"
                                     AutomationProperties.HelpText="Keyboard alternative to dragging a chapter onto a part or a scene onto a chapter."
                                     ToolTip="Move chapter to part, or scene to chapter" />
+                            <Button Content="Split at caret" MinWidth="96" MinHeight="28" Margin="0,0,4,4"
+                                    Command="{Binding SplitChapterAtCaretCommand}"
+                                    AutomationProperties.Name="Split loaded chapter at caret"
+                                    ToolTip="Safe split at editor caret. Rejects cuts through scene markers." />
+                            <Button Content="Merge next" MinWidth="84" MinHeight="28" Margin="0,0,4,4"
+                                    Command="{Binding MergeWithNextChapterCommand}"
+                                    AutomationProperties.Name="Merge loaded chapter with next chapter"
+                                    ToolTip="Merge with the next adjacent chapter." />
                         </WrapPanel>
                     </StackPanel>
                     <StackPanel DockPanel.Dock="Bottom" Margin="8">

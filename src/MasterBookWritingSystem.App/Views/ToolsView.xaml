@@ -161,6 +161,124 @@
                     <ListBox Grid.Row="1" Margin="0,12,0,0" ItemsSource="{Binding BetaSummaryLines}" />
                 </Grid>
             </TabItem>
+
+            <TabItem Header="Manuscript search"
+                     DataContext="{Binding ManuscriptMaintenance}">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Project-wide search/replace (preview required; safety snapshot before write)"
+                                   FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,8" />
+                        <DockPanel Margin="0,0,0,6">
+                            <TextBlock DockPanel.Dock="Left" Width="80" VerticalAlignment="Center" Text="Find" />
+                            <TextBox Text="{Binding FindText, UpdateSourceTrigger=PropertyChanged}"
+                                     AutomationProperties.Name="Manuscript search find text" />
+                        </DockPanel>
+                        <DockPanel Margin="0,0,0,6">
+                            <TextBlock DockPanel.Dock="Left" Width="80" VerticalAlignment="Center" Text="Replace" />
+                            <TextBox Text="{Binding ReplacementText, UpdateSourceTrigger=PropertyChanged}"
+                                     AutomationProperties.Name="Manuscript search replacement text" />
+                        </DockPanel>
+                        <WrapPanel Margin="0,0,0,6">
+                            <CheckBox Content="Case sensitive" Margin="0,0,12,4" IsChecked="{Binding CaseSensitive}" />
+                            <CheckBox Content="Whole word" Margin="0,0,12,4" IsChecked="{Binding WholeWord}" />
+                            <CheckBox Content="Regex (validated + timed)" Margin="0,0,12,4" IsChecked="{Binding UseRegex}" />
+                        </WrapPanel>
+                        <WrapPanel Margin="0,0,0,6">
+                            <ComboBox Width="160" Margin="0,0,8,4"
+                                      ItemsSource="{Binding ScopeKinds}"
+                                      SelectedItem="{Binding ScopeKind}"
+                                      AutomationProperties.Name="Search scope kind" />
+                            <ComboBox Width="160" Margin="0,0,8,4"
+                                      ItemsSource="{Binding Books}"
+                                      SelectedItem="{Binding SelectedBook}"
+                                      DisplayMemberPath="Label"
+                                      AutomationProperties.Name="Search scope book" />
+                            <ComboBox Width="200" Margin="0,0,8,4"
+                                      ItemsSource="{Binding Parts}"
+                                      SelectedItem="{Binding SelectedPart}"
+                                      DisplayMemberPath="Label"
+                                      AutomationProperties.Name="Search scope part" />
+                        </WrapPanel>
+                        <TextBlock Text="Selected chapters (for SelectedChapters scope)" Margin="0,0,0,4" />
+                        <ListBox Height="90" Margin="0,0,0,8"
+                                 ItemsSource="{Binding Chapters}"
+                                 AutomationProperties.Name="Search scope chapters">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsSelected}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <Button Content="Preview" MinWidth="90" Margin="0,0,8,0" Command="{Binding PreviewReplaceCommand}"
+                                    AutomationProperties.Name="Preview manuscript replacements" />
+                            <Button Content="Include/exclude all" MinWidth="120" Margin="0,0,8,0" Command="{Binding ToggleIncludeAllCommand}" />
+                            <Button Content="Apply confirmed replace" MinWidth="150" Margin="0,0,8,0" Command="{Binding ApplyReplaceCommand}"
+                                    AutomationProperties.Name="Apply confirmed manuscript replace" />
+                            <Button Content="Cancel" MinWidth="70" Margin="0,0,8,0" Command="{Binding CancelOperationCommand}"
+                                    IsEnabled="{Binding IsBusy}" />
+                            <Button Content="One-operation rollback" MinWidth="150" Command="{Binding RollbackReplaceCommand}"
+                                    AutomationProperties.Name="Rollback last manuscript replace" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding RollbackSummary}" TextWrapping="Wrap" Margin="0,0,0,6" Opacity="0.85" />
+                        <TextBlock Text="{Binding ProgressMessage}" Style="{StaticResource StatusLiveTextStyle}" />
+                    </StackPanel>
+                    <DataGrid Grid.Row="1"
+                              ItemsSource="{Binding Hits}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              IsReadOnly="False"
+                              AutomationProperties.Name="Manuscript replace preview hits">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Header="Include" Binding="{Binding Include, UpdateSourceTrigger=PropertyChanged}" Width="70" />
+                            <DataGridTextColumn Header="Chapter" Binding="{Binding ChapterTitle}" IsReadOnly="True" Width="140" />
+                            <DataGridTextColumn Header="Context" Binding="{Binding ContextDisplay}" IsReadOnly="True" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Grid.Row="2" Margin="0,8,0,0" Text="{Binding StatusMessage}" Style="{StaticResource StatusLiveTextStyle}" />
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Manuscript versions"
+                     DataContext="{Binding ManuscriptMaintenance}">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="280" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <DockPanel Margin="0,0,12,0">
+                        <TextBlock DockPanel.Dock="Top" Text="Lightweight manuscript versions (archive files — not full project snapshots)"
+                                   FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,8" />
+                        <StackPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
+                            <TextBox Text="{Binding VersionLabel, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,6"
+                                     AutomationProperties.Name="Manuscript version label" />
+                            <TextBox Text="{Binding VersionNotes, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,6"
+                                     AcceptsReturn="True" MinHeight="40" TextWrapping="Wrap"
+                                     AutomationProperties.Name="Manuscript version notes" />
+                            <Button Content="Create version" Margin="0,0,0,6" Command="{Binding CreateVersionCommand}" />
+                            <Button Content="Preview before/after diff" Margin="0,0,0,6" Command="{Binding PreviewVersionDiffCommand}" />
+                            <Button Content="Restore version…" Command="{Binding RestoreVersionCommand}"
+                                    AutomationProperties.Name="Restore manuscript version" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding Versions}"
+                                 SelectedItem="{Binding SelectedVersion}"
+                                 DisplayMemberPath="Label"
+                                 AutomationProperties.Name="Manuscript version list" />
+                    </DockPanel>
+                    <DockPanel Grid.Column="1">
+                        <TextBlock DockPanel.Dock="Top" Text="{Binding ProgressMessage}" Margin="0,0,0,6" />
+                        <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusMessage}" Style="{StaticResource StatusLiveTextStyle}" Margin="0,8,0,0" />
+                        <ListBox ItemsSource="{Binding DiffLines}"
+                                 DisplayMemberPath="Text"
+                                 AutomationProperties.Name="Manuscript version diff lines" />
+                    </DockPanel>
+                </Grid>
+            </TabItem>
         </TabControl>
 
         <StackPanel Grid.Row="2" Margin="0,10,0,0">

@@ -11,6 +11,8 @@ public static class BackupPathRules
     [
         "Exports",
         "Snapshots",
+        "ManuscriptVersions",
+        "SearchReplaceRollback",
         "Recovery",
         ".tmp",
         "tmp",
@@ -38,6 +40,20 @@ public static class BackupPathRules
         if (normalized.Contains("/Recovery/", StringComparison.OrdinalIgnoreCase)
             || normalized.StartsWith("13 Archive/Recovery", StringComparison.OrdinalIgnoreCase)
             || normalized.EndsWith("/Recovery", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (normalized.Contains("/ManuscriptVersions/", StringComparison.OrdinalIgnoreCase)
+            || normalized.StartsWith("13 Archive/ManuscriptVersions", StringComparison.OrdinalIgnoreCase)
+            || normalized.EndsWith("/ManuscriptVersions", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (normalized.Contains("/SearchReplaceRollback/", StringComparison.OrdinalIgnoreCase)
+            || normalized.StartsWith("13 Archive/SearchReplaceRollback", StringComparison.OrdinalIgnoreCase)
+            || normalized.EndsWith("/SearchReplaceRollback", StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }

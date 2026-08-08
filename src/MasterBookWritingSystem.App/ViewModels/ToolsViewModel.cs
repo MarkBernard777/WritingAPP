@@ -27,7 +27,8 @@ public partial class ToolsViewModel : ObservableObject
         IStoryDataService story,
         IChapterService chapters,
         IWorkflowService workflow,
-        IToolsReportExporter exporter)
+        IToolsReportExporter exporter,
+        ManuscriptMaintenanceViewModel manuscriptMaintenance)
     {
         _projects = projects;
         _ideas = ideas;
@@ -36,8 +37,11 @@ public partial class ToolsViewModel : ObservableObject
         _chapters = chapters;
         _workflow = workflow;
         _exporter = exporter;
+        ManuscriptMaintenance = manuscriptMaintenance;
         _ = RefreshAsync();
     }
+
+    public ManuscriptMaintenanceViewModel ManuscriptMaintenance { get; }
 
     public ObservableCollection<IdeaListItemViewModel> Ideas { get; } = [];
     public ObservableCollection<SceneDiagnosticItemViewModel> SceneDiagnostics { get; } = [];
