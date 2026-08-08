@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Backup;
+using MasterBookWritingSystem.Core.Diagnostics;
 using MasterBookWritingSystem.Core.Domain;
 using MasterBookWritingSystem.Core.Recovery;
 using MasterBookWritingSystem.Infrastructure.IO;
@@ -1136,13 +1137,5 @@ public sealed class RecoveryCentreService : IRecoveryCentreService
     }
 
     private static string SanitizeDiagnostic(string message)
-    {
-        // Keep diagnostics free of long prose/payloads.
-        if (message.Length <= 240)
-        {
-            return message;
-        }
-
-        return message[..237] + "...";
-    }
+        => DiagnosticTextSanitizer.Sanitize(message);
 }

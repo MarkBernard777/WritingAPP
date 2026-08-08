@@ -2,6 +2,8 @@
 
 Master Book-Writing System ships a **self-contained win-x64** build so users do not need a machine-wide .NET runtime. Seed templates are bundled beside the executable.
 
+Current product release: **1.1.0** (see `docs/RELEASE_NOTES.md` and `docs/V1.1_TRACEABILITY.md`).
+
 ## Prerequisites
 
 - .NET 10 SDK

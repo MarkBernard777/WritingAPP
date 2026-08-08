@@ -250,21 +250,30 @@ public sealed class ProjectSnapshotWriter : IProjectSnapshotWriter
     private static async Task BackupSqliteAsync(string sourceDb, string destinationDb, CancellationToken cancellationToken)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(destinationDb)!);
+
+        // Disable pooling for backup connections so parallel ClearAllPools calls cannot dispose handles mid-backup.
         await using var source = new SqliteConnection(new SqliteConnectionStringBuilder
         {
             DataSource = sourceDb,
-            Mode = SqliteOpenMode.ReadWrite,
+            Mode = SqliteOpenMode.ReadOnly,
+            Pooling = false,
         }.ToString());
         await source.OpenAsync(cancellationToken).ConfigureAwait(false);
         await using var destination = new SqliteConnection(new SqliteConnectionStringBuilder
         {
             DataSource = destinationDb,
             Mode = SqliteOpenMode.ReadWriteCreate,
+            Pooling = false,
         }.ToString());
         await destination.OpenAsync(cancellationToken).ConfigureAwait(false);
-        source.BackupDatabase(destination);
-        await destination.CloseAsync().ConfigureAwait(false);
-        await source.CloseAsync().ConfigureAwait(false);
-        SqliteConnection.ClearAllPools();
+        try
+        {
+            source.BackupDatabase(destination);
+        }
+        finally
+        {
+            await destination.CloseAsync().ConfigureAwait(false);
+            await source.CloseAsync().ConfigureAwait(false);
+        }
     }
 }

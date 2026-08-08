@@ -68,12 +68,14 @@ public sealed class ExportBackupServiceTests : IDisposable
         Assert.True(File.Exists(result.AbsolutePath));
 
         using var document = WordprocessingDocument.Open(result.AbsolutePath, false);
-        Assert.NotNull(document.MainDocumentPart);
-        var text = document.MainDocumentPart!.Document.InnerText;
+        var mainPart = document.MainDocumentPart;
+        Assert.NotNull(mainPart);
+        Assert.NotNull(mainPart.Document);
+        var text = mainPart.Document.InnerText;
         Assert.True(text.IndexOf("Beta", StringComparison.Ordinal) < text.IndexOf("Alpha", StringComparison.Ordinal));
         Assert.Contains("Second body", text, StringComparison.Ordinal);
         Assert.Contains("First body", text, StringComparison.Ordinal);
-        Assert.Contains("w:br", document.MainDocumentPart.Document.OuterXml, StringComparison.Ordinal);
+        Assert.Contains("w:br", mainPart.Document.OuterXml, StringComparison.Ordinal);
     }
 
     [Fact]

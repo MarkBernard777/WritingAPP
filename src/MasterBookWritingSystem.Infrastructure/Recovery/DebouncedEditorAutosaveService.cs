@@ -1,4 +1,5 @@
 using MasterBookWritingSystem.Core.Abstractions;
+using MasterBookWritingSystem.Core.Diagnostics;
 using MasterBookWritingSystem.Core.Recovery;
 
 namespace MasterBookWritingSystem.Infrastructure.Recovery;
@@ -282,7 +283,7 @@ public sealed class DebouncedEditorAutosaveService : IEditorAutosaveService, IDi
     }
 
     private static string Truncate(string message)
-        => message.Length <= 160 ? message : message[..157] + "...";
+        => DiagnosticTextSanitizer.Sanitize(message, maxLength: 160);
 
     private sealed class PendingEdit
     {

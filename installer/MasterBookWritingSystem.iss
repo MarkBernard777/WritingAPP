@@ -6,7 +6,7 @@
 ; Unsigned installers may trigger a Windows SmartScreen / reputation warning.
 
 #ifndef AppVersion
-  #define AppVersion "1.0.0"
+  #define AppVersion "1.1.0"
 #endif
 
 #ifndef PublishDir
