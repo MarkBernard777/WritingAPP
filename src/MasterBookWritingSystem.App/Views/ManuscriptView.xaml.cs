@@ -272,6 +272,10 @@ public partial class ManuscriptView : UserControl
         }
     }
 
+    /// <summary>
+    /// Unsubscribes presentation-only handlers. Does not call <see cref="ManuscriptViewModel.Detach"/>;
+    /// navigation owns view-model lifecycle disposal.
+    /// </summary>
     private void DetachViewModel()
     {
         if (_boundViewModel is not null)
@@ -281,7 +285,6 @@ public partial class ManuscriptView : UserControl
             _boundViewModel.AssociateSelectionRequested -= OnAssociateSelectionRequested;
             _boundViewModel.CaretRequested -= OnCaretRequested;
             _boundViewModel.SplitIndexRequested -= OnSplitIndexRequested;
-            _boundViewModel.Detach();
             _boundViewModel = null;
         }
     }

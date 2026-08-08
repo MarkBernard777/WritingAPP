@@ -176,6 +176,9 @@ public sealed class NavigationService : ObservableObject, INavigationService
         _pendingBeatId = null;
     }
 
+    /// <summary>
+    /// Sole owner of section view-model lifecycle cleanup. Views must not call Detach on VMs.
+    /// </summary>
     private void DetachCurrent()
     {
         if (_currentViewModel is ManuscriptViewModel manuscript)

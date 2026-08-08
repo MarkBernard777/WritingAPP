@@ -6,5 +6,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/MasterBookWritingSystem.Tests/MasterBookWritingSystem.Tests.csproj" />
+    <Project Path="tests/MasterBookWritingSystem.App.Tests/MasterBookWritingSystem.App.Tests.csproj" />
   </Folder>
 </Solution>

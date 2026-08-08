@@ -9,6 +9,7 @@ using MasterBookWritingSystem.Core.Domain.Story;
 using MasterBookWritingSystem.Core.Hierarchy;
 using MasterBookWritingSystem.Core.Manuscript;
 using MasterBookWritingSystem.Core.Recovery;
+using MasterBookWritingSystem.Core.Threading;
 using MasterBookWritingSystem.Infrastructure.Manuscript;
 
 namespace MasterBookWritingSystem.App.ViewModels;
@@ -33,6 +34,7 @@ public partial class ManuscriptViewModel : ObservableObject
     private int _editorSessionVersion;
     private CancellationTokenSource? _previewDebounceCts;
     private CancellationTokenSource? _refreshCts;
+    private int _detached;
     private static readonly TimeSpan PreviewDebounceDelay = TimeSpan.FromMilliseconds(250);
 
     public ManuscriptViewModel(
@@ -196,15 +198,24 @@ public partial class ManuscriptViewModel : ObservableObject
 
     public event EventHandler<EditorCaretRequest>? CaretRequested;
 
+    /// <summary>
+    /// Owned by <see cref="Navigation.NavigationService"/>. Safe to call more than once.
+    /// Views must only unsubscribe presentation handlers; they must not call this.
+    /// </summary>
     public void Detach()
     {
+        // Still cancel in-flight work on every call; only unsubscribe once.
+        CancellationTokenSourceLifecycle.CancelAndDispose(ref _previewDebounceCts);
+        CancellationTokenSourceLifecycle.CancelAndDispose(ref _refreshCts);
+
+        if (Interlocked.Exchange(ref _detached, 1) != 0)
+        {
+            return;
+        }
+
         _changes.Changed -= OnStoryChanged;
         Corkboard.Detach();
         _autosave.SaveCompleted -= OnAutosaveCompleted;
-        _previewDebounceCts?.Cancel();
-        _previewDebounceCts?.Dispose();
-        _refreshCts?.Cancel();
-        _refreshCts?.Dispose();
     }
 
     public async Task FocusChapterAsync(Guid chapterId, Guid? sceneId = null)
@@ -328,10 +339,12 @@ public partial class ManuscriptViewModel : ObservableObject
 
     private void SchedulePreviewUpdate(string markdown)
     {
-        _previewDebounceCts?.Cancel();
-        _previewDebounceCts?.Dispose();
-        var cts = new CancellationTokenSource();
-        _previewDebounceCts = cts;
+        if (Volatile.Read(ref _detached) != 0)
+        {
+            return;
+        }
+
+        var cts = CancellationTokenSourceLifecycle.Replace(ref _previewDebounceCts);
         _ = UpdatePreviewAfterDelayAsync(markdown, cts.Token);
     }
 
@@ -581,10 +594,12 @@ public partial class ManuscriptViewModel : ObservableObject
             return;
         }
 
-        _refreshCts?.Cancel();
-        _refreshCts?.Dispose();
-        _refreshCts = new CancellationTokenSource();
-        var cancellationToken = _refreshCts.Token;
+        if (Volatile.Read(ref _detached) != 0)
+        {
+            return;
+        }
+
+        var cancellationToken = CancellationTokenSourceLifecycle.Replace(ref _refreshCts).Token;
 
         var project = _projectService.ActiveProject;
         HasProject = project is not null;

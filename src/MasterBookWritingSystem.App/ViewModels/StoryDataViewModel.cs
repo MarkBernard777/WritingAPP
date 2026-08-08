@@ -39,7 +39,18 @@ public partial class StoryDataViewModel : ObservableObject
         _ = RefreshAsync();
     }
 
-    public void Detach() => _changes.Changed -= OnStoryChanged;
+    private int _detached;
+
+    /// <summary>Owned by <see cref="Navigation.NavigationService"/>. Idempotent.</summary>
+    public void Detach()
+    {
+        if (Interlocked.Exchange(ref _detached, 1) != 0)
+        {
+            return;
+        }
+
+        _changes.Changed -= OnStoryChanged;
+    }
 
     public ObservableCollection<CharacterListItemViewModel> Characters { get; } = [];
 

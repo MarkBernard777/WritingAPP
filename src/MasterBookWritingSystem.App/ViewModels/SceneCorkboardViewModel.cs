@@ -98,7 +98,20 @@ public partial class SceneCorkboardViewModel : ObservableObject
     [ObservableProperty]
     private bool _canMoveSelectedDown;
 
-    public void Detach() => _changes.Changed -= OnStoryChanged;
+    private int _detached;
+
+    /// <summary>
+    /// Called from <see cref="ManuscriptViewModel.Detach"/> (navigation-owned). Idempotent.
+    /// </summary>
+    public void Detach()
+    {
+        if (Interlocked.Exchange(ref _detached, 1) != 0)
+        {
+            return;
+        }
+
+        _changes.Changed -= OnStoryChanged;
+    }
 
     partial void OnSelectedBookFilterChanged(BookFilterOption? value)
     {
