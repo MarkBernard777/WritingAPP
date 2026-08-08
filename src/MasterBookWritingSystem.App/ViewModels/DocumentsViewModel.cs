@@ -1,10 +1,12 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MasterBookWritingSystem.App.Navigation;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Domain.Documents;
 using MasterBookWritingSystem.Core.Domain.Story;
+using MasterBookWritingSystem.Core.Recovery;
 using MasterBookWritingSystem.Core.Story;
 
 namespace MasterBookWritingSystem.App.ViewModels;
@@ -16,20 +18,29 @@ public partial class DocumentsViewModel : ObservableObject
     private readonly IStoryDataService _storyData;
     private readonly IChapterService _chapters;
     private readonly INavigationService _navigation;
+    private readonly IEditorAutosaveService _autosave;
+    private readonly ISaveStateService _saveState;
     private readonly Dictionary<Guid, Character> _charactersById = [];
+    private bool _suppressAutosave;
 
     public DocumentsViewModel(
         IProjectService projectService,
         IDocumentService documentService,
         IStoryDataService storyData,
         IChapterService chapters,
-        INavigationService navigation)
+        INavigationService navigation,
+        IEditorAutosaveService autosave,
+        ISaveStateService saveState)
     {
         _projectService = projectService;
         _documentService = documentService;
         _storyData = storyData;
         _chapters = chapters;
         _navigation = navigation;
+        _autosave = autosave;
+        _saveState = saveState;
+        _saveState.Changed += (_, _) => SyncSaveState();
+        SyncSaveState();
         _ = RefreshAsync();
     }
 
@@ -65,8 +76,28 @@ public partial class DocumentsViewModel : ObservableObject
         "The Scene List shows the shared scene inventory from Story Data → Scenes. "
         + "Use Open / Edit to change a scene there. Optional document notes below are not the canonical scene list.";
 
+    [ObservableProperty]
+    private string _saveStateDisplay = "Clean";
+
     partial void OnSelectedDocumentChanged(DocumentListItemViewModel? value)
         => _ = LoadSelectedAsync();
+
+    partial void OnNotesChanged(string value)
+    {
+        if (_suppressAutosave)
+        {
+            return;
+        }
+
+        var project = _projectService.ActiveProject;
+        var document = SelectedDocument;
+        if (project is null || document is null)
+        {
+            return;
+        }
+
+        _autosave.ScheduleDocumentNotesSave(project.Id, document.Id, value);
+    }
 
     [RelayCommand]
     private async Task RefreshAsync()
@@ -112,17 +143,27 @@ public partial class DocumentsViewModel : ObservableObject
 
         try
         {
+            _saveState.Report(SaveState.Saving, "Saving…");
             await _documentService
                 .UpdateFieldAsync(project.Id, document.Id, field.Key, field.Value)
                 .ConfigureAwait(true);
             var updated = await _documentService.GetAsync(project.Id, document.DocumentType).ConfigureAwait(true);
             document.CompletionPercentage = updated.CompletionPercentage;
             await RefreshValidationAsync().ConfigureAwait(true);
+            await _saveState.RefreshRecoveryAvailabilityAsync(project.Id).ConfigureAwait(true);
+            if (_saveState.State != SaveState.RecoveryAvailable)
+            {
+                _saveState.Report(SaveState.Saved, "Saved");
+            }
+
             StatusMessage = $"Saved {field.Label}";
+            SyncSaveState();
         }
         catch (Exception ex)
         {
+            _saveState.Report(SaveState.SaveFailed, ex.Message);
             StatusMessage = ex.Message;
+            SyncSaveState();
         }
     }
 
@@ -138,12 +179,22 @@ public partial class DocumentsViewModel : ObservableObject
 
         try
         {
+            _saveState.Report(SaveState.Saving, "Saving…");
             await _documentService.UpdateNotesAsync(project.Id, document.Id, Notes).ConfigureAwait(true);
+            await _saveState.RefreshRecoveryAvailabilityAsync(project.Id).ConfigureAwait(true);
+            if (_saveState.State != SaveState.RecoveryAvailable)
+            {
+                _saveState.Report(SaveState.Saved, "Saved");
+            }
+
             StatusMessage = "Notes saved";
+            SyncSaveState();
         }
         catch (Exception ex)
         {
+            _saveState.Report(SaveState.SaveFailed, ex.Message);
             StatusMessage = ex.Message;
+            SyncSaveState();
         }
     }
 
@@ -162,9 +213,13 @@ public partial class DocumentsViewModel : ObservableObject
 
     private async Task LoadSelectedAsync()
     {
+        foreach (var field in Fields)
+        {
+            field.PropertyChanged -= OnFieldPropertyChanged;
+        }
+
         Fields.Clear();
         SceneInventory.Clear();
-        Notes = string.Empty;
         ValidationMessage = string.Empty;
         SelectedInventoryScene = null;
 
@@ -173,12 +228,17 @@ public partial class DocumentsViewModel : ObservableObject
         if (project is null || selected is null)
         {
             IsSceneListDocument = false;
+            _suppressAutosave = true;
+            Notes = string.Empty;
+            _suppressAutosave = false;
             return;
         }
 
         IsSceneListDocument = selected.DocumentType == DocumentType.SceneList;
         var document = await _documentService.GetAsync(project.Id, selected.DocumentType).ConfigureAwait(true);
+        _suppressAutosave = true;
         Notes = document.Notes;
+        _suppressAutosave = false;
 
         if (IsSceneListDocument)
         {
@@ -191,12 +251,37 @@ public partial class DocumentsViewModel : ObservableObject
         {
             foreach (var field in document.Fields)
             {
-                Fields.Add(new DocumentFieldItemViewModel(field));
+                var item = new DocumentFieldItemViewModel(field);
+                item.PropertyChanged += OnFieldPropertyChanged;
+                Fields.Add(item);
             }
 
             await RefreshValidationAsync().ConfigureAwait(true);
         }
+
+        SyncSaveState();
     }
+
+    private void OnFieldPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(DocumentFieldItemViewModel.Value)
+            || sender is not DocumentFieldItemViewModel field)
+        {
+            return;
+        }
+
+        var project = _projectService.ActiveProject;
+        var document = SelectedDocument;
+        if (project is null || document is null)
+        {
+            return;
+        }
+
+        _autosave.ScheduleDocumentFieldSave(project.Id, document.Id, field.Key, field.Value);
+    }
+
+    private void SyncSaveState()
+        => SaveStateDisplay = _saveState.Message;
 
     private async Task LoadSceneInventoryAsync(Guid projectId)
     {

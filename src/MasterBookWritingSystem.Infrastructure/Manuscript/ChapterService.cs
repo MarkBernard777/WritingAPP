@@ -2,6 +2,7 @@ using System.Text;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Domain.Manuscript;
 using MasterBookWritingSystem.Core.Manuscript;
+using MasterBookWritingSystem.Core.Recovery;
 using MasterBookWritingSystem.Infrastructure.IO;
 using MasterBookWritingSystem.Infrastructure.Persistence;
 using MasterBookWritingSystem.Infrastructure.Persistence.Entities;
@@ -15,15 +16,18 @@ public sealed class ChapterService : IChapterService
     private readonly IProjectService _projectService;
     private readonly IChapterFileStore _chapterFileStore;
     private readonly ISnapshotService _snapshots;
+    private readonly IRecoveryJournalService _journal;
 
     public ChapterService(
         IProjectService projectService,
         IChapterFileStore chapterFileStore,
-        ISnapshotService snapshots)
+        ISnapshotService snapshots,
+        IRecoveryJournalService journal)
     {
         _projectService = projectService;
         _chapterFileStore = chapterFileStore;
         _snapshots = snapshots;
+        _journal = journal;
     }
 
     public async Task<IReadOnlyList<Chapter>> GetAllAsync(
@@ -207,9 +211,34 @@ public sealed class ChapterService : IChapterService
         ArgumentNullException.ThrowIfNull(markdownContent);
         var rootPath = RequireActiveRoot(projectId);
         var chapter = await GetAsync(projectId, chapterId, cancellationToken).ConfigureAwait(false);
-        await _chapterFileStore.SaveAsync(rootPath, chapter, markdownContent, cancellationToken)
+        var entryId = RecoveryJournalIds.Create(
+            projectId,
+            RecoveryEntityType.ManuscriptChapter,
+            chapterId);
+        await _journal.UpsertAsync(
+                new RecoveryJournalEntry
+                {
+                    EntryId = entryId,
+                    ProjectId = projectId,
+                    EntityType = RecoveryEntityType.ManuscriptChapter,
+                    EntityId = chapterId,
+                    DraftText = markdownContent,
+                },
+                cancellationToken)
             .ConfigureAwait(false);
-        return await GetAsync(projectId, chapterId, cancellationToken).ConfigureAwait(false);
+
+        try
+        {
+            await _chapterFileStore.SaveAsync(rootPath, chapter, markdownContent, cancellationToken)
+                .ConfigureAwait(false);
+            await _journal.ClearAsync(projectId, entryId, cancellationToken).ConfigureAwait(false);
+            return await GetAsync(projectId, chapterId, cancellationToken).ConfigureAwait(false);
+        }
+        catch
+        {
+            // Journal retained for recovery.
+            throw;
+        }
     }
 
     public async Task<ManuscriptCompileResult> CompileSelectedAsync(

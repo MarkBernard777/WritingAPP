@@ -1,6 +1,7 @@
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Documents;
 using MasterBookWritingSystem.Core.Domain.Documents;
+using MasterBookWritingSystem.Core.Recovery;
 using MasterBookWritingSystem.Core.Workflow;
 using MasterBookWritingSystem.Infrastructure.Persistence;
 using MasterBookWritingSystem.Infrastructure.Persistence.Entities;
@@ -13,11 +14,16 @@ public sealed class DocumentService : IDocumentService
 {
     private readonly IProjectService _projectService;
     private readonly IDocumentTemplateCatalog _catalog;
+    private readonly IRecoveryJournalService _journal;
 
-    public DocumentService(IProjectService projectService, IDocumentTemplateCatalog catalog)
+    public DocumentService(
+        IProjectService projectService,
+        IDocumentTemplateCatalog catalog,
+        IRecoveryJournalService journal)
     {
         _projectService = projectService;
         _catalog = catalog;
+        _journal = journal;
     }
 
     public async Task EnsureDocumentsAsync(Guid projectId, CancellationToken cancellationToken = default)
@@ -89,43 +95,71 @@ public sealed class DocumentService : IDocumentService
         string value,
         CancellationToken cancellationToken = default)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(fieldKey);
         var rootPath = RequireActiveRoot(projectId);
         var databasePath = Path.Combine(rootPath, ProjectPaths.DatabaseFileName);
-
-        await using (var context = ProjectDbContextFactory.Create(databasePath))
-        {
-            await using var transaction = await context.Database
-                .BeginTransactionAsync(cancellationToken)
-                .ConfigureAwait(false);
-
-            var document = await context.Documents
-                .Include(item => item.Fields)
-                .FirstOrDefaultAsync(
-                    item => item.ProjectId == projectId && item.Id == documentId,
-                    cancellationToken)
-                .ConfigureAwait(false)
-                ?? throw new InvalidOperationException($"Document '{documentId}' was not found.");
-
-            var field = document.Fields.FirstOrDefault(item => item.Key == fieldKey)
-                ?? throw new InvalidOperationException($"Field '{fieldKey}' was not found.");
-
-            field.Value = value ?? string.Empty;
-            document.LastEditedUtc = DateTimeOffset.UtcNow;
-            document.CompletionPercentage = PhaseGateRules.CalculateCompletionPercentage(
-                document.Fields.Select(item => new DocumentField
+        var draft = value ?? string.Empty;
+        var entryId = RecoveryJournalIds.Create(
+            projectId,
+            RecoveryEntityType.DocumentField,
+            documentId,
+            fieldKey);
+        await _journal.UpsertAsync(
+                new RecoveryJournalEntry
                 {
-                    Key = item.Key,
-                    Label = item.Label,
-                    Value = item.Value,
-                    IsRequired = item.IsRequired,
-                    SortOrder = item.SortOrder,
-                }));
+                    EntryId = entryId,
+                    ProjectId = projectId,
+                    EntityType = RecoveryEntityType.DocumentField,
+                    EntityId = documentId,
+                    SecondaryKey = fieldKey,
+                    DraftText = draft,
+                },
+                cancellationToken)
+            .ConfigureAwait(false);
 
-            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await using (var context = ProjectDbContextFactory.Create(databasePath))
+            {
+                await using var transaction = await context.Database
+                    .BeginTransactionAsync(cancellationToken)
+                    .ConfigureAwait(false);
+
+                var document = await context.Documents
+                    .Include(item => item.Fields)
+                    .FirstOrDefaultAsync(
+                        item => item.ProjectId == projectId && item.Id == documentId,
+                        cancellationToken)
+                    .ConfigureAwait(false)
+                    ?? throw new InvalidOperationException($"Document '{documentId}' was not found.");
+
+                var field = document.Fields.FirstOrDefault(item => item.Key == fieldKey)
+                    ?? throw new InvalidOperationException($"Field '{fieldKey}' was not found.");
+
+                field.Value = draft;
+                document.LastEditedUtc = DateTimeOffset.UtcNow;
+                document.CompletionPercentage = PhaseGateRules.CalculateCompletionPercentage(
+                    document.Fields.Select(item => new DocumentField
+                    {
+                        Key = item.Key,
+                        Label = item.Label,
+                        Value = item.Value,
+                        IsRequired = item.IsRequired,
+                        SortOrder = item.SortOrder,
+                    }));
+
+                await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            SqliteConnection.ClearAllPools();
+            await _journal.ClearAsync(projectId, entryId, cancellationToken).ConfigureAwait(false);
         }
-
-        SqliteConnection.ClearAllPools();
+        catch
+        {
+            SqliteConnection.ClearAllPools();
+            throw;
+        }
     }
 
     public async Task UpdateNotesAsync(
@@ -136,20 +170,45 @@ public sealed class DocumentService : IDocumentService
     {
         var rootPath = RequireActiveRoot(projectId);
         var databasePath = Path.Combine(rootPath, ProjectPaths.DatabaseFileName);
+        var draft = notes ?? string.Empty;
+        var entryId = RecoveryJournalIds.Create(
+            projectId,
+            RecoveryEntityType.DocumentNotes,
+            documentId);
+        await _journal.UpsertAsync(
+                new RecoveryJournalEntry
+                {
+                    EntryId = entryId,
+                    ProjectId = projectId,
+                    EntityType = RecoveryEntityType.DocumentNotes,
+                    EntityId = documentId,
+                    DraftText = draft,
+                },
+                cancellationToken)
+            .ConfigureAwait(false);
 
-        await using (var context = ProjectDbContextFactory.Create(databasePath))
+        try
         {
-            var document = await context.Documents
-                .FirstOrDefaultAsync(item => item.ProjectId == projectId && item.Id == documentId, cancellationToken)
-                .ConfigureAwait(false)
-                ?? throw new InvalidOperationException($"Document '{documentId}' was not found.");
+            await using (var context = ProjectDbContextFactory.Create(databasePath))
+            {
+                var document = await context.Documents
+                    .FirstOrDefaultAsync(item => item.ProjectId == projectId && item.Id == documentId, cancellationToken)
+                    .ConfigureAwait(false)
+                    ?? throw new InvalidOperationException($"Document '{documentId}' was not found.");
 
-            document.Notes = notes ?? string.Empty;
-            document.LastEditedUtc = DateTimeOffset.UtcNow;
-            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                document.Notes = draft;
+                document.LastEditedUtc = DateTimeOffset.UtcNow;
+                await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            SqliteConnection.ClearAllPools();
+            await _journal.ClearAsync(projectId, entryId, cancellationToken).ConfigureAwait(false);
         }
-
-        SqliteConnection.ClearAllPools();
+        catch
+        {
+            SqliteConnection.ClearAllPools();
+            throw;
+        }
     }
 
     public async Task<DocumentValidationResult> ValidateAsync(

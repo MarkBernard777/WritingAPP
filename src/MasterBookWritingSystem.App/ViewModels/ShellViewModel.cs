@@ -4,6 +4,7 @@ using MasterBookWritingSystem.App.Navigation;
 using MasterBookWritingSystem.App.Services;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Backup;
+using MasterBookWritingSystem.Core.Recovery;
 
 namespace MasterBookWritingSystem.App.ViewModels;
 
@@ -14,19 +15,25 @@ public partial class ShellViewModel : ObservableObject
     private readonly IProjectDialogService _dialogs;
     private readonly IRecentProjectsStore _recentProjects;
     private readonly ISnapshotService _snapshots;
+    private readonly IEditorAutosaveService _autosave;
+    private readonly ISaveStateService _saveState;
 
     public ShellViewModel(
         INavigationService navigationService,
         IProjectService projectService,
         IProjectDialogService dialogs,
         IRecentProjectsStore recentProjects,
-        ISnapshotService snapshots)
+        ISnapshotService snapshots,
+        IEditorAutosaveService autosave,
+        ISaveStateService saveState)
     {
         _navigationService = navigationService;
         _projectService = projectService;
         _dialogs = dialogs;
         _recentProjects = recentProjects;
         _snapshots = snapshots;
+        _autosave = autosave;
+        _saveState = saveState;
         _navigationService.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName is nameof(INavigationService.CurrentViewModel)
@@ -37,7 +44,9 @@ public partial class ShellViewModel : ObservableObject
                 OnPropertyChanged(nameof(CurrentSection));
             }
         };
+        _saveState.Changed += (_, _) => SyncSaveState();
         UpdateProjectCaption();
+        SyncSaveState();
     }
 
     public ObservableObject CurrentViewModel => _navigationService.CurrentViewModel;
@@ -52,6 +61,9 @@ public partial class ShellViewModel : ObservableObject
     [ObservableProperty]
     private string _statusMessage = string.Empty;
 
+    [ObservableProperty]
+    private string _saveStateDisplay = "Clean";
+
     [RelayCommand]
     private void Navigate(AppSection section) => _navigationService.NavigateTo(section);
 
@@ -60,6 +72,7 @@ public partial class ShellViewModel : ObservableObject
     {
         try
         {
+            await FlushPendingSavesAsync().ConfigureAwait(true);
             var parent = _dialogs.PickFolder("Choose a folder for the new portable book project");
             if (parent is null)
             {
@@ -83,7 +96,9 @@ public partial class ShellViewModel : ObservableObject
 
             await _recentProjects.AddAsync(project.RootPath).ConfigureAwait(true);
             var protectionStatus = await ProtectProjectAsync(project.Id).ConfigureAwait(true);
+            await _saveState.RefreshRecoveryAvailabilityAsync(project.Id).ConfigureAwait(true);
             UpdateProjectCaption();
+            SyncSaveState();
             StatusMessage = $"Created {project.Title}.{protectionStatus}";
             _navigationService.NavigateTo(AppSection.Dashboard);
         }
@@ -99,6 +114,7 @@ public partial class ShellViewModel : ObservableObject
     {
         try
         {
+            await FlushPendingSavesAsync().ConfigureAwait(true);
             var folder = _dialogs.PickFolder("Select an existing book project folder (contains project.mbws)");
             if (folder is null)
             {
@@ -108,7 +124,9 @@ public partial class ShellViewModel : ObservableObject
             var project = await _projectService.OpenAsync(folder).ConfigureAwait(true);
             await _recentProjects.AddAsync(project.RootPath).ConfigureAwait(true);
             var protectionStatus = await ProtectProjectAsync(project.Id).ConfigureAwait(true);
+            await _saveState.RefreshRecoveryAvailabilityAsync(project.Id).ConfigureAwait(true);
             UpdateProjectCaption();
+            SyncSaveState();
             StatusMessage = $"Opened {project.Title}.{protectionStatus}";
             _navigationService.NavigateTo(AppSection.Dashboard);
         }
@@ -122,10 +140,31 @@ public partial class ShellViewModel : ObservableObject
     [RelayCommand]
     private async Task CloseProjectAsync()
     {
+        await FlushPendingSavesAsync().ConfigureAwait(true);
+        _autosave.CancelAll();
         await _projectService.CloseAsync().ConfigureAwait(true);
+        _saveState.Report(SaveState.Clean, "Clean");
         UpdateProjectCaption();
+        SyncSaveState();
         StatusMessage = "Project closed";
         _navigationService.NavigateTo(AppSection.Dashboard);
+    }
+
+    public async Task FlushPendingSavesAsync()
+    {
+        try
+        {
+            if (_autosave.HasPendingWork)
+            {
+                await _autosave.FlushAsync().ConfigureAwait(true);
+            }
+        }
+        catch (Exception ex)
+        {
+            _saveState.Report(SaveState.SaveFailed, ex.Message);
+            SyncSaveState();
+            StatusMessage = $"Save failed: {ex.Message}";
+        }
     }
 
     private async Task<string> ProtectProjectAsync(Guid projectId)
@@ -152,4 +191,7 @@ public partial class ShellViewModel : ObservableObject
             ? "No project open"
             : $"{project.Title}  •  {project.RootPath}";
     }
+
+    private void SyncSaveState()
+        => SaveStateDisplay = _saveState.Message;
 }

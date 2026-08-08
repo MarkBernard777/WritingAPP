@@ -45,7 +45,14 @@
         <Border DockPanel.Dock="Bottom"
                 Background="#EDF2F7"
                 Padding="12,8">
-            <TextBlock Text="{Binding StatusMessage}" Opacity="0.8" />
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Right"
+                           Text="{Binding SaveStateDisplay}"
+                           FontWeight="SemiBold"
+                           Margin="16,0,0,0"
+                           VerticalAlignment="Center" />
+                <TextBlock Text="{Binding StatusMessage}" Opacity="0.8" TextWrapping="Wrap" />
+            </DockPanel>
         </Border>
 
         <Border DockPanel.Dock="Left"

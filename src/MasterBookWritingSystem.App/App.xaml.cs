@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using MasterBookWritingSystem.App.DependencyInjection;
+using MasterBookWritingSystem.App.ViewModels;
 using MasterBookWritingSystem.Core.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,6 +45,19 @@ public partial class App : Application
     {
         if (_host is not null)
         {
+            try
+            {
+                var shell = _host.Services.GetService<ShellViewModel>();
+                if (shell is not null)
+                {
+                    await shell.FlushPendingSavesAsync().ConfigureAwait(true);
+                }
+            }
+            catch
+            {
+                // Keep journal; shutdown must continue.
+            }
+
             await _host.StopAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(true);
             _host.Dispose();
         }

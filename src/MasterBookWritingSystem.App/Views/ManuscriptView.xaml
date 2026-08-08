@@ -151,6 +151,11 @@
                                Foreground="#C05621"
                                Text="Unsaved changes"
                                Visibility="{Binding IsDirty, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    <TextBlock DockPanel.Dock="Left"
+                               Margin="12,0,0,0"
+                               VerticalAlignment="Center"
+                               FontWeight="SemiBold"
+                               Text="{Binding SaveStateDisplay}" />
                     <TextBlock Text="{Binding StatusMessage}"
                                Foreground="#276749"
                                TextWrapping="Wrap"

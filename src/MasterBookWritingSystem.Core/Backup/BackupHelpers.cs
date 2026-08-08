@@ -11,6 +11,7 @@ public static class BackupPathRules
     [
         "Exports",
         "Snapshots",
+        "Recovery",
         ".tmp",
         "tmp",
         "Temp",
@@ -30,6 +31,13 @@ public static class BackupPathRules
         if (normalized.Contains("/Snapshots/", StringComparison.OrdinalIgnoreCase)
             || normalized.StartsWith("13 Archive/Snapshots", StringComparison.OrdinalIgnoreCase)
             || normalized.EndsWith("/Snapshots", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (normalized.Contains("/Recovery/", StringComparison.OrdinalIgnoreCase)
+            || normalized.StartsWith("13 Archive/Recovery", StringComparison.OrdinalIgnoreCase)
+            || normalized.EndsWith("/Recovery", StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }

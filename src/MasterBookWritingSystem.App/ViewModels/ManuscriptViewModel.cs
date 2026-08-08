@@ -5,6 +5,7 @@ using MasterBookWritingSystem.App.Navigation;
 using MasterBookWritingSystem.App.Services;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Manuscript;
+using MasterBookWritingSystem.Core.Recovery;
 using MasterBookWritingSystem.Infrastructure.Manuscript;
 
 namespace MasterBookWritingSystem.App.ViewModels;
@@ -16,6 +17,8 @@ public partial class ManuscriptViewModel : ObservableObject
     private readonly IStoryDataService _storyData;
     private readonly INavigationService _navigation;
     private readonly IProjectDialogService _dialogs;
+    private readonly IEditorAutosaveService _autosave;
+    private readonly ISaveStateService _saveState;
     private string _savedContent = string.Empty;
     private bool _suppressDirty;
     private bool _restoringSelection;
@@ -26,13 +29,20 @@ public partial class ManuscriptViewModel : ObservableObject
         IChapterService chapterService,
         IStoryDataService storyData,
         INavigationService navigation,
-        IProjectDialogService dialogs)
+        IProjectDialogService dialogs,
+        IEditorAutosaveService autosave,
+        ISaveStateService saveState)
     {
         _projectService = projectService;
         _chapterService = chapterService;
         _storyData = storyData;
         _navigation = navigation;
         _dialogs = dialogs;
+        _autosave = autosave;
+        _saveState = saveState;
+        _autosave.SaveCompleted += OnAutosaveCompleted;
+        _saveState.Changed += (_, _) => SyncSaveState();
+        SyncSaveState();
         _ = RefreshAsync();
     }
 
@@ -72,6 +82,9 @@ public partial class ManuscriptViewModel : ObservableObject
     [ObservableProperty]
     private LinkedSceneItemViewModel? _selectedLinkedScene;
 
+    [ObservableProperty]
+    private string _saveStateDisplay = "Clean";
+
     partial void OnSelectedChapterChanged(ChapterListItemViewModel? value)
     {
         if (_restoringSelection)
@@ -93,6 +106,13 @@ public partial class ManuscriptViewModel : ObservableObject
         WordCount = ManuscriptTextAnalytics.CountWords(value);
         PreviewHtml = MarkdownPreviewRenderer.ToHtmlDocument(value);
         RefreshBracketNotes(value);
+
+        var project = _projectService.ActiveProject;
+        var chapterId = _loadedChapterId;
+        if (IsDirty && project is not null && chapterId is { } id)
+        {
+            _autosave.ScheduleManuscriptSave(project.Id, id, value);
+        }
     }
 
     [RelayCommand]
@@ -287,15 +307,25 @@ public partial class ManuscriptViewModel : ObservableObject
 
         try
         {
+            _saveState.Report(SaveState.Saving, "Saving…");
             var saved = await _chapterService.SaveContentAsync(project.Id, selected.Id, MarkdownText)
                 .ConfigureAwait(true);
             selected.Apply(saved);
             SetEditorContent(MarkdownText, markClean: true);
+            await _saveState.RefreshRecoveryAvailabilityAsync(project.Id).ConfigureAwait(true);
+            if (_saveState.State != SaveState.RecoveryAvailable)
+            {
+                _saveState.Report(SaveState.Saved, "Saved");
+            }
+
             StatusMessage = $"Saved ({saved.WordCount} words).";
+            SyncSaveState();
         }
         catch (Exception ex)
         {
+            _saveState.Report(SaveState.SaveFailed, ex.Message);
             StatusMessage = ex.Message;
+            SyncSaveState();
         }
     }
 
@@ -347,12 +377,24 @@ public partial class ManuscriptViewModel : ObservableObject
             return;
         }
 
-        if (IsDirty && !ConfirmDiscard())
+        if (IsDirty)
         {
-            _restoringSelection = true;
-            SelectedChapter = Chapters.FirstOrDefault(item => item.Id == _loadedChapterId);
-            _restoringSelection = false;
-            return;
+            try
+            {
+                await _autosave.FlushAsync().ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = ex.Message;
+            }
+
+            if (IsDirty && !ConfirmDiscard())
+            {
+                _restoringSelection = true;
+                SelectedChapter = Chapters.FirstOrDefault(item => item.Id == _loadedChapterId);
+                _restoringSelection = false;
+                return;
+            }
         }
 
         var project = _projectService.ActiveProject;
@@ -374,12 +416,55 @@ public partial class ManuscriptViewModel : ObservableObject
             _loadedChapterId = value.Id;
             await LoadLinkedScenesAsync(project.Id, value.Id).ConfigureAwait(true);
             StatusMessage = string.Empty;
+            SyncSaveState();
         }
         catch (Exception ex)
         {
             StatusMessage = ex.Message;
         }
     }
+
+    private void OnAutosaveCompleted(object? sender, EditorSaveCompletedEventArgs e)
+    {
+        if (e.EntityType != RecoveryEntityType.ManuscriptChapter
+            || e.EntityId != _loadedChapterId)
+        {
+            return;
+        }
+
+        void Apply()
+        {
+            if (!e.Succeeded)
+            {
+                StatusMessage = e.ErrorMessage ?? "Save failed";
+                SyncSaveState();
+                return;
+            }
+
+            if (_loadedChapterId == e.EntityId
+                && string.Equals(MarkdownText, e.SavedText, StringComparison.Ordinal))
+            {
+                _savedContent = e.SavedText;
+                IsDirty = false;
+                StatusMessage = "Saved";
+            }
+
+            SyncSaveState();
+        }
+
+        var dispatcher = System.Windows.Application.Current?.Dispatcher;
+        if (dispatcher is null || dispatcher.CheckAccess())
+        {
+            Apply();
+        }
+        else
+        {
+            dispatcher.Invoke(Apply);
+        }
+    }
+
+    private void SyncSaveState()
+        => SaveStateDisplay = _saveState.Message;
 
     [RelayCommand]
     private void OpenLinkedSceneInStoryData()
