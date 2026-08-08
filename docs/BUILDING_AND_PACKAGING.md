@@ -1,63 +1,109 @@
 # Building and Packaging
 
-Milestone 12 ships a **self-contained win-x64** build of Master Book-Writing System so users do not need a machine-wide .NET runtime. Seed templates are bundled beside the executable.
+Master Book-Writing System ships a **self-contained win-x64** build so users do not need a machine-wide .NET runtime. Seed templates are bundled beside the executable.
 
 ## Prerequisites
 
 - .NET 10 SDK
-- PowerShell 5+ (Windows)
-- [Inno Setup 6](https://jrsoftware.org/isinfo.php) with `ISCC.exe` on `PATH` or in the default install location (required to produce the `.exe` installer)
+- PowerShell 5.1+ (Windows)
+- [Inno Setup 6](https://jrsoftware.org/isinfo.php) with `ISCC.exe` on `PATH` or in the default install location (**optional** — ZIP/MSIX still build without it)
+- Windows SDK packaging tools (`makeappx.exe`, `signtool.exe`) for MSIX / Authenticode (**optional**)
 
 ## Versioning
 
-The application version is defined in:
+The checked-in application version lives in:
 
 `src/MasterBookWritingSystem.App/MasterBookWritingSystem.App.csproj`
 
 Properties: `Version`, `AssemblyVersion`, `FileVersion`, `InformationalVersion`.
 
-Override for a one-off release:
+The release script accepts a semantic version (for example `1.1.0`) and derives:
 
-```powershell
-.\scripts\build-release.ps1 -Version 1.2.3
-```
+| Field | Example from `1.1.0` |
+|-------|----------------------|
+| SemVer / InformationalVersion | `1.1.0` |
+| AssemblyVersion / FileVersion | `1.1.0.0` |
+| MSIX Identity Version | `1.1.0.0` |
+
+MSBuild properties are passed for the release build only; the script does **not** rewrite the `.csproj` unless you change it yourself.
 
 ## One-command release
 
 From the repository root:
 
-```powershell
-.\scripts\build-release.ps1
-```
-
-The script:
-
-1. Restores and builds in Release
-2. Runs `dotnet test`
-3. Publishes self-contained single-file `win-x64` (`PublishSingleFile=true`, `PublishTrimmed=false`; `seed/` remains beside the exe)
-4. Validates the publish folder (exe, DLLs, `seed/`)
-5. Creates a portable ZIP
-6. Compiles the Inno Setup installer (fails clearly if `ISCC.exe` is missing)
-
-Equivalent publish command used by the script:
+### Unsigned validation / test build (no certificates)
 
 ```powershell
-dotnet publish `
-  '.\src\MasterBookWritingSystem.App\MasterBookWritingSystem.App.csproj' `
-  -c Release `
-  -r win-x64 `
-  --self-contained true `
-  -p:PublishTrimmed=false `
-  -o '.\artifacts\publish\win-x64'
+.\scripts\test-release.ps1
+.\scripts\build-release.ps1 -AllowDirtyWorkingTree -ForceOverwrite
 ```
+
+Use `-AllowDirtyWorkingTree` only for local validation while you have intentional uncommitted script/docs changes. Production releases should run on a clean tracked tree **without** that switch.
+
+Omit `-ForceOverwrite` to fail if a same-version ZIP/manifest already exists (no silent overwrite).
+
+### Signed release (certificate supplied outside Git)
+
+Never commit `.pfx` files, passwords, or thumbprints. Prefer environment variables in a private shell / CI secret store:
+
+```powershell
+$env:MBWS_SIGN_PFX_PATH = "C:\secure\path\to\cert.pfx"
+$env:MBWS_SIGN_PFX_PASSWORD = "<password>"   # do not echo / log
+$env:MBWS_SIGN_TIMESTAMP_URL = "http://timestamp.digicert.com"
+$env:MBWS_MSIX_PUBLISHER = "CN=Your Certificate Subject"
+
+.\scripts\build-release.ps1 -Sign -ForceOverwrite
+```
+
+Or thumbprint from the current user / machine store (no PFX password):
+
+```powershell
+$env:MBWS_SIGN_THUMBPRINT = "<thumbprint>"
+.\scripts\build-release.ps1 -Sign
+```
+
+Explicit parameters (password as `SecureString`):
+
+```powershell
+$pwd = Read-Host -AsSecureString "PFX password"
+.\scripts\build-release.ps1 `
+  -Sign `
+  -CertificatePath "C:\secure\path\to\cert.pfx" `
+  -CertificatePassword $pwd `
+  -MsixPublisher "CN=Your Certificate Subject"
+```
+
+After signing, the script runs Authenticode verification and **fails the release** if verification fails. Passwords and PFX paths are never written to the release manifest or checksum files.
+
+### Optional skips
+
+```powershell
+.\scripts\build-release.ps1 -SkipInstaller -SkipMsix
+.\scripts\build-release.ps1 -SkipTests   # not recommended for real releases
+```
+
+## What the script does
+
+1. Validates a supported repo layout and (by default) a clean **tracked** git working tree — does not delete user projects or unrelated folders such as `dist/`
+2. Restores, builds Release, runs all tests
+3. Publishes self-contained single-file `win-x64` with version properties applied
+4. Verifies `MasterBookWritingSystem.App.exe` and required `seed/` content beside it
+5. Creates a versioned portable ZIP (refuses silent overwrite)
+6. Builds the Inno Setup installer when `ISCC.exe` is available
+7. Builds an MSIX when `makeappx.exe` is available
+8. Optionally signs installer/MSIX and verifies Authenticode
+9. Writes `SHA256SUMS-<version>.txt` and `release-manifest-<version>.json`
 
 ## Artifacts
 
 | Path | Purpose |
 |------|---------|
-| `artifacts/publish/win-x64/` | Full self-contained folder (portable run from here) |
-| `artifacts/packages/MasterBookWritingSystem-<version>-win-x64.zip` | ZIP of the publish folder |
-| `artifacts/installer/MasterBookWritingSystem-Setup-<version>.exe` | Per-user Inno Setup installer |
+| `artifacts/publish/win-x64/` | Full self-contained folder |
+| `artifacts/packages/MasterBookWritingSystem-<version>-win-x64.zip` | Portable ZIP |
+| `artifacts/installer/MasterBookWritingSystem-Setup-<version>.exe` | Per-user Inno Setup installer (if ISCC present) |
+| `artifacts/packages/MasterBookWritingSystem-<version>-x64.msix` | MSIX package (if MakeAppx present) |
+| `artifacts/packages/SHA256SUMS-<version>.txt` | SHA-256 checksums for distributable packages |
+| `artifacts/packages/release-manifest-<version>.json` | Version, commit, UTC time, tests, runtime, artifact names/sizes/hashes |
 
 ## Installer behavior
 
@@ -66,31 +112,31 @@ dotnet publish `
 - Copies the complete publish tree, including `seed/`
 - Creates a Start Menu shortcut; optional desktop shortcut
 - Uninstall removes only the installed app directory — **never** user book projects
-- Application settings remain under `%LocalAppData%\MasterBookWritingSystem` (outside the `App` install folder where applicable)
-- Book projects stay in user-selected folders
 
 ## Seed content
 
 - Published builds include `seed/` next to `MasterBookWritingSystem.App.exe`
 - Runtime lookup prefers `AppContext.BaseDirectory\seed`, then parent-folder walk (development fallback)
 - Project creation **copies** templates into the new project folder and does not modify installed seed files
-- Startup preflight aborts with a clear message if required seed files are missing
 
-## Signing (disabled)
+## Script tests
 
-Code signing is **not** enabled in this repository.
+```powershell
+.\scripts\test-release.ps1
+```
 
-- Do not commit certificates, passwords, or `.pfx` files
-- `installer/MasterBookWritingSystem.iss` contains commented `SignTool` hooks for a future signed release
-- **Unsigned development installers may trigger a Windows SmartScreen / reputation warning**
+Covers version validation, collision protection, missing seed content, checksum/manifest generation, and tool discovery shape. If Pester is installed, `tests/scripts/Release.Tests.ps1` mirrors the same cases:
+
+```powershell
+Invoke-Pester -Path .\tests\scripts\Release.Tests.ps1
+```
 
 ## Manual verification checklist
 
-1. Run `dotnet build` and `dotnet test`
-2. Run `.\scripts\build-release.ps1`
-3. Launch from `artifacts\publish\win-x64\MasterBookWritingSystem.App.exe`
-4. Copy the publish folder to a path **outside** the repository and launch again (proves seed discovery without parent-folder walking to the repo)
-5. Create a new project; confirm templates appear under the project directories
-6. Open/save manuscript, compile, export, snapshot/restore as smoke tests
-7. Confirm the publish folder contains the runtime (no separate .NET install required)
-8. Install then uninstall the Setup exe; confirm user projects remain
+1. `.\scripts\test-release.ps1`
+2. `.\scripts\build-release.ps1` (clean tree for a real release)
+3. Launch `artifacts\publish\win-x64\MasterBookWritingSystem.App.exe`
+4. Copy the publish folder outside the repo and launch again
+5. Create a project; confirm templates appear
+6. Install/uninstall Setup exe when produced; confirm user projects remain
+7. For signed builds, confirm `Get-AuthenticodeSignature` reports `Valid` on the installer/MSIX
