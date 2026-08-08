@@ -63,6 +63,9 @@
             <DataTemplate DataType="{x:Type vm:StoryDataViewModel}">
                 <views:StoryDataView />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ProgressViewModel}">
+                <views:ProgressView />
+            </DataTemplate>
             <DataTemplate DataType="{x:Type vm:ToolsViewModel}">
                 <views:ToolsView />
             </DataTemplate>

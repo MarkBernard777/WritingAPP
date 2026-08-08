@@ -60,7 +60,7 @@ public sealed class ManuscriptHierarchyServiceTests : IDisposable
         var project = await CreateAsync("Fresh Hierarchy");
         var tree = await _hierarchy.GetHierarchyAsync(project.Id);
 
-        Assert.Equal(8, ProjectSchema.CurrentVersion);
+        Assert.Equal(9, ProjectSchema.CurrentVersion);
         Assert.Single(tree.Books);
         Assert.Equal(project.Title, tree.Books[0].Title);
         Assert.Equal(1, tree.Books[0].SequenceNumber);
@@ -367,7 +367,7 @@ public sealed class ManuscriptHierarchyServiceTests : IDisposable
             var version = await context.SchemaVersions
                 .AsNoTracking()
                 .SingleAsync(item => item.Version == ProjectSchema.CurrentVersion);
-            Assert.Equal(ProjectSchema.ManuscriptHierarchyMigrationName, version.Name);
+            Assert.Equal(ProjectSchema.DraftingProgressMigrationName, version.Name);
         }
     }
 

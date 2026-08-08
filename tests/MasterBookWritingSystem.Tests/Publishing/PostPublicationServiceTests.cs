@@ -243,7 +243,7 @@ public sealed class PostPublicationServiceTests : IDisposable
     {
         var project = await CreateAsync("Schema7");
         var validation = await _projects.ValidateAsync(project.RootPath);
-        Assert.Equal(8, validation.SchemaVersion);
+        Assert.Equal(9, validation.SchemaVersion);
         Assert.Equal(ProjectSchema.CurrentVersion, validation.SchemaVersion);
     }
 

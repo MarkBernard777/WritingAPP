@@ -96,6 +96,7 @@ public sealed class NavigationService : ObservableObject, INavigationService
             AppSection.Documents => _services.GetRequiredService<DocumentsViewModel>(),
             AppSection.Manuscript => CreateManuscriptViewModel(),
             AppSection.StoryData => CreateStoryDataViewModel(),
+            AppSection.Progress => _services.GetRequiredService<ProgressViewModel>(),
             AppSection.Tools => _services.GetRequiredService<ToolsViewModel>(),
             AppSection.Publishing => _services.GetRequiredService<PublishingViewModel>(),
             AppSection.Settings => _services.GetRequiredService<SettingsViewModel>(),

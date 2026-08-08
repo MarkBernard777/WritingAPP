@@ -7,6 +7,7 @@ public enum AppSection
     Documents,
     Manuscript,
     StoryData,
+    Progress,
     Tools,
     Publishing,
     Settings,

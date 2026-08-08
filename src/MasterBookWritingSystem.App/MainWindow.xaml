@@ -63,6 +63,12 @@
                            AutomationProperties.Name="{Binding SaveStateAccessibleName}"
                            Margin="16,0,0,0"
                            VerticalAlignment="Center" />
+                <TextBlock DockPanel.Dock="Right"
+                           Text="{Binding TimerDisplay}"
+                           Margin="16,0,0,0"
+                           VerticalAlignment="Center"
+                           Opacity="0.9"
+                           AutomationProperties.Name="Drafting session timer status" />
                 <TextBlock Text="{Binding StatusMessage}"
                            Style="{StaticResource StatusLiveTextStyle}"
                            Opacity="0.9"
@@ -118,6 +124,13 @@
                              CommandParameter="{x:Static nav:AppSection.StoryData}"
                              IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=StoryData, Mode=OneWay}"
                              AutomationProperties.Name="Navigate to Story Data" />
+                <RadioButton Content="Progress"
+                             GroupName="Nav"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Command="{Binding NavigateCommand}"
+                             CommandParameter="{x:Static nav:AppSection.Progress}"
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Progress, Mode=OneWay}"
+                             AutomationProperties.Name="Navigate to Drafting Progress" />
                 <RadioButton Content="Tools"
                              GroupName="Nav"
                              Style="{StaticResource NavRadioButtonStyle}"

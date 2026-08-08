@@ -117,7 +117,7 @@ public sealed class IdeaServiceAndToolsIntegrationTests : IDisposable
     {
         var project = await CreateAsync("Schema5");
         var validation = await _projects.ValidateAsync(project.RootPath);
-        Assert.Equal(8, validation.SchemaVersion);
+        Assert.Equal(9, validation.SchemaVersion);
         Assert.Equal(ProjectSchema.CurrentVersion, validation.SchemaVersion);
     }
 

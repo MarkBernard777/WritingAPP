@@ -2,6 +2,7 @@ using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Infrastructure.Dashboard;
 using MasterBookWritingSystem.Infrastructure.Backup;
 using MasterBookWritingSystem.Infrastructure.Documents;
+using MasterBookWritingSystem.Infrastructure.Drafting;
 using MasterBookWritingSystem.Infrastructure.IO;
 using MasterBookWritingSystem.Infrastructure.Manuscript;
 using MasterBookWritingSystem.Infrastructure.Paths;
@@ -53,6 +54,10 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddSingleton<IPublishingService, PublishingService>();
         services.AddSingleton<IWorkflowService, WorkflowService>();
         services.AddSingleton<IDashboardService, DashboardService>();
+        services.AddSingleton<IDraftingTargetService, DraftingTargetService>();
+        services.AddSingleton<IDraftingSessionRepository, DraftingSessionRepository>();
+        services.AddSingleton<IDraftingProgressQueryService, DraftingProgressQueryService>();
+        services.AddSingleton<IDraftingTimerService, DraftingTimerService>();
         return services;
     }
 }

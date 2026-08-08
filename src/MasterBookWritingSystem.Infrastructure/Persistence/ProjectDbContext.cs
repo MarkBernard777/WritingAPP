@@ -58,6 +58,10 @@ public sealed class ProjectDbContext : DbContext
 
     public DbSet<CorrectionRecord> Corrections => Set<CorrectionRecord>();
 
+    public DbSet<DraftingTargetRecord> DraftingTargets => Set<DraftingTargetRecord>();
+
+    public DbSet<DraftingSessionRecord> DraftingSessions => Set<DraftingSessionRecord>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ProjectRecord>(entity =>
@@ -431,6 +435,29 @@ public sealed class ProjectDbContext : DbContext
             entity.Property(item => item.Status).HasConversion<int>();
             entity.HasIndex(item => new { item.ProjectId, item.Status });
             entity.HasIndex(item => new { item.ProjectId, item.ReportedDate });
+        });
+
+        modelBuilder.Entity<DraftingTargetRecord>(entity =>
+        {
+            entity.ToTable("DraftingTargets");
+            entity.HasKey(item => item.ProjectId);
+            entity.HasOne(item => item.Project)
+                .WithMany()
+                .HasForeignKey(item => item.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<DraftingSessionRecord>(entity =>
+        {
+            entity.ToTable("DraftingSessions");
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.ViewpointLabel).HasMaxLength(500);
+            entity.HasIndex(item => new { item.ProjectId, item.StartedUtc });
+            entity.HasIndex(item => new { item.ProjectId, item.CompletionReason, item.EndedUtc });
+            entity.HasOne(item => item.Project)
+                .WithMany()
+                .HasForeignKey(item => item.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

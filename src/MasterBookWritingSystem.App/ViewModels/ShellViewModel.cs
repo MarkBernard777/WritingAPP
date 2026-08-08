@@ -18,6 +18,7 @@ public partial class ShellViewModel : ObservableObject
     private readonly ISnapshotService _snapshots;
     private readonly IEditorAutosaveService _autosave;
     private readonly ISaveStateService _saveState;
+    private readonly IDraftingTimerService _timer;
 
     public ShellViewModel(
         INavigationService navigationService,
@@ -26,7 +27,8 @@ public partial class ShellViewModel : ObservableObject
         IRecentProjectsStore recentProjects,
         ISnapshotService snapshots,
         IEditorAutosaveService autosave,
-        ISaveStateService saveState)
+        ISaveStateService saveState,
+        IDraftingTimerService timer)
     {
         _navigationService = navigationService;
         _projectService = projectService;
@@ -35,6 +37,7 @@ public partial class ShellViewModel : ObservableObject
         _snapshots = snapshots;
         _autosave = autosave;
         _saveState = saveState;
+        _timer = timer;
         _navigationService.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName is nameof(INavigationService.CurrentViewModel)
@@ -46,8 +49,10 @@ public partial class ShellViewModel : ObservableObject
             }
         };
         _saveState.Changed += (_, _) => SyncSaveState();
+        _timer.Changed += (_, _) => SyncTimerDisplay();
         UpdateProjectCaption();
         SyncSaveState();
+        SyncTimerDisplay();
     }
 
     public ObservableObject CurrentViewModel => _navigationService.CurrentViewModel;
@@ -67,6 +72,9 @@ public partial class ShellViewModel : ObservableObject
 
     [ObservableProperty]
     private string _saveStateAccessibleName = "Save status: Clean";
+
+    [ObservableProperty]
+    private string _timerDisplay = "Timer: stopped";
 
     [RelayCommand]
     private void Navigate(AppSection section) => _navigationService.NavigateTo(section);
@@ -101,8 +109,10 @@ public partial class ShellViewModel : ObservableObject
             await _recentProjects.AddAsync(project.RootPath).ConfigureAwait(true);
             var protectionStatus = await ProtectProjectAsync(project.Id).ConfigureAwait(true);
             await _saveState.RefreshRecoveryAvailabilityAsync(project.Id).ConfigureAwait(true);
+            await _timer.OnProjectOpenedAsync(project.Id).ConfigureAwait(true);
             UpdateProjectCaption();
             SyncSaveState();
+            SyncTimerDisplay();
             StatusMessage = $"Created {project.Title}.{protectionStatus}";
             _navigationService.NavigateTo(AppSection.Dashboard);
         }
@@ -130,9 +140,14 @@ public partial class ShellViewModel : ObservableObject
             await _recentProjects.AddAsync(project.RootPath).ConfigureAwait(true);
             var protectionStatus = await ProtectProjectAsync(project.Id).ConfigureAwait(true);
             await _saveState.RefreshRecoveryAvailabilityAsync(project.Id).ConfigureAwait(true);
+            await _timer.OnProjectOpenedAsync(project.Id).ConfigureAwait(true);
             UpdateProjectCaption();
             SyncSaveState();
-            StatusMessage = $"Opened {project.Title}.{protectionStatus}";
+            SyncTimerDisplay();
+            var interruptNote = _timer.GetSnapshot().HasInterruptedSession
+                ? " Interrupted drafting session available under Progress."
+                : string.Empty;
+            StatusMessage = $"Opened {project.Title}.{protectionStatus}{interruptNote}";
             _navigationService.NavigateTo(AppSection.Dashboard);
         }
         catch (Exception ex)
@@ -158,10 +173,12 @@ public partial class ShellViewModel : ObservableObject
     {
         await FlushPendingSavesAsync().ConfigureAwait(true);
         _autosave.CancelAll();
+        await _timer.OnProjectClosedAsync().ConfigureAwait(true);
         await _projectService.CloseAsync().ConfigureAwait(true);
         _saveState.Report(SaveState.Clean, "Clean");
         UpdateProjectCaption();
         SyncSaveState();
+        SyncTimerDisplay();
         StatusMessage = "Project closed";
         _navigationService.NavigateTo(AppSection.Dashboard);
     }
@@ -212,5 +229,20 @@ public partial class ShellViewModel : ObservableObject
     {
         SaveStateDisplay = SaveStateAccessibility.FormatDisplay(_saveState.State, _saveState.Message);
         SaveStateAccessibleName = SaveStateAccessibility.FormatAccessibleName(_saveState.State, _saveState.Message);
+    }
+
+    private void SyncTimerDisplay()
+    {
+        var snapshot = _timer.GetSnapshot();
+        var elapsed = snapshot.ActiveElapsed;
+        if (elapsed < TimeSpan.Zero)
+        {
+            elapsed = TimeSpan.Zero;
+        }
+
+        var clock = $"{(int)elapsed.TotalHours:00}:{elapsed.Minutes:00}:{elapsed.Seconds:00}";
+        TimerDisplay = snapshot.HasInterruptedSession
+            ? $"Timer: interrupted ({clock})"
+            : $"Timer: {snapshot.State.ToString().ToLowerInvariant()} ({clock})";
     }
 }
