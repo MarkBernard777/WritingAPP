@@ -320,10 +320,10 @@ public sealed class ChapterService : IChapterService
                         }
 
                         first = false;
-                        var trimmed = content.TrimEnd();
-                        await writer.WriteLineAsync(trimmed).ConfigureAwait(false);
+                        var stripped = SceneProseAssociation.StripMarkers(content).TrimEnd();
+                        await writer.WriteLineAsync(stripped).ConfigureAwait(false);
                         await writer.WriteLineAsync().ConfigureAwait(false);
-                        totalWords += ManuscriptTextAnalytics.CountWords(trimmed);
+                        totalWords += ManuscriptTextAnalytics.CountWords(stripped);
                     }
                 },
                 cancellationToken)

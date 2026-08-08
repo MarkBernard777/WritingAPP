@@ -13,11 +13,16 @@ public sealed class ManuscriptHierarchyService : IManuscriptHierarchyService
 {
     private readonly IProjectService _projectService;
     private readonly IStoryChangeNotifier _changes;
+    private readonly ISceneProseService _sceneProse;
 
-    public ManuscriptHierarchyService(IProjectService projectService, IStoryChangeNotifier changes)
+    public ManuscriptHierarchyService(
+        IProjectService projectService,
+        IStoryChangeNotifier changes,
+        ISceneProseService sceneProse)
     {
         _projectService = projectService;
         _changes = changes;
+        _sceneProse = sceneProse;
     }
 
     public async Task<ManuscriptHierarchy> GetHierarchyAsync(
@@ -480,64 +485,99 @@ public sealed class ManuscriptHierarchyService : IManuscriptHierarchyService
         Guid? chapterId,
         CancellationToken cancellationToken = default)
     {
+        Guid? sourceChapterId;
+        await using (var peek = Open(projectId))
+        {
+            var scene = await peek.Scenes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    item => item.ProjectId == projectId && item.Id == sceneId,
+                    cancellationToken)
+                .ConfigureAwait(false)
+                ?? throw new InvalidOperationException($"Scene '{sceneId}' was not found.");
+            sourceChapterId = scene.ChapterId;
+            if (sourceChapterId == chapterId)
+            {
+                SqliteConnection.ClearAllPools();
+                return ToScene(scene);
+            }
+
+            if (chapterId is { } targetChapterId)
+            {
+                var exists = await peek.Chapters.AnyAsync(
+                        item => item.ProjectId == projectId && item.Id == targetChapterId,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                if (!exists)
+                {
+                    throw new InvalidOperationException($"Chapter '{targetChapterId}' was not found.");
+                }
+            }
+        }
+
+        SqliteConnection.ClearAllPools();
+
+        // File-first association rewrite (journaled) before SQLite chapter-id commit.
+        await _sceneProse
+            .SyncAssignmentFilesAsync(projectId, sceneId, sourceChapterId, chapterId, cancellationToken)
+            .ConfigureAwait(false);
+
         await using var context = Open(projectId);
         await using var transaction = await context.Database
             .BeginTransactionAsync(cancellationToken)
             .ConfigureAwait(false);
-
-        var scene = await context.Scenes
+        var moving = await context.Scenes
             .FirstOrDefaultAsync(
                 item => item.ProjectId == projectId && item.Id == sceneId,
                 cancellationToken)
             .ConfigureAwait(false)
             ?? throw new InvalidOperationException($"Scene '{sceneId}' was not found.");
 
-        var sourceChapterId = scene.ChapterId;
-        if (sourceChapterId == chapterId)
-        {
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-            SqliteConnection.ClearAllPools();
-            return ToScene(scene);
-        }
-
-        if (chapterId is { } targetChapterId)
-        {
-            var exists = await context.Chapters.AnyAsync(
-                    item => item.ProjectId == projectId && item.Id == targetChapterId,
-                    cancellationToken)
-                .ConfigureAwait(false);
-            if (!exists)
-            {
-                throw new InvalidOperationException($"Chapter '{targetChapterId}' was not found.");
-            }
-        }
-
         // Park the scene outside both unique buckets while source/destination are renumbered.
-        scene.ChapterId = null;
-        scene.SequenceNumber = int.MinValue;
+        moving.ChapterId = null;
+        moving.SequenceNumber = int.MinValue;
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         await RenumberScenesInBucketAsync(
                 context,
                 projectId,
                 sourceChapterId,
-                excludingSceneId: scene.Id,
+                excludingSceneId: moving.Id,
                 cancellationToken)
             .ConfigureAwait(false);
 
-        var next = await NextSceneSequenceAsync(context, projectId, chapterId, excludingSceneId: scene.Id, cancellationToken)
+        var next = await NextSceneSequenceAsync(
+                context,
+                projectId,
+                chapterId,
+                excludingSceneId: moving.Id,
+                cancellationToken)
             .ConfigureAwait(false);
-        scene.ChapterId = chapterId;
-        scene.SequenceNumber = next;
-        scene.LastEditedUtc = DateTimeOffset.UtcNow;
+        moving.ChapterId = chapterId;
+        moving.SequenceNumber = next;
+        moving.LastEditedUtc = DateTimeOffset.UtcNow;
 
         await TouchProjectAsync(context, projectId, DateTimeOffset.UtcNow, cancellationToken)
             .ConfigureAwait(false);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
-        PublishScene(projectId, scene.Id);
-        return ToScene(scene);
+
+        var journalChapters = new List<Guid>();
+        if (sourceChapterId is { } source)
+        {
+            journalChapters.Add(source);
+        }
+
+        if (chapterId is { } destination)
+        {
+            journalChapters.Add(destination);
+        }
+
+        await _sceneProse.ClearChapterJournalsAsync(projectId, journalChapters, cancellationToken)
+            .ConfigureAwait(false);
+        PublishScene(projectId, moving.Id);
+        return ToScene(moving);
     }
 
     public async Task<Scene> MoveSceneAsync(

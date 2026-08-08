@@ -5,6 +5,7 @@ using MasterBookWritingSystem.App.Navigation;
 using MasterBookWritingSystem.App.Services;
 using MasterBookWritingSystem.Core.Accessibility;
 using MasterBookWritingSystem.Core.Abstractions;
+using MasterBookWritingSystem.Core.Domain.Story;
 using MasterBookWritingSystem.Core.Hierarchy;
 using MasterBookWritingSystem.Core.Manuscript;
 using MasterBookWritingSystem.Core.Recovery;
@@ -144,6 +145,34 @@ public partial class ManuscriptViewModel : ObservableObject
     [ObservableProperty]
     private bool _isCorkboardMode;
 
+    [ObservableProperty]
+    private bool _isDistractionFreeMode;
+
+    [ObservableProperty]
+    private SceneDraftEditorViewModel? _sceneDraftEditor;
+
+    [ObservableProperty]
+    private string _associationCountsDisplay = "Chapter: 0 words";
+
+    [ObservableProperty]
+    private SceneOutlineItemViewModel? _selectedOutlineItem;
+
+    [ObservableProperty]
+    private BracketNoteItemViewModel? _selectedBracketNote;
+
+    public ObservableCollection<SceneOutlineItemViewModel> SceneOutline { get; } = [];
+
+    public ObservableCollection<CharacterOptionViewModel> ViewpointOptions { get; } = [];
+
+    public IReadOnlyList<SceneDraftStatus> SceneStatusOptions { get; } = Enum.GetValues<SceneDraftStatus>();
+
+    public void NotifyProseAssociationChanged()
+    {
+        RebuildSceneOutline();
+        RefreshAssociationCounts(MarkdownText);
+        RefreshBracketNotes(MarkdownText);
+    }
+
     public int EditorSessionVersion => _editorSessionVersion;
 
     public string LeftPanelToggleLabel => IsLeftPanelCollapsed ? "Show hierarchy" : "Hide hierarchy";
@@ -151,6 +180,18 @@ public partial class ManuscriptViewModel : ObservableObject
     public string RightPanelToggleLabel => IsRightPanelCollapsed ? "Show context" : "Hide context";
 
     public string CorkboardToggleLabel => IsCorkboardMode ? "Show editor" : "Show corkboard";
+
+    public bool IsLeftChromeVisible => !IsDistractionFreeMode && !IsLeftPanelCollapsed;
+
+    public bool IsRightChromeVisible => !IsDistractionFreeMode && !IsRightPanelCollapsed;
+
+    public bool HasSceneDraftEditor => SceneDraftEditor is not null;
+
+    public event EventHandler<MarkdownFormatKind>? FormatRequested;
+
+    public event EventHandler<SceneAssociationRequest>? AssociateSelectionRequested;
+
+    public event EventHandler<EditorCaretRequest>? CaretRequested;
 
     public void Detach()
     {
@@ -191,13 +232,58 @@ public partial class ManuscriptViewModel : ObservableObject
     }
 
     partial void OnIsLeftPanelCollapsedChanged(bool value)
-        => OnPropertyChanged(nameof(LeftPanelToggleLabel));
+    {
+        OnPropertyChanged(nameof(LeftPanelToggleLabel));
+        OnPropertyChanged(nameof(IsLeftChromeVisible));
+    }
 
     partial void OnIsRightPanelCollapsedChanged(bool value)
-        => OnPropertyChanged(nameof(RightPanelToggleLabel));
+    {
+        OnPropertyChanged(nameof(RightPanelToggleLabel));
+        OnPropertyChanged(nameof(IsRightChromeVisible));
+    }
 
     partial void OnIsCorkboardModeChanged(bool value)
         => OnPropertyChanged(nameof(CorkboardToggleLabel));
+
+    partial void OnIsDistractionFreeModeChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsLeftChromeVisible));
+        OnPropertyChanged(nameof(IsRightChromeVisible));
+    }
+
+    partial void OnSelectedLinkedSceneChanged(LinkedSceneItemViewModel? value)
+    {
+        SceneDraftEditor = value is null ? null : SceneDraftEditorViewModel.From(value.Source);
+        OnPropertyChanged(nameof(HasSceneDraftEditor));
+        SelectedOutlineItem = SceneOutline.FirstOrDefault(item => item.SceneId == value?.Id);
+        _contextSceneId = value?.Id;
+    }
+
+    partial void OnSelectedOutlineItemChanged(SceneOutlineItemViewModel? value)
+    {
+        if (value is null || _restoringSelection)
+        {
+            return;
+        }
+
+        SelectedLinkedScene = LinkedScenes.FirstOrDefault(item => item.Id == value.SceneId);
+        NavigateToSelectedSceneProse();
+    }
+
+    partial void OnSelectedBracketNoteChanged(BracketNoteItemViewModel? value)
+    {
+        if (value is null)
+        {
+            return;
+        }
+
+        CaretRequested?.Invoke(this, new EditorCaretRequest
+        {
+            CaretIndex = value.CharIndex,
+            SelectionLength = value.MarkerLength,
+        });
+    }
 
     partial void OnHierarchyFilterChanged(string value) => ApplyHierarchyFilter();
 
@@ -225,7 +311,8 @@ public partial class ManuscriptViewModel : ObservableObject
         }
 
         IsDirty = !string.Equals(value, _savedContent, StringComparison.Ordinal);
-        WordCount = ManuscriptTextAnalytics.CountWords(value);
+        WordCount = ManuscriptTextAnalytics.CountWords(SceneProseAssociation.StripMarkers(value));
+        RefreshAssociationCounts(value);
         SchedulePreviewUpdate(value);
 
         var project = _projectService.ActiveProject;
@@ -288,6 +375,109 @@ public partial class ManuscriptViewModel : ObservableObject
         }
 
         await FocusCorkboardAsync(Corkboard.SelectedCard?.Id).ConfigureAwait(true);
+    }
+
+    [RelayCommand]
+    private void ToggleDistractionFree()
+    {
+        IsDistractionFreeMode = !IsDistractionFreeMode;
+        if (IsDistractionFreeMode)
+        {
+            IsCorkboardMode = false;
+            StatusMessage = "Distraction-free mode. Press Esc or click Exit focus to restore panels.";
+        }
+    }
+
+    [RelayCommand]
+    private void ExitDistractionFree() => IsDistractionFreeMode = false;
+
+    [RelayCommand]
+    private void FormatMarkdown(MarkdownFormatKind kind)
+        => FormatRequested?.Invoke(this, kind);
+
+    [RelayCommand]
+    private void AssociateSelectedSceneWithSelection()
+    {
+        if (SelectedLinkedScene is null)
+        {
+            StatusMessage = "Select a linked scene before associating prose.";
+            return;
+        }
+
+        AssociateSelectionRequested?.Invoke(this, new SceneAssociationRequest
+        {
+            SceneId = SelectedLinkedScene.Id,
+        });
+    }
+
+    [RelayCommand]
+    private void NavigateToSelectedSceneProse()
+    {
+        if (SelectedLinkedScene is null)
+        {
+            StatusMessage = "Select a scene in the outline to navigate.";
+            return;
+        }
+
+        var doc = SceneProseAssociation.Parse(MarkdownText);
+        var caret = doc.GetCaretIndexForScene(SelectedLinkedScene.Id);
+        if (caret is null)
+        {
+            StatusMessage =
+                "This scene has no prose region yet. Select text and use Associate selection, or assign the scene to append an empty region.";
+            return;
+        }
+
+        CaretRequested?.Invoke(this, new EditorCaretRequest
+        {
+            CaretIndex = caret.Value,
+            SelectionLength = 0,
+        });
+        StatusMessage = $"Jumped to scene '{SelectedLinkedScene.Source.Title}'.";
+    }
+
+    [RelayCommand]
+    private async Task SaveSceneMetadataAsync()
+    {
+        var project = _projectService.ActiveProject;
+        var editor = SceneDraftEditor;
+        if (project is null || editor is null)
+        {
+            return;
+        }
+
+        try
+        {
+            // One user operation: chapter file first (journaled), then scene metadata.
+            if (IsDirty && _loadedChapterId is { } chapterId)
+            {
+                await _autosave.FlushAsync().ConfigureAwait(true);
+                if (IsDirty)
+                {
+                    await _chapterService
+                        .SaveContentAsync(project.Id, chapterId, MarkdownText)
+                        .ConfigureAwait(true);
+                    _savedContent = MarkdownText;
+                    IsDirty = false;
+                }
+            }
+
+            var model = editor.ToModel();
+            var updated = await _storyData.UpdateSceneAsync(project.Id, model).ConfigureAwait(true);
+            if (_loadedChapterId is { } loaded)
+            {
+                await LoadLinkedScenesAsync(project.Id, loaded).ConfigureAwait(true);
+                SelectLinkedScene(updated.Id);
+            }
+
+            SceneDraftEditor = SceneDraftEditorViewModel.From(updated);
+            StatusMessage = "Scene metadata saved.";
+            SyncSaveState();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
     }
 
     [RelayCommand]
@@ -1580,6 +1770,67 @@ public partial class ManuscriptViewModel : ObservableObject
         {
             LinkedScenes.Add(new LinkedSceneItemViewModel(scene));
         }
+
+        ViewpointOptions.Clear();
+        ViewpointOptions.Add(CharacterOptionViewModel.Unassigned());
+        foreach (var character in await _storyData.GetCharactersAsync(projectId).ConfigureAwait(true))
+        {
+            ViewpointOptions.Add(CharacterOptionViewModel.From(character));
+        }
+
+        RebuildSceneOutline();
+        RefreshAssociationCounts(MarkdownText);
+    }
+
+    private void RebuildSceneOutline()
+    {
+        var keep = SelectedOutlineItem?.SceneId ?? SelectedLinkedScene?.Id;
+        _restoringSelection = true;
+        SceneOutline.Clear();
+        var doc = SceneProseAssociation.Parse(MarkdownText);
+        foreach (var linked in LinkedScenes)
+        {
+            var hasProse = doc.Spans.Any(span => span.SceneId == linked.Id);
+            SceneOutline.Add(new SceneOutlineItemViewModel(
+                linked.Id,
+                linked.Source.SequenceNumber,
+                linked.Source.Title,
+                hasProse));
+        }
+
+        SelectedOutlineItem = keep is { } id
+            ? SceneOutline.FirstOrDefault(item => item.SceneId == id)
+            : SceneOutline.FirstOrDefault();
+        _restoringSelection = false;
+    }
+
+    private void RefreshAssociationCounts(string markdown)
+    {
+        var viewpoint = LinkedScenes.ToDictionary(
+            item => item.Id,
+            item => item.Source.ViewpointCharacterId);
+        var counts = SceneProseAssociation.CalculateWordCounts(markdown, viewpoint);
+        WordCount = counts.ChapterWordCount;
+        var sceneParts = LinkedScenes.Select(item =>
+        {
+            counts.SceneWordCounts.TryGetValue(item.Id, out var words);
+            return $"{item.Source.Title}: {words}";
+        });
+        var viewpointParts = counts.ViewpointWordCounts.Select(pair =>
+        {
+            var label = pair.Key == Guid.Empty
+                ? "No viewpoint"
+                : $"POV {pair.Key.ToString("N")[..8]}";
+            return $"{label}: {pair.Value}";
+        });
+        AssociationCountsDisplay =
+            $"Chapter: {counts.ChapterWordCount} words"
+            + (LinkedScenes.Count == 0
+                ? string.Empty
+                : " | Scenes: " + string.Join(", ", sceneParts))
+            + (counts.ViewpointWordCounts.Count == 0
+                ? string.Empty
+                : " | Viewpoints: " + string.Join(", ", viewpointParts));
     }
 
     private void SetEditorContent(string content, bool markClean)
@@ -1589,9 +1840,9 @@ public partial class ManuscriptViewModel : ObservableObject
         _suppressDirty = false;
         _savedContent = content;
         IsDirty = !markClean;
-        WordCount = ManuscriptTextAnalytics.CountWords(content);
         PreviewHtml = MarkdownPreviewRenderer.ToHtmlDocument(content);
         RefreshBracketNotes(content);
+        RefreshAssociationCounts(content);
         _editorSessionVersion++;
         OnPropertyChanged(nameof(EditorSessionVersion));
     }
@@ -1668,6 +1919,10 @@ public partial class ChapterListItemViewModel : ObservableObject
 public sealed class BracketNoteItemViewModel(BracketNote note)
 {
     public string Display => $"Line {note.LineNumber}: {note.Marker} — {note.LineText}";
+
+    public int CharIndex { get; } = note.CharIndex;
+
+    public int MarkerLength { get; } = note.MarkerLength;
 }
 
 public sealed class LinkedSceneItemViewModel(Core.Domain.Story.Scene source)
@@ -1677,4 +1932,89 @@ public sealed class LinkedSceneItemViewModel(Core.Domain.Story.Scene source)
     public Guid Id => Source.Id;
 
     public string DisplayName => $"{Source.SequenceNumber}. {Source.Title} ({Source.Status})";
+}
+
+public sealed class SceneOutlineItemViewModel(Guid sceneId, int sequenceNumber, string title, bool hasProseRegion)
+{
+    public Guid SceneId { get; } = sceneId;
+
+    public string DisplayName =>
+        $"{sequenceNumber}. {title}" + (hasProseRegion ? string.Empty : " (outline only)");
+}
+
+public sealed class SceneAssociationRequest
+{
+    public required Guid SceneId { get; init; }
+}
+
+public sealed class EditorCaretRequest
+{
+    public required int CaretIndex { get; init; }
+
+    public int SelectionLength { get; init; }
+}
+
+public partial class SceneDraftEditorViewModel : ObservableObject
+{
+    private Scene _source = null!;
+
+    public Guid Id => _source.Id;
+
+    [ObservableProperty] private string _title = string.Empty;
+    [ObservableProperty] private Guid? _viewpointCharacterId;
+    [ObservableProperty] private string _location = string.Empty;
+    [ObservableProperty] private string _time = string.Empty;
+    [ObservableProperty] private string _goal = string.Empty;
+    [ObservableProperty] private string _opposition = string.Empty;
+    [ObservableProperty] private string _stakes = string.Empty;
+    [ObservableProperty] private string _outcome = string.Empty;
+    [ObservableProperty] private string _consequence = string.Empty;
+    [ObservableProperty] private string _setupObligations = string.Empty;
+    [ObservableProperty] private string _payoffObligations = string.Empty;
+    [ObservableProperty] private SceneDraftStatus _status;
+
+    public static SceneDraftEditorViewModel From(Scene scene)
+    {
+        var editor = new SceneDraftEditorViewModel { _source = scene };
+        editor.Title = scene.Title;
+        editor.ViewpointCharacterId = scene.ViewpointCharacterId;
+        editor.Location = scene.Location;
+        editor.Time = scene.Time;
+        editor.Goal = scene.Goal;
+        editor.Opposition = scene.Opposition;
+        editor.Stakes = scene.Stakes;
+        editor.Outcome = scene.Outcome;
+        editor.Consequence = scene.Consequence;
+        editor.SetupObligations = scene.SetupObligations;
+        editor.PayoffObligations = scene.PayoffObligations;
+        editor.Status = scene.Status;
+        return editor;
+    }
+
+    public Scene ToModel() => new()
+    {
+        Id = _source.Id,
+        ProjectId = _source.ProjectId,
+        ChapterId = _source.ChapterId,
+        SequenceNumber = _source.SequenceNumber,
+        NextSceneId = _source.NextSceneId,
+        Title = Title.Trim(),
+        ViewpointCharacterId = ViewpointCharacterId,
+        Location = Location.Trim(),
+        Time = Time.Trim(),
+        Goal = Goal.Trim(),
+        Opposition = Opposition.Trim(),
+        Stakes = Stakes.Trim(),
+        MainEvent = _source.MainEvent,
+        Revelation = _source.Revelation,
+        EmotionalTurn = _source.EmotionalTurn,
+        Choice = _source.Choice,
+        Outcome = Outcome.Trim(),
+        Consequence = Consequence.Trim(),
+        SetupObligations = SetupObligations.Trim(),
+        PayoffObligations = PayoffObligations.Trim(),
+        Status = Status,
+        WordCount = _source.WordCount,
+        LastEditedUtc = _source.LastEditedUtc,
+    };
 }

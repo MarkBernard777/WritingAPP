@@ -12,11 +12,16 @@ public sealed class StoryDataService : IStoryDataService
 {
     private readonly IProjectService _projectService;
     private readonly IStoryChangeNotifier _changes;
+    private readonly ISceneProseService _sceneProse;
 
-    public StoryDataService(IProjectService projectService, IStoryChangeNotifier changes)
+    public StoryDataService(
+        IProjectService projectService,
+        IStoryChangeNotifier changes,
+        ISceneProseService sceneProse)
     {
         _projectService = projectService;
         _changes = changes;
+        _sceneProse = sceneProse;
     }
 
     public StoryValidationResult ValidateCharacter(Character character)
@@ -470,6 +475,28 @@ public sealed class StoryDataService : IStoryDataService
         Guid sceneId,
         CancellationToken cancellationToken = default)
     {
+        Guid? chapterId;
+        await using (var peek = Open(projectId))
+        {
+            var existing = await peek.Scenes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    item => item.ProjectId == projectId && item.Id == sceneId,
+                    cancellationToken)
+                .ConfigureAwait(false)
+                ?? throw new InvalidOperationException($"Scene '{sceneId}' was not found.");
+            chapterId = existing.ChapterId;
+        }
+
+        SqliteConnection.ClearAllPools();
+        if (chapterId is { } linkedChapterId)
+        {
+            // File-first: unwrap markers, keep author prose, then delete the DB row.
+            await _sceneProse
+                .UnwrapSceneFileAsync(projectId, linkedChapterId, sceneId, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
         await using var context = Open(projectId);
         var record = await context.Scenes
             .FirstOrDefaultAsync(

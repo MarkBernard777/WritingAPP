@@ -35,8 +35,13 @@ public sealed class ChapterFileStore : IChapterFileStore
         await AtomicFileWriter.WriteAllTextAsync(absolutePath, markdownContent, cancellationToken)
             .ConfigureAwait(false);
 
-        var wordCount = ManuscriptTextAnalytics.CountWords(markdownContent);
+        // Chapter word count is visible prose only (markers are association metadata, not prose).
+        var wordCount = ManuscriptTextAnalytics.CountWords(SceneProseAssociation.StripMarkers(markdownContent));
         var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(markdownContent)));
+        var associationCounts = SceneProseAssociation.CalculateWordCounts(
+            markdownContent,
+            new Dictionary<Guid, Guid?>());
+        var now = DateTimeOffset.UtcNow;
 
         var databasePath = Path.Combine(rootPath, ProjectPaths.DatabaseFileName);
         await using (var context = ProjectDbContextFactory.Create(databasePath))
@@ -73,12 +78,25 @@ public sealed class ChapterFileStore : IChapterFileStore
                 existing.ContentHash = hash;
             }
 
+            var chapterScenes = await context.Scenes
+                .Where(scene => scene.ProjectId == chapter.ProjectId && scene.ChapterId == chapter.Id)
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+            foreach (var scene in chapterScenes)
+            {
+                if (associationCounts.SceneWordCounts.TryGetValue(scene.Id, out var sceneWords))
+                {
+                    scene.WordCount = sceneWords;
+                    scene.LastEditedUtc = now;
+                }
+            }
+
             var project = await context.Projects
                 .FirstOrDefaultAsync(record => record.Id == chapter.ProjectId, cancellationToken)
                 .ConfigureAwait(false);
             if (project is not null)
             {
-                project.LastEditedUtc = DateTimeOffset.UtcNow;
+                project.LastEditedUtc = now;
             }
 
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

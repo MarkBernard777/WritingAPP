@@ -83,6 +83,7 @@ public sealed class ExportService : IExportService
                 var chapter = ordered[index];
                 var markdown = _chapters.LoadContentAsync(projectId, chapter.Id, cancellationToken)
                     .GetAwaiter().GetResult();
+                markdown = MasterBookWritingSystem.Core.Manuscript.SceneProseAssociation.StripMarkers(markdown);
 
                 body.AppendChild(CreateHeading(chapter.Title));
                 foreach (var paragraph in MarkdownToParagraphs(markdown))

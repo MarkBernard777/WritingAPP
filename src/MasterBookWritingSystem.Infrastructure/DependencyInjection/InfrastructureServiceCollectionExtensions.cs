@@ -33,6 +33,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddSingleton<IRecoveryCentreService, RecoveryCentreService>();
         services.AddSingleton<ISaveStateService, SaveStateService>();
         services.AddSingleton<IChapterFileStore, ChapterFileStore>();
+        services.AddSingleton<ISceneProseService, SceneProseService>();
         services.AddSingleton<IChapterService, ChapterService>();
         services.AddSingleton<IManuscriptHierarchyService, ManuscriptHierarchyService>();
         services.AddSingleton<IDocumentService, DocumentService>();

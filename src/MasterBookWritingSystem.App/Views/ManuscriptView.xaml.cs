@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using MasterBookWritingSystem.App.ViewModels;
 using MasterBookWritingSystem.Core.Hierarchy;
+using MasterBookWritingSystem.Core.Manuscript;
 
 namespace MasterBookWritingSystem.App.Views;
 
@@ -20,6 +21,17 @@ public partial class ManuscriptView : UserControl
         InitializeComponent();
         DataContextChanged += OnDataContextChanged;
         Unloaded += (_, _) => DetachViewModel();
+        PreviewKeyDown += OnPreviewKeyDown;
+    }
+
+    private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape
+            && _boundViewModel is { IsDistractionFreeMode: true })
+        {
+            _boundViewModel.ExitDistractionFreeCommand.Execute(null);
+            e.Handled = true;
+        }
     }
 
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -29,6 +41,9 @@ public partial class ManuscriptView : UserControl
         {
             _boundViewModel = viewModel;
             viewModel.PropertyChanged += OnViewModelPropertyChanged;
+            viewModel.FormatRequested += OnFormatRequested;
+            viewModel.AssociateSelectionRequested += OnAssociateSelectionRequested;
+            viewModel.CaretRequested += OnCaretRequested;
             UpdatePreview(viewModel.PreviewHtml);
             SyncTreeSelection(viewModel.SelectedNode);
         }
@@ -54,6 +69,70 @@ public partial class ManuscriptView : UserControl
         {
             SyncTreeSelection(_boundViewModel.SelectedNode);
         }
+    }
+
+    private void OnFormatRequested(object? sender, MarkdownFormatKind kind)
+    {
+        if (!MarkdownEditor.IsFocused)
+        {
+            MarkdownEditor.Focus();
+        }
+
+        var start = MarkdownEditor.SelectionStart;
+        var length = MarkdownEditor.SelectionLength;
+        var text = MarkdownEditor.Text;
+        var updated = MarkdownFormatting.Apply(text, start, length, kind, out var newStart, out var newLength);
+        var suffixLength = text.Length - start - length;
+        var replacementLength = updated.Length - start - suffixLength;
+        var replacement = updated.Substring(start, replacementLength);
+        MarkdownEditor.Select(start, length);
+        MarkdownEditor.SelectedText = replacement;
+        MarkdownEditor.Select(newStart, newLength);
+    }
+
+    private void OnAssociateSelectionRequested(object? sender, SceneAssociationRequest request)
+    {
+        try
+        {
+            var existing = SceneProseAssociation.Parse(MarkdownEditor.Text);
+            if (existing.Spans.Any(span => span.SceneId == request.SceneId))
+            {
+                throw new InvalidOperationException("This scene already has a prose region in the chapter.");
+            }
+
+            var start = MarkdownEditor.SelectionStart;
+            var length = MarkdownEditor.SelectionLength;
+            MarkdownEditor.SelectedText = length == 0
+                ? SceneProseMarkers.FormatOpen(request.SceneId) + "\n\n" + SceneProseMarkers.CloseMarker
+                : SceneProseMarkers.FormatOpen(request.SceneId) + "\n" + MarkdownEditor.SelectedText + "\n"
+                  + SceneProseMarkers.CloseMarker;
+
+            _boundViewModel?.NotifyProseAssociationChanged();
+            if (_boundViewModel is not null)
+            {
+                _boundViewModel.StatusMessage = "Scene prose region associated. Save/autosave will persist the chapter file.";
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_boundViewModel is not null)
+            {
+                _boundViewModel.StatusMessage = ex.Message;
+            }
+        }
+    }
+
+    private void OnCaretRequested(object? sender, EditorCaretRequest request)
+    {
+        if (!MarkdownEditor.IsFocused)
+        {
+            MarkdownEditor.Focus();
+        }
+
+        var index = Math.Clamp(request.CaretIndex, 0, MarkdownEditor.Text.Length);
+        var length = Math.Clamp(request.SelectionLength, 0, MarkdownEditor.Text.Length - index);
+        MarkdownEditor.Select(index, length);
+        MarkdownEditor.ScrollToLine(Math.Max(0, MarkdownEditor.GetLineIndexFromCharacterIndex(index)));
     }
 
     private void SyncTreeSelection(HierarchyNodeViewModel? node)
@@ -167,7 +246,6 @@ public partial class ManuscriptView : UserControl
             return;
         }
 
-        // Gesture translation only — persistence stays in the view-model command.
         if (_boundViewModel.HandleHierarchyDropCommand.CanExecute(null))
         {
             _boundViewModel.HandleHierarchyDropCommand.Execute(new HierarchyDropRequest
@@ -198,6 +276,9 @@ public partial class ManuscriptView : UserControl
         if (_boundViewModel is not null)
         {
             _boundViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+            _boundViewModel.FormatRequested -= OnFormatRequested;
+            _boundViewModel.AssociateSelectionRequested -= OnAssociateSelectionRequested;
+            _boundViewModel.CaretRequested -= OnCaretRequested;
             _boundViewModel.Detach();
             _boundViewModel = null;
         }
@@ -218,11 +299,7 @@ public partial class ManuscriptView : UserControl
         return null;
     }
 
-    private static void ExpandAncestors(HierarchyNodeViewModel node)
-    {
-        // Expansion is bound on containers; parent IsExpanded is restored via VM reload.
-        _ = node;
-    }
+    private static void ExpandAncestors(HierarchyNodeViewModel node) => _ = node;
 
     private static TreeViewItem? FindContainer(ItemsControl parent, object item)
     {
