@@ -14,17 +14,20 @@ public sealed class ExportService : IExportService
     private readonly IChapterService _chapters;
     private readonly IStoryDataService _story;
     private readonly IIdeaService _ideas;
+    private readonly ISnapshotService _snapshots;
 
     public ExportService(
         IProjectService projects,
         IChapterService chapters,
         IStoryDataService story,
-        IIdeaService ideas)
+        IIdeaService ideas,
+        ISnapshotService snapshots)
     {
         _projects = projects;
         _chapters = chapters;
         _story = story;
         _ideas = ideas;
+        _snapshots = snapshots;
     }
 
     public async Task<ExportResult> ExportManuscriptDocxAsync(
@@ -34,6 +37,14 @@ public sealed class ExportService : IExportService
         IProgress<OperationProgress>? progress = null)
     {
         var root = ProjectRootGuard.RequireActiveRoot(_projects, projectId);
+        await _snapshots
+            .CreateSafetySnapshotAsync(
+                projectId,
+                SafetySnapshotReason.CompilationOrExport,
+                cancellationToken,
+                progress)
+            .ConfigureAwait(false);
+
         var all = await _chapters.GetAllAsync(projectId, cancellationToken).ConfigureAwait(false);
         IReadOnlyList<Chapter> ordered;
         if (chapterIdsInOrder is null || chapterIdsInOrder.Count == 0)

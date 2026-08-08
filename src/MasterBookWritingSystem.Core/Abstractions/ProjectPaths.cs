@@ -37,6 +37,7 @@ public static class ProjectPaths
         "12 Marketing",
         "13 Archive",
         Path.Combine("13 Archive", "Snapshots"),
+        Path.Combine("13 Archive", "Snapshots", "Retired"),
         "Assets",
         "Exports",
     ];

@@ -28,6 +28,17 @@ public interface ISnapshotService
         CancellationToken cancellationToken = default,
         IProgress<OperationProgress>? progress = null);
 
+    Task<AutomaticSnapshotResult> CreateAutomaticSnapshotIfNeededAsync(
+        Guid projectId,
+        CancellationToken cancellationToken = default,
+        IProgress<OperationProgress>? progress = null);
+
+    Task<SafetySnapshotResult> CreateSafetySnapshotAsync(
+        Guid projectId,
+        SafetySnapshotReason reason,
+        CancellationToken cancellationToken = default,
+        IProgress<OperationProgress>? progress = null);
+
     Task<IReadOnlyList<SnapshotInfo>> ListSnapshotsAsync(
         Guid projectId,
         CancellationToken cancellationToken = default);

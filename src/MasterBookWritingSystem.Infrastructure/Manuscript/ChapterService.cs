@@ -14,11 +14,16 @@ public sealed class ChapterService : IChapterService
 {
     private readonly IProjectService _projectService;
     private readonly IChapterFileStore _chapterFileStore;
+    private readonly ISnapshotService _snapshots;
 
-    public ChapterService(IProjectService projectService, IChapterFileStore chapterFileStore)
+    public ChapterService(
+        IProjectService projectService,
+        IChapterFileStore chapterFileStore,
+        ISnapshotService snapshots)
     {
         _projectService = projectService;
         _chapterFileStore = chapterFileStore;
+        _snapshots = snapshots;
     }
 
     public async Task<IReadOnlyList<Chapter>> GetAllAsync(
@@ -234,6 +239,10 @@ public sealed class ChapterService : IChapterService
         }
 
         var rootPath = RequireActiveRoot(projectId);
+        await _snapshots
+            .CreateSafetySnapshotAsync(projectId, SafetySnapshotReason.CompilationOrExport, cancellationToken)
+            .ConfigureAwait(false);
+
         var chapters = await GetAllAsync(projectId, cancellationToken).ConfigureAwait(false);
         var byId = chapters.ToDictionary(item => item.Id);
         var ordered = new List<Chapter>();

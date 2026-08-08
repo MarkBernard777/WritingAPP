@@ -1,5 +1,6 @@
 using System.Text.Json;
 using MasterBookWritingSystem.Core.Abstractions;
+using MasterBookWritingSystem.Core.Backup;
 using MasterBookWritingSystem.Core.Domain;
 using MasterBookWritingSystem.Infrastructure.Documents;
 using MasterBookWritingSystem.Infrastructure.IO;
@@ -20,17 +21,23 @@ public sealed class ProjectService : IProjectService
     private readonly IApplicationPaths _applicationPaths;
     private readonly IWorkflowDefinitionSource _workflowDefinitionSource;
     private readonly IDocumentTemplateCatalog _documentTemplateCatalog;
+    private readonly IProjectIntegrityService _integrityService;
+    private readonly IProjectSnapshotWriter _snapshotWriter;
     private readonly object _gate = new();
     private Project? _activeProject;
 
     public ProjectService(
         IApplicationPaths applicationPaths,
         IWorkflowDefinitionSource workflowDefinitionSource,
-        IDocumentTemplateCatalog documentTemplateCatalog)
+        IDocumentTemplateCatalog documentTemplateCatalog,
+        IProjectIntegrityService integrityService,
+        IProjectSnapshotWriter snapshotWriter)
     {
         _applicationPaths = applicationPaths;
         _workflowDefinitionSource = workflowDefinitionSource;
         _documentTemplateCatalog = documentTemplateCatalog;
+        _integrityService = integrityService;
+        _snapshotWriter = snapshotWriter;
     }
 
     public Project? ActiveProject
@@ -152,6 +159,16 @@ public sealed class ProjectService : IProjectService
 
         await using (var context = ProjectDbContextFactory.Create(databasePath))
         {
+            var pending = (await context.Database
+                    .GetPendingMigrationsAsync(cancellationToken)
+                    .ConfigureAwait(false))
+                .ToList();
+            if (pending.Count > 0)
+            {
+                await CreatePreMigrationSafetySnapshotAsync(rootPath, context, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
             await context.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
 
             record = await context.Projects
@@ -239,43 +256,53 @@ public sealed class ProjectService : IProjectService
         var schemaVersion = 0;
         if (File.Exists(databasePath))
         {
-            try
+            var integrity = await _integrityService.CheckAsync(rootPath, cancellationToken)
+                .ConfigureAwait(false);
+            if (!integrity.IsHealthy)
             {
-                await using var context = ProjectDbContextFactory.Create(databasePath);
-                var canConnect = await context.Database
-                    .CanConnectAsync(cancellationToken)
-                    .ConfigureAwait(false);
-
-                if (!canConnect)
+                errors.Add(integrity.Summary);
+                errors.AddRange(integrity.Details.Select(detail => $"SQLite: {detail}"));
+            }
+            else
+            {
+                try
                 {
-                    errors.Add($"{ProjectPaths.DatabaseFileName} is not a readable SQLite database.");
-                }
-                else
-                {
-                    var hasProjectsTable = await TableExistsAsync(context, "Projects", cancellationToken)
+                    await using var context = ProjectDbContextFactory.Create(databasePath);
+                    var canConnect = await context.Database
+                        .CanConnectAsync(cancellationToken)
                         .ConfigureAwait(false);
-                    if (!hasProjectsTable)
+
+                    if (!canConnect)
                     {
-                        errors.Add("Database schema has not been initialized.");
+                        errors.Add($"{ProjectPaths.DatabaseFileName} is not a readable SQLite database.");
                     }
                     else
                     {
-                        schemaVersion = await context.SchemaVersions
-                            .AsNoTracking()
-                            .OrderByDescending(version => version.Version)
-                            .Select(version => version.Version)
-                            .FirstOrDefaultAsync(cancellationToken)
+                        var hasProjectsTable = await TableExistsAsync(context, "Projects", cancellationToken)
                             .ConfigureAwait(false);
+                        if (!hasProjectsTable)
+                        {
+                            errors.Add("Database schema has not been initialized.");
+                        }
+                        else
+                        {
+                            schemaVersion = await context.SchemaVersions
+                                .AsNoTracking()
+                                .OrderByDescending(version => version.Version)
+                                .Select(version => version.Version)
+                                .FirstOrDefaultAsync(cancellationToken)
+                                .ConfigureAwait(false);
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                errors.Add($"Failed to inspect {ProjectPaths.DatabaseFileName}: {ex.Message}");
-            }
-            finally
-            {
-                SqliteConnection.ClearAllPools();
+                catch (Exception ex)
+                {
+                    errors.Add($"Failed to inspect {ProjectPaths.DatabaseFileName}: {ex.Message}");
+                }
+                finally
+                {
+                    SqliteConnection.ClearAllPools();
+                }
             }
         }
 
@@ -287,6 +314,84 @@ public sealed class ProjectService : IProjectService
                 : schemaVersion,
             Errors = errors,
         };
+    }
+
+    private async Task CreatePreMigrationSafetySnapshotAsync(
+        string rootPath,
+        ProjectDbContext context,
+        CancellationToken cancellationToken)
+    {
+        var identity = await TryResolveProjectIdentityAsync(rootPath, context, cancellationToken)
+            .ConfigureAwait(false);
+        if (identity is null)
+        {
+            return;
+        }
+
+        await _snapshotWriter.WriteAsync(
+                new ProjectSnapshotWriteRequest
+                {
+                    ProjectRootPath = rootPath,
+                    ProjectId = identity.Value.Id,
+                    ProjectTitle = identity.Value.Title,
+                    SchemaVersion = identity.Value.SchemaVersion,
+                    Kind = SnapshotKind.Safety,
+                    NamePrefix = "safety-migration",
+                },
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private static async Task<(Guid Id, string Title, int SchemaVersion)?> TryResolveProjectIdentityAsync(
+        string rootPath,
+        ProjectDbContext context,
+        CancellationToken cancellationToken)
+    {
+        var metadataPath = Path.Combine(rootPath, ProjectPaths.MetadataFileName);
+        if (File.Exists(metadataPath))
+        {
+            try
+            {
+                var json = await File.ReadAllTextAsync(metadataPath, cancellationToken).ConfigureAwait(false);
+                var document = JsonSerializer.Deserialize<ProjectMetadataDocument>(json, JsonOptions);
+                if (document is not null && document.Id != Guid.Empty)
+                {
+                    return (document.Id, document.Title, document.SchemaVersion);
+                }
+            }
+            catch
+            {
+                // Fall through to database lookup.
+            }
+        }
+
+        if (!await TableExistsAsync(context, "Projects", cancellationToken).ConfigureAwait(false))
+        {
+            return null;
+        }
+
+        var record = await context.Projects
+            .AsNoTracking()
+            .OrderBy(project => project.Id)
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+        if (record is null)
+        {
+            return null;
+        }
+
+        var schemaVersion = 0;
+        if (await TableExistsAsync(context, "SchemaVersions", cancellationToken).ConfigureAwait(false))
+        {
+            schemaVersion = await context.SchemaVersions
+                .AsNoTracking()
+                .OrderByDescending(version => version.Version)
+                .Select(version => version.Version)
+                .FirstOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        return (record.Id, record.Title, schemaVersion);
     }
 
     private void SetActive(Project project)

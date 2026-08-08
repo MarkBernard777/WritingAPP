@@ -1,8 +1,5 @@
-using System.Security.Cryptography;
-using System.Text;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Backup;
-using MasterBookWritingSystem.Infrastructure.IO;
 using Microsoft.Data.Sqlite;
 
 namespace MasterBookWritingSystem.Infrastructure.Backup;
@@ -10,90 +7,127 @@ namespace MasterBookWritingSystem.Infrastructure.Backup;
 public sealed class SnapshotService : ISnapshotService
 {
     private readonly IProjectService _projects;
+    private readonly IProjectSnapshotWriter _writer;
+    private readonly TimeProvider _timeProvider;
 
-    public SnapshotService(IProjectService projects)
+    public SnapshotService(
+        IProjectService projects,
+        IProjectSnapshotWriter writer,
+        TimeProvider timeProvider)
     {
         _projects = projects;
+        _writer = writer;
+        _timeProvider = timeProvider;
     }
 
-    public async Task<SnapshotInfo> CreateSnapshotAsync(
+    public Task<SnapshotInfo> CreateSnapshotAsync(
+        Guid projectId,
+        CancellationToken cancellationToken = default,
+        IProgress<OperationProgress>? progress = null)
+        => CreateSnapshotCoreAsync(projectId, SnapshotKind.Manual, "snapshot", cancellationToken, progress);
+
+    public async Task<AutomaticSnapshotResult> CreateAutomaticSnapshotIfNeededAsync(
         Guid projectId,
         CancellationToken cancellationToken = default,
         IProgress<OperationProgress>? progress = null)
     {
-        var root = ProjectRootGuard.RequireActiveRoot(_projects, projectId);
-        var project = _projects.ActiveProject!;
-        var stamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
-        var snapshotName = $"snapshot-{stamp}";
-        var snapshotRoot = Path.Combine(root, "13 Archive", "Snapshots", snapshotName);
-        if (Directory.Exists(snapshotRoot))
+        var snapshots = await ListSnapshotsAsync(projectId, cancellationToken).ConfigureAwait(false);
+        var latestValid = snapshots
+            .Where(snapshot => snapshot.IsValid)
+            .OrderByDescending(snapshot => snapshot.Manifest.CreatedUtc)
+            .FirstOrDefault();
+        var today = DateOnly.FromDateTime(_timeProvider.GetLocalNow().DateTime);
+        if (latestValid is not null && GetLocalSnapshotDate(latestValid.Manifest.CreatedUtc) == today)
         {
-            throw new InvalidOperationException($"Snapshot already exists: {snapshotName}");
-        }
-
-        Directory.CreateDirectory(snapshotRoot);
-        progress?.Report(new OperationProgress { Message = "Copying project files…", PercentComplete = 10 });
-
-        var files = new List<SnapshotFileEntry>();
-        try
-        {
-            await CopyProjectTreeAsync(root, snapshotRoot, files, cancellationToken, progress)
-                .ConfigureAwait(false);
-
-            progress?.Report(new OperationProgress { Message = "Backing up SQLite database…", PercentComplete = 70 });
-            var dbRelative = ProjectPaths.DatabaseFileName;
-            var dbDest = Path.Combine(snapshotRoot, dbRelative);
-            await BackupSqliteAsync(
-                    Path.Combine(root, ProjectPaths.DatabaseFileName),
-                    dbDest,
-                    cancellationToken)
-                .ConfigureAwait(false);
-            SqliteConnection.ClearAllPools();
-            files.RemoveAll(item => item.RelativePath.Equals(dbRelative, StringComparison.OrdinalIgnoreCase));
-            files.Add(new SnapshotFileEntry
+            return new AutomaticSnapshotResult
             {
-                RelativePath = dbRelative.Replace('\\', '/'),
-                SizeBytes = new FileInfo(dbDest).Length,
-                Sha256 = await ChecksumHelper.Sha256FileAsync(dbDest, cancellationToken).ConfigureAwait(false),
-            });
-
-            var validation = await _projects.ValidateAsync(root, cancellationToken).ConfigureAwait(false);
-            var manifest = new SnapshotManifest
-            {
-                FormatVersion = SnapshotManifest.CurrentFormatVersion,
-                ProjectId = project.Id,
-                ProjectTitle = project.Title,
-                CreatedUtc = DateTimeOffset.UtcNow,
-                SchemaVersion = validation.SchemaVersion == 0
-                    ? ProjectSchema.CurrentVersion
-                    : validation.SchemaVersion,
-                SnapshotName = snapshotName,
-                Files = files.OrderBy(item => item.RelativePath, StringComparer.OrdinalIgnoreCase).ToList(),
-            };
-
-            var manifestPath = Path.Combine(snapshotRoot, "snapshot-manifest.json");
-            await AtomicFileWriter
-                .WriteAllTextAsync(manifestPath, ManifestSerializer.Serialize(manifest), cancellationToken)
-                .ConfigureAwait(false);
-
-            progress?.Report(new OperationProgress { Message = "Snapshot created", PercentComplete = 100 });
-            return new SnapshotInfo
-            {
-                Name = snapshotName,
-                DirectoryPath = snapshotRoot,
-                Manifest = manifest,
-                IsValid = true,
+                Outcome = AutomaticSnapshotOutcome.AlreadyProtectedToday,
+                Message = "A valid snapshot already protects today's project state.",
+                Snapshot = latestValid,
             };
         }
-        catch
+
+        progress?.Report(new OperationProgress
         {
-            if (Directory.Exists(snapshotRoot))
+            Message = "Checking whether the project changed since its last snapshot...",
+            PercentComplete = 5,
+        });
+        var candidate = await CreateSnapshotCoreAsync(
+                projectId,
+                SnapshotKind.Automatic,
+                "auto",
+                cancellationToken,
+                progress)
+            .ConfigureAwait(false);
+
+        if (latestValid is not null
+            && HasSameRestorableContent(candidate.Manifest, latestValid.Manifest))
+        {
+            if (TryDelete(candidate.DirectoryPath))
             {
-                try { Directory.Delete(snapshotRoot, recursive: true); } catch { /* ignore cleanup errors */ }
+                progress?.Report(new OperationProgress
+                {
+                    Message = "No project changes found; automatic snapshot was not needed.",
+                    PercentComplete = 100,
+                });
+                return new AutomaticSnapshotResult
+                {
+                    Outcome = AutomaticSnapshotOutcome.NoChanges,
+                    Message = "No project changes were found since the last valid snapshot.",
+                    Snapshot = latestValid,
+                };
             }
 
-            throw;
+            return new AutomaticSnapshotResult
+            {
+                Outcome = AutomaticSnapshotOutcome.Created,
+                Message = $"Automatic snapshot retained because temporary cleanup failed: {candidate.Name}.",
+                Snapshot = candidate,
+            };
         }
+
+        return new AutomaticSnapshotResult
+        {
+            Outcome = AutomaticSnapshotOutcome.Created,
+            Message = $"Automatic snapshot created: {candidate.Name}.",
+            Snapshot = candidate,
+        };
+    }
+
+    public async Task<SafetySnapshotResult> CreateSafetySnapshotAsync(
+        Guid projectId,
+        SafetySnapshotReason reason,
+        CancellationToken cancellationToken = default,
+        IProgress<OperationProgress>? progress = null)
+    {
+        if (reason == SafetySnapshotReason.CompilationOrExport)
+        {
+            return await CreateSafetySnapshotIfContentChangedAsync(projectId, cancellationToken, progress)
+                .ConfigureAwait(false);
+        }
+
+        var prefix = reason switch
+        {
+            SafetySnapshotReason.Migration => "safety-migration",
+            SafetySnapshotReason.ImportOverwrite => "safety-import",
+            SafetySnapshotReason.Restore => "safety-restore",
+            _ => "safety",
+        };
+
+        var snapshot = await CreateSnapshotCoreAsync(
+                projectId,
+                SnapshotKind.Safety,
+                prefix,
+                cancellationToken,
+                progress)
+            .ConfigureAwait(false);
+
+        return new SafetySnapshotResult
+        {
+            Outcome = SafetySnapshotOutcome.Created,
+            Message = $"Safety snapshot created: {snapshot.Name}.",
+            Snapshot = snapshot,
+        };
     }
 
     public async Task<IReadOnlyList<SnapshotInfo>> ListSnapshotsAsync(
@@ -108,7 +142,9 @@ public sealed class SnapshotService : ISnapshotService
         }
 
         var results = new List<SnapshotInfo>();
-        foreach (var directory in Directory.GetDirectories(snapshotsRoot).OrderByDescending(path => path))
+        foreach (var directory in Directory.GetDirectories(snapshotsRoot)
+                     .Where(path => !SnapshotRetentionPolicy.IsRetiredDirectoryName(Path.GetFileName(path)))
+                     .OrderByDescending(path => path))
         {
             cancellationToken.ThrowIfCancellationRequested();
             results.Add(await InspectSnapshotAsync(directory, cancellationToken).ConfigureAwait(false));
@@ -164,6 +200,18 @@ public sealed class SnapshotService : ISnapshotService
             };
         }
 
+        progress?.Report(new OperationProgress
+        {
+            Message = "Creating safety snapshot before restore…",
+            PercentComplete = 5,
+        });
+        await CreateSafetySnapshotAsync(
+                projectId,
+                SafetySnapshotReason.Restore,
+                cancellationToken,
+                progress)
+            .ConfigureAwait(false);
+
         var staging = Path.Combine(Path.GetTempPath(), "mbws-restore-" + Guid.NewGuid().ToString("N"));
         var backupOfCurrent = Path.Combine(Path.GetTempPath(), "mbws-current-" + Guid.NewGuid().ToString("N"));
         try
@@ -205,7 +253,6 @@ public sealed class SnapshotService : ISnapshotService
                 File.Copy(source, dest, overwrite: true);
             }
 
-            // Restore project.json if present in staging (may be listed in files).
             var stagedMetadata = Path.Combine(staging, ProjectPaths.MetadataFileName);
             if (File.Exists(stagedMetadata))
             {
@@ -217,7 +264,6 @@ public sealed class SnapshotService : ISnapshotService
             var validation = await _projects.ValidateAsync(root, cancellationToken).ConfigureAwait(false);
             if (!validation.IsValid || opened.Id != projectId && opened.Id != stagedInfo.Manifest.ProjectId)
             {
-                // Roll back
                 await _projects.CloseAsync(cancellationToken).ConfigureAwait(false);
                 SqliteConnection.ClearAllPools();
                 ClearRestorableContent(root);
@@ -268,6 +314,74 @@ public sealed class SnapshotService : ISnapshotService
             TryDelete(staging);
             TryDelete(backupOfCurrent);
         }
+    }
+
+    private async Task<SafetySnapshotResult> CreateSafetySnapshotIfContentChangedAsync(
+        Guid projectId,
+        CancellationToken cancellationToken,
+        IProgress<OperationProgress>? progress)
+    {
+        var snapshots = await ListSnapshotsAsync(projectId, cancellationToken).ConfigureAwait(false);
+        var latestValid = snapshots
+            .Where(snapshot => snapshot.IsValid)
+            .OrderByDescending(snapshot => snapshot.Manifest.CreatedUtc)
+            .FirstOrDefault();
+
+        var candidate = await CreateSnapshotCoreAsync(
+                projectId,
+                SnapshotKind.Safety,
+                "safety-export",
+                cancellationToken,
+                progress)
+            .ConfigureAwait(false);
+
+        if (latestValid is not null
+            && HasSameRestorableContent(candidate.Manifest, latestValid.Manifest))
+        {
+            if (TryDelete(candidate.DirectoryPath))
+            {
+                return new SafetySnapshotResult
+                {
+                    Outcome = SafetySnapshotOutcome.SkippedNoChanges,
+                    Message = "No project changes since the latest valid snapshot; safety snapshot was not needed.",
+                    Snapshot = latestValid,
+                };
+            }
+        }
+
+        return new SafetySnapshotResult
+        {
+            Outcome = SafetySnapshotOutcome.Created,
+            Message = $"Safety snapshot created: {candidate.Name}.",
+            Snapshot = candidate,
+        };
+    }
+
+    private async Task<SnapshotInfo> CreateSnapshotCoreAsync(
+        Guid projectId,
+        SnapshotKind kind,
+        string namePrefix,
+        CancellationToken cancellationToken,
+        IProgress<OperationProgress>? progress)
+    {
+        var root = ProjectRootGuard.RequireActiveRoot(_projects, projectId);
+        var project = _projects.ActiveProject!;
+        var validation = await _projects.ValidateAsync(root, cancellationToken).ConfigureAwait(false);
+        return await _writer.WriteAsync(
+                new ProjectSnapshotWriteRequest
+                {
+                    ProjectRootPath = root,
+                    ProjectId = project.Id,
+                    ProjectTitle = project.Title,
+                    SchemaVersion = validation.SchemaVersion == 0
+                        ? ProjectSchema.CurrentVersion
+                        : validation.SchemaVersion,
+                    Kind = kind,
+                    NamePrefix = namePrefix,
+                },
+                cancellationToken,
+                progress)
+            .ConfigureAwait(false);
     }
 
     private async Task<SnapshotInfo> InspectSnapshotAsync(string directory, CancellationToken cancellationToken)
@@ -350,64 +464,34 @@ public sealed class SnapshotService : ISnapshotService
         };
     }
 
-    private static async Task CopyProjectTreeAsync(
-        string sourceRoot,
-        string destRoot,
-        List<SnapshotFileEntry> files,
-        CancellationToken cancellationToken,
-        IProgress<OperationProgress>? progress)
+    private DateOnly GetLocalSnapshotDate(DateTimeOffset createdUtc)
     {
-        foreach (var file in Directory.EnumerateFiles(sourceRoot, "*", SearchOption.AllDirectories))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var relative = Path.GetRelativePath(sourceRoot, file).Replace('\\', '/');
-            if (BackupPathRules.IsExcludedRelativePath(relative))
-            {
-                continue;
-            }
-
-            if (relative.Equals(ProjectPaths.DatabaseFileName, StringComparison.OrdinalIgnoreCase))
-            {
-                continue; // handled via SQLite backup API
-            }
-
-            var dest = Path.Combine(destRoot, relative.Replace('/', Path.DirectorySeparatorChar));
-            Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
-            File.Copy(file, dest, overwrite: false);
-            files.Add(new SnapshotFileEntry
-            {
-                RelativePath = relative,
-                SizeBytes = new FileInfo(dest).Length,
-                Sha256 = await ChecksumHelper.Sha256FileAsync(dest, cancellationToken).ConfigureAwait(false),
-            });
-        }
-
-        progress?.Report(new OperationProgress
-        {
-            Message = $"Copied {files.Count} files",
-            PercentComplete = 55,
-        });
+        var local = TimeZoneInfo.ConvertTime(createdUtc, _timeProvider.LocalTimeZone);
+        return DateOnly.FromDateTime(local.DateTime);
     }
 
-    private static async Task BackupSqliteAsync(string sourceDb, string destinationDb, CancellationToken cancellationToken)
+    private static bool HasSameRestorableContent(SnapshotManifest first, SnapshotManifest second)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(destinationDb)!);
-        await using var source = new SqliteConnection(new SqliteConnectionStringBuilder
+        static Dictionary<string, SnapshotFileEntry> ComparableFiles(SnapshotManifest manifest)
+            => manifest.Files
+                .Where(file => !file.RelativePath.Equals(
+                    ProjectPaths.MetadataFileName,
+                    StringComparison.OrdinalIgnoreCase))
+                .ToDictionary(
+                    file => file.RelativePath.Replace('\\', '/'),
+                    StringComparer.OrdinalIgnoreCase);
+
+        var firstFiles = ComparableFiles(first);
+        var secondFiles = ComparableFiles(second);
+        if (firstFiles.Count != secondFiles.Count)
         {
-            DataSource = sourceDb,
-            Mode = SqliteOpenMode.ReadWrite,
-        }.ToString());
-        await source.OpenAsync(cancellationToken).ConfigureAwait(false);
-        await using var destination = new SqliteConnection(new SqliteConnectionStringBuilder
-        {
-            DataSource = destinationDb,
-            Mode = SqliteOpenMode.ReadWriteCreate,
-        }.ToString());
-        await destination.OpenAsync(cancellationToken).ConfigureAwait(false);
-        source.BackupDatabase(destination);
-        await destination.CloseAsync().ConfigureAwait(false);
-        await source.CloseAsync().ConfigureAwait(false);
-        SqliteConnection.ClearAllPools();
+            return false;
+        }
+
+        return firstFiles.All(pair =>
+            secondFiles.TryGetValue(pair.Key, out var other)
+            && pair.Value.SizeBytes == other.SizeBytes
+            && pair.Value.Sha256.Equals(other.Sha256, StringComparison.OrdinalIgnoreCase));
     }
 
     private static async Task CopyRestorableTreeAsync(string sourceRoot, string destRoot, CancellationToken cancellationToken)
@@ -457,7 +541,7 @@ public sealed class SnapshotService : ISnapshotService
         }
     }
 
-    private static void TryDelete(string path)
+    private static bool TryDelete(string path)
     {
         try
         {
@@ -465,10 +549,12 @@ public sealed class SnapshotService : ISnapshotService
             {
                 Directory.Delete(path, recursive: true);
             }
+
+            return true;
         }
         catch
         {
-            // best effort
+            return false;
         }
     }
 }

@@ -1,19 +1,25 @@
 using System.IO.Compression;
 using System.Text;
+using System.Text.Json;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Backup;
 using MasterBookWritingSystem.Infrastructure.IO;
+using MasterBookWritingSystem.Infrastructure.Persistence;
 using Microsoft.Data.Sqlite;
 
 namespace MasterBookWritingSystem.Infrastructure.Backup;
 
 public sealed class PortablePackageService : IPortablePackageService
 {
-    private readonly IProjectService _projects;
+    private static readonly JsonSerializerOptions MetadataJsonOptions = new() { WriteIndented = true };
 
-    public PortablePackageService(IProjectService projects)
+    private readonly IProjectService _projects;
+    private readonly IProjectSnapshotWriter _snapshotWriter;
+
+    public PortablePackageService(IProjectService projects, IProjectSnapshotWriter snapshotWriter)
     {
         _projects = projects;
+        _snapshotWriter = snapshotWriter;
     }
 
     public async Task<ExportResult> ExportZipAsync(
@@ -186,10 +192,15 @@ public sealed class PortablePackageService : IPortablePackageService
             progress?.Report(new OperationProgress { Message = "Writing project files…", PercentComplete = 70 });
             if (destinationExists)
             {
-                Directory.Delete(destination, recursive: true);
+                await CreatePreImportSafetySnapshotAsync(destination, cancellationToken, progress)
+                    .ConfigureAwait(false);
+                ClearRestorableContent(destination);
+            }
+            else
+            {
+                Directory.CreateDirectory(destination);
             }
 
-            Directory.CreateDirectory(destination);
             foreach (var entry in manifest.Files)
             {
                 var source = Path.Combine(staging, entry.RelativePath.Replace('/', Path.DirectorySeparatorChar));
@@ -228,6 +239,76 @@ public sealed class PortablePackageService : IPortablePackageService
         finally
         {
             TryDelete(staging);
+        }
+    }
+
+    private async Task CreatePreImportSafetySnapshotAsync(
+        string destination,
+        CancellationToken cancellationToken,
+        IProgress<OperationProgress>? progress)
+    {
+        progress?.Report(new OperationProgress
+        {
+            Message = "Creating safety snapshot before overwrite…",
+            PercentComplete = 60,
+        });
+
+        var identity = await TryReadDestinationIdentityAsync(destination, cancellationToken)
+            .ConfigureAwait(false);
+        await _snapshotWriter.WriteAsync(
+                new ProjectSnapshotWriteRequest
+                {
+                    ProjectRootPath = destination,
+                    ProjectId = identity.Id,
+                    ProjectTitle = identity.Title,
+                    SchemaVersion = identity.SchemaVersion,
+                    Kind = SnapshotKind.Safety,
+                    NamePrefix = "safety-import",
+                },
+                cancellationToken,
+                progress)
+            .ConfigureAwait(false);
+    }
+
+    private static async Task<(Guid Id, string Title, int SchemaVersion)> TryReadDestinationIdentityAsync(
+        string destination,
+        CancellationToken cancellationToken)
+    {
+        var metadataPath = Path.Combine(destination, ProjectPaths.MetadataFileName);
+        if (File.Exists(metadataPath))
+        {
+            try
+            {
+                var json = await File.ReadAllTextAsync(metadataPath, cancellationToken).ConfigureAwait(false);
+                var document = JsonSerializer.Deserialize<ProjectMetadataDocument>(json, MetadataJsonOptions);
+                if (document is not null && document.Id != Guid.Empty)
+                {
+                    return (document.Id, document.Title, document.SchemaVersion);
+                }
+            }
+            catch
+            {
+                // Fall through.
+            }
+        }
+
+        return (
+            Guid.Empty,
+            Path.GetFileName(destination.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)),
+            0);
+    }
+
+    private static void ClearRestorableContent(string root)
+    {
+        foreach (var file in Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories).ToList())
+        {
+            var relative = Path.GetRelativePath(root, file).Replace('\\', '/');
+            if (BackupPathRules.IsExcludedRelativePath(relative))
+            {
+                continue;
+            }
+
+            File.Delete(file);
         }
     }
 

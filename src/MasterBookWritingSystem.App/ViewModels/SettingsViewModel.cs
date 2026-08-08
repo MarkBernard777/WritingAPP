@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using MasterBookWritingSystem.App.Services;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Backup;
+using MasterBookWritingSystem.Core.Settings;
 
 namespace MasterBookWritingSystem.App.ViewModels;
 
@@ -15,19 +16,23 @@ public partial class SettingsViewModel : ObservableObject
     private readonly ISnapshotService _snapshots;
     private readonly IPortablePackageService _packages;
     private readonly IProjectDialogService _dialogs;
+    private readonly IApplicationSettingsStore _settingsStore;
 
     public SettingsViewModel(
         IProjectService projects,
         IExportService exports,
         ISnapshotService snapshots,
         IPortablePackageService packages,
-        IProjectDialogService dialogs)
+        IProjectDialogService dialogs,
+        IApplicationSettingsStore settingsStore)
     {
         _projects = projects;
         _exports = exports;
         _snapshots = snapshots;
         _packages = packages;
         _dialogs = dialogs;
+        _settingsStore = settingsStore;
+        LoadRetentionSettings();
         _ = RefreshAsync();
     }
 
@@ -38,10 +43,16 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private string _progressMessage = string.Empty;
     [ObservableProperty] private SnapshotListItemViewModel? _selectedSnapshot;
     [ObservableProperty] private string _restorePreview = string.Empty;
+    [ObservableProperty] private string _snapshotRetentionLimitText = SnapshotRetentionPolicy.DefaultMaxActiveSnapshots.ToString();
+    [ObservableProperty] private string _snapshotRetentionExplanation =
+        $"Active snapshot retention limit: {SnapshotRetentionPolicy.DefaultMaxActiveSnapshots}. "
+        + "When the limit is exceeded, older snapshots are moved to 13 Archive/Snapshots/Retired/ "
+        + "(recoverable) and are hidden from the active snapshot list. They are not permanently deleted.";
 
     [RelayCommand]
     private async Task RefreshAsync()
     {
+        LoadRetentionSettings();
         var project = _projects.ActiveProject;
         HasProject = project is not null;
         Snapshots.Clear();
@@ -65,6 +76,54 @@ public partial class SettingsViewModel : ObservableObject
         {
             StatusMessage = ex.Message;
         }
+    }
+
+    [RelayCommand]
+    private async Task SaveSnapshotRetentionAsync()
+    {
+        if (!int.TryParse(SnapshotRetentionLimitText.Trim(), out var requested))
+        {
+            StatusMessage =
+                $"Enter a whole number between {SnapshotRetentionPolicy.MinimumMaxActiveSnapshots} and {SnapshotRetentionPolicy.MaximumMaxActiveSnapshots}.";
+            return;
+        }
+
+        if (!SnapshotRetentionPolicy.TryNormalize(requested, out var normalized, out var error))
+        {
+            StatusMessage = error
+                ?? $"Enter a whole number between {SnapshotRetentionPolicy.MinimumMaxActiveSnapshots} and {SnapshotRetentionPolicy.MaximumMaxActiveSnapshots}.";
+            return;
+        }
+
+        try
+        {
+            await _settingsStore.SaveAsync(new ApplicationSettings
+            {
+                SnapshotRetentionLimit = normalized,
+            }).ConfigureAwait(true);
+            SnapshotRetentionLimitText = normalized.ToString();
+            UpdateRetentionExplanation(normalized);
+            StatusMessage = $"Snapshot retention saved: keep {normalized} active snapshot(s).";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
+    }
+
+    private void LoadRetentionSettings()
+    {
+        var settings = _settingsStore.GetSettings();
+        SnapshotRetentionLimitText = settings.SnapshotRetentionLimit.ToString();
+        UpdateRetentionExplanation(settings.SnapshotRetentionLimit);
+    }
+
+    private void UpdateRetentionExplanation(int limit)
+    {
+        SnapshotRetentionExplanation =
+            $"Active snapshot retention limit: {limit}. "
+            + "When the limit is exceeded, older snapshots are moved to 13 Archive/Snapshots/Retired/ "
+            + "(recoverable) and are hidden from the active snapshot list. They are not permanently deleted.";
     }
 
     [RelayCommand]
@@ -266,6 +325,17 @@ public sealed class SnapshotListItemViewModel(SnapshotInfo snapshot)
     public string Name { get; } = snapshot.Name;
 
     public string DirectoryPath { get; } = snapshot.DirectoryPath;
+
+    public string Kind { get; } = snapshot.Manifest.Kind switch
+    {
+        SnapshotKind.Automatic => "Automatic",
+        SnapshotKind.Safety => "Safety",
+        _ => "Manual",
+    };
+
+    public string DisplayWithKind => snapshot.IsValid
+        ? $"{Kind}: {snapshot.Name} | {snapshot.Manifest.Files.Count} files | {snapshot.Manifest.CreatedUtc:u}"
+        : $"{Kind}: {snapshot.Name} | INVALID";
 
     public string Display => snapshot.IsValid
         ? $"{snapshot.Name} · {snapshot.Manifest.Files.Count} files · {snapshot.Manifest.CreatedUtc:u}"

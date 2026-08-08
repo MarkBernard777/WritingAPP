@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using MasterBookWritingSystem.App.Navigation;
 using MasterBookWritingSystem.App.Services;
 using MasterBookWritingSystem.Core.Abstractions;
+using MasterBookWritingSystem.Core.Backup;
 
 namespace MasterBookWritingSystem.App.ViewModels;
 
@@ -12,17 +13,20 @@ public partial class ShellViewModel : ObservableObject
     private readonly IProjectService _projectService;
     private readonly IProjectDialogService _dialogs;
     private readonly IRecentProjectsStore _recentProjects;
+    private readonly ISnapshotService _snapshots;
 
     public ShellViewModel(
         INavigationService navigationService,
         IProjectService projectService,
         IProjectDialogService dialogs,
-        IRecentProjectsStore recentProjects)
+        IRecentProjectsStore recentProjects,
+        ISnapshotService snapshots)
     {
         _navigationService = navigationService;
         _projectService = projectService;
         _dialogs = dialogs;
         _recentProjects = recentProjects;
+        _snapshots = snapshots;
         _navigationService.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName is nameof(INavigationService.CurrentViewModel)
@@ -78,8 +82,9 @@ public partial class ShellViewModel : ObservableObject
             }).ConfigureAwait(true);
 
             await _recentProjects.AddAsync(project.RootPath).ConfigureAwait(true);
+            var protectionStatus = await ProtectProjectAsync(project.Id).ConfigureAwait(true);
             UpdateProjectCaption();
-            StatusMessage = $"Created {project.Title}";
+            StatusMessage = $"Created {project.Title}.{protectionStatus}";
             _navigationService.NavigateTo(AppSection.Dashboard);
         }
         catch (Exception ex)
@@ -102,8 +107,9 @@ public partial class ShellViewModel : ObservableObject
 
             var project = await _projectService.OpenAsync(folder).ConfigureAwait(true);
             await _recentProjects.AddAsync(project.RootPath).ConfigureAwait(true);
+            var protectionStatus = await ProtectProjectAsync(project.Id).ConfigureAwait(true);
             UpdateProjectCaption();
-            StatusMessage = $"Opened {project.Title}";
+            StatusMessage = $"Opened {project.Title}.{protectionStatus}";
             _navigationService.NavigateTo(AppSection.Dashboard);
         }
         catch (Exception ex)
@@ -120,6 +126,23 @@ public partial class ShellViewModel : ObservableObject
         UpdateProjectCaption();
         StatusMessage = "Project closed";
         _navigationService.NavigateTo(AppSection.Dashboard);
+    }
+
+    private async Task<string> ProtectProjectAsync(Guid projectId)
+    {
+        try
+        {
+            var result = await _snapshots
+                .CreateAutomaticSnapshotIfNeededAsync(projectId)
+                .ConfigureAwait(true);
+            return result.Outcome == AutomaticSnapshotOutcome.Created
+                ? " Automatic safety snapshot created"
+                : string.Empty;
+        }
+        catch (Exception ex)
+        {
+            return $" Automatic snapshot warning: {ex.Message}";
+        }
     }
 
     private void UpdateProjectCaption()

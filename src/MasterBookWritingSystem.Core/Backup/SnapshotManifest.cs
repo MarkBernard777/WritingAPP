@@ -1,5 +1,19 @@
 namespace MasterBookWritingSystem.Core.Backup;
 
+public enum SnapshotKind
+{
+    Manual = 0,
+    Automatic = 1,
+    Safety = 2,
+}
+
+public enum AutomaticSnapshotOutcome
+{
+    Created = 0,
+    AlreadyProtectedToday = 1,
+    NoChanges = 2,
+}
+
 public sealed class SnapshotManifest
 {
     public const int CurrentFormatVersion = 1;
@@ -15,6 +29,8 @@ public sealed class SnapshotManifest
     public int SchemaVersion { get; set; }
 
     public string SnapshotName { get; set; } = string.Empty;
+
+    public SnapshotKind Kind { get; set; } = SnapshotKind.Manual;
 
     public List<SnapshotFileEntry> Files { get; set; } = [];
 }
@@ -65,6 +81,15 @@ public sealed class SnapshotRestoreResult
     public required string Message { get; init; }
 
     public IReadOnlyList<string> Details { get; init; } = [];
+}
+
+public sealed class AutomaticSnapshotResult
+{
+    public required AutomaticSnapshotOutcome Outcome { get; init; }
+
+    public required string Message { get; init; }
+
+    public SnapshotInfo? Snapshot { get; init; }
 }
 
 public sealed class PortablePackageManifest
