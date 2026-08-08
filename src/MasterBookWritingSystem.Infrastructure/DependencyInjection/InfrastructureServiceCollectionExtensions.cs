@@ -30,6 +30,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddSingleton<IProjectService, ProjectService>();
         services.AddSingleton<IProjectIntegrityService, SqliteProjectIntegrityService>();
         services.AddSingleton<IRecoveryJournalService, FileRecoveryJournalService>();
+        services.AddSingleton<IRecoveryCentreService, RecoveryCentreService>();
         services.AddSingleton<ISaveStateService, SaveStateService>();
         services.AddSingleton<IChapterFileStore, ChapterFileStore>();
         services.AddSingleton<IChapterService, ChapterService>();

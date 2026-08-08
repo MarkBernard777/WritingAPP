@@ -113,6 +113,13 @@
                              Command="{Binding NavigateCommand}"
                              CommandParameter="{x:Static nav:AppSection.Settings}"
                              IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Settings, Mode=OneWay}" />
+                <RadioButton Content="Recovery Centre"
+                             GroupName="Nav"
+                             Style="{StaticResource NavRadioButtonStyle}"
+                             Command="{Binding NavigateCommand}"
+                             CommandParameter="{x:Static nav:AppSection.Recovery}"
+                             IsChecked="{Binding CurrentSection, Converter={StaticResource AppSectionToBooleanConverter}, ConverterParameter=Recovery, Mode=OneWay}"
+                             AutomationProperties.Name="Navigate to Recovery Centre" />
             </StackPanel>
         </Border>
 

@@ -10,6 +10,7 @@ public sealed class NavigationService : ObservableObject, INavigationService
     private ObservableObject _currentViewModel = null!;
     private AppSection _currentSection;
     private Guid? _pendingSceneId;
+    private string? _pendingRecoveryRoot;
 
     public NavigationService(IServiceProvider services)
     {
@@ -35,6 +36,12 @@ public sealed class NavigationService : ObservableObject, INavigationService
         NavigateTo(AppSection.StoryData);
     }
 
+    public void NavigateToRecovery(string? projectRootPath = null)
+    {
+        _pendingRecoveryRoot = projectRootPath;
+        NavigateTo(AppSection.Recovery);
+    }
+
     public void NavigateTo(AppSection section)
     {
         CurrentViewModel = section switch
@@ -47,6 +54,7 @@ public sealed class NavigationService : ObservableObject, INavigationService
             AppSection.Tools => _services.GetRequiredService<ToolsViewModel>(),
             AppSection.Publishing => _services.GetRequiredService<PublishingViewModel>(),
             AppSection.Settings => _services.GetRequiredService<SettingsViewModel>(),
+            AppSection.Recovery => CreateRecoveryViewModel(),
             _ => throw new ArgumentOutOfRangeException(nameof(section), section, null),
         };
         CurrentSection = section;
@@ -60,6 +68,19 @@ public sealed class NavigationService : ObservableObject, INavigationService
             var pending = sceneId;
             _pendingSceneId = null;
             _ = viewModel.FocusSceneAsync(pending);
+        }
+
+        return viewModel;
+    }
+
+    private RecoveryViewModel CreateRecoveryViewModel()
+    {
+        var viewModel = _services.GetRequiredService<RecoveryViewModel>();
+        var pending = _pendingRecoveryRoot;
+        _pendingRecoveryRoot = null;
+        if (!string.IsNullOrWhiteSpace(pending))
+        {
+            _ = viewModel.LoadRootAsync(pending);
         }
 
         return viewModel;

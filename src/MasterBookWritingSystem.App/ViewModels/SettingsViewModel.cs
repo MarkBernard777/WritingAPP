@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MasterBookWritingSystem.App.Navigation;
 using MasterBookWritingSystem.App.Services;
 using MasterBookWritingSystem.Core.Abstractions;
 using MasterBookWritingSystem.Core.Backup;
@@ -17,6 +18,7 @@ public partial class SettingsViewModel : ObservableObject
     private readonly IPortablePackageService _packages;
     private readonly IProjectDialogService _dialogs;
     private readonly IApplicationSettingsStore _settingsStore;
+    private readonly INavigationService _navigation;
 
     public SettingsViewModel(
         IProjectService projects,
@@ -24,7 +26,8 @@ public partial class SettingsViewModel : ObservableObject
         ISnapshotService snapshots,
         IPortablePackageService packages,
         IProjectDialogService dialogs,
-        IApplicationSettingsStore settingsStore)
+        IApplicationSettingsStore settingsStore,
+        INavigationService navigation)
     {
         _projects = projects;
         _exports = exports;
@@ -32,6 +35,7 @@ public partial class SettingsViewModel : ObservableObject
         _packages = packages;
         _dialogs = dialogs;
         _settingsStore = settingsStore;
+        _navigation = navigation;
         LoadRetentionSettings();
         _ = RefreshAsync();
     }
@@ -76,6 +80,13 @@ public partial class SettingsViewModel : ObservableObject
         {
             StatusMessage = ex.Message;
         }
+    }
+
+    [RelayCommand]
+    private void OpenRecoveryCentre()
+    {
+        var root = _projects.ActiveProject?.RootPath;
+        _navigation.NavigateToRecovery(root);
     }
 
     [RelayCommand]

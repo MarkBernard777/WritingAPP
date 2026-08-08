@@ -1,0 +1,205 @@
+<UserControl x:Class="MasterBookWritingSystem.App.Views.RecoveryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             AutomationProperties.Name="Recovery Centre">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,12">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="Browse…"
+                        Margin="0,0,8,0"
+                        Padding="12,6"
+                        Command="{Binding BrowseCommand}"
+                        AutomationProperties.Name="Browse for project folder" />
+                <Button Content="Use active project"
+                        Margin="0,0,8,0"
+                        Padding="12,6"
+                        Command="{Binding UseActiveProjectCommand}"
+                        AutomationProperties.Name="Use active project root" />
+                <Button Content="Refresh"
+                        Margin="0,0,8,0"
+                        Padding="12,6"
+                        Command="{Binding RefreshCommand}"
+                        AutomationProperties.Name="Refresh recovery diagnostics" />
+                <Button Content="Cancel"
+                        Padding="12,6"
+                        Command="{Binding CancelOperationCommand}"
+                        IsEnabled="{Binding IsBusy}"
+                        AutomationProperties.Name="Cancel current recovery operation" />
+            </StackPanel>
+            <StackPanel>
+                <TextBlock Text="Recovery Centre"
+                           FontSize="26"
+                           FontWeight="SemiBold"
+                           AutomationProperties.Name="Recovery Centre heading" />
+                <TextBlock Text="{Binding SelectedRootPath}"
+                           Opacity="0.8"
+                           Margin="0,4,0,0"
+                           TextTrimming="CharacterEllipsis"
+                           AutomationProperties.Name="Selected project root path" />
+            </StackPanel>
+        </DockPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="Integrity and structure" FontWeight="SemiBold" Margin="0,0,0,8" />
+                <TextBlock Text="{Binding ProjectTitle}" Margin="0,0,0,4" />
+                <TextBlock Margin="0,0,0,4">
+                    <Run Text="Database exists: " />
+                    <Run Text="{Binding DatabaseExists, Mode=OneWay}" />
+                    <Run Text="  |  Metadata exists: " />
+                    <Run Text="{Binding MetadataExists, Mode=OneWay}" />
+                    <Run Text="  |  Database readable: " />
+                    <Run Text="{Binding DatabaseReadable, Mode=OneWay}" />
+                </TextBlock>
+                <TextBlock Text="{Binding IntegritySummary}"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,4"
+                           AutomationProperties.Name="Integrity summary" />
+                <TextBlock Margin="0,0,0,12" Opacity="0.8">
+                    <Run Text="Checked: " />
+                    <Run Text="{Binding IntegrityCheckedUtc, Mode=OneWay}" />
+                </TextBlock>
+
+                <TextBlock Text="Diagnostic notes" FontWeight="SemiBold" Margin="0,0,0,6" />
+                <ListBox ItemsSource="{Binding DiagnosticNotes}"
+                         MinHeight="60"
+                         MaxHeight="120"
+                         Margin="0,0,0,12"
+                         AutomationProperties.Name="Diagnostic notes list" />
+
+                <TextBlock Text="Missing chapter files" FontWeight="SemiBold" Margin="0,0,0,6" />
+                <ListBox ItemsSource="{Binding MissingChapters}"
+                         MinHeight="60"
+                         MaxHeight="120"
+                         Margin="0,0,0,16"
+                         AutomationProperties.Name="Missing chapter files list" />
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <DockPanel Grid.Column="0" Margin="0,0,8,0">
+                        <TextBlock DockPanel.Dock="Top" Text="Active snapshots" FontWeight="SemiBold" Margin="0,0,0,6" />
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Preview"
+                                    Margin="0,0,8,0"
+                                    Padding="10,4"
+                                    Command="{Binding PreviewActiveSnapshotCommand}"
+                                    AutomationProperties.Name="Preview active snapshot" />
+                            <Button Content="Restore…"
+                                    Padding="10,4"
+                                    Command="{Binding RestoreActiveSnapshotCommand}"
+                                    AutomationProperties.Name="Restore active snapshot" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding ActiveSnapshots}"
+                                 SelectedItem="{Binding SelectedActiveSnapshot}"
+                                 DisplayMemberPath="DisplayName"
+                                 MinHeight="140"
+                                 AutomationProperties.Name="Active snapshots list" />
+                    </DockPanel>
+
+                    <DockPanel Grid.Column="1" Margin="8,0,0,0">
+                        <TextBlock DockPanel.Dock="Top" Text="Retired snapshots" FontWeight="SemiBold" Margin="0,0,0,6" />
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Preview"
+                                    Margin="0,0,8,0"
+                                    Padding="10,4"
+                                    Command="{Binding PreviewRetiredSnapshotCommand}"
+                                    AutomationProperties.Name="Preview retired snapshot" />
+                            <Button Content="Unretire"
+                                    Margin="0,0,8,0"
+                                    Padding="10,4"
+                                    Command="{Binding UnretireSnapshotCommand}"
+                                    AutomationProperties.Name="Move retired snapshot to active list" />
+                            <Button Content="Restore…"
+                                    Padding="10,4"
+                                    Command="{Binding RestoreRetiredSnapshotCommand}"
+                                    AutomationProperties.Name="Restore retired snapshot" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding RetiredSnapshots}"
+                                 SelectedItem="{Binding SelectedRetiredSnapshot}"
+                                 DisplayMemberPath="DisplayName"
+                                 MinHeight="140"
+                                 AutomationProperties.Name="Retired snapshots list" />
+                    </DockPanel>
+                </Grid>
+
+                <TextBlock Text="{Binding SnapshotPreview}"
+                           TextWrapping="Wrap"
+                           Margin="0,12,0,16"
+                           Opacity="0.9"
+                           AutomationProperties.Name="Snapshot preview text" />
+
+                <TextBlock Text="Recovery journal" FontWeight="SemiBold" Margin="0,0,0,6" />
+                <ListBox ItemsSource="{Binding JournalEntries}"
+                         SelectedItem="{Binding SelectedJournalEntry}"
+                         MinHeight="100"
+                         MaxHeight="160"
+                         Margin="0,0,0,8"
+                         AutomationProperties.Name="Recovery journal entries">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <Run Text="{Binding EntityType, Mode=OneWay}" />
+                                <Run Text=" · " />
+                                <Run Text="{Binding DraftLength, Mode=OneWay}" />
+                                <Run Text=" chars · " />
+                                <Run Text="{Binding UpdatedUtc, Mode=OneWay, StringFormat={}{0:u}}" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button Content="Preview journal"
+                            Margin="0,0,8,0"
+                            Padding="10,4"
+                            Command="{Binding PreviewJournalCommand}"
+                            AutomationProperties.Name="Preview journal entry" />
+                    <Button Content="Recover to copy"
+                            Margin="0,0,8,0"
+                            Padding="10,4"
+                            Command="{Binding RecoverJournalCopyCommand}"
+                            AutomationProperties.Name="Recover journal to separate copy" />
+                    <Button Content="Overwrite current…"
+                            Padding="10,4"
+                            Command="{Binding RecoverJournalOverwriteCommand}"
+                            AutomationProperties.Name="Overwrite current content from journal" />
+                </StackPanel>
+                <TextBox Text="{Binding JournalPreview, Mode=OneWay}"
+                         IsReadOnly="True"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto"
+                         MinHeight="100"
+                         MaxHeight="220"
+                         Margin="0,0,0,16"
+                         AutomationProperties.Name="Journal draft preview" />
+
+                <Button Content="Rebuild missing project.json"
+                        HorizontalAlignment="Left"
+                        Padding="12,6"
+                        Command="{Binding RebuildMetadataCommand}"
+                        AutomationProperties.Name="Rebuild missing project metadata" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Margin="0,12,0,0">
+            <TextBlock Text="{Binding ProgressMessage}"
+                       Opacity="0.75"
+                       AutomationProperties.Name="Recovery progress message" />
+            <TextBlock Text="{Binding StatusMessage}"
+                       Foreground="#276749"
+                       TextWrapping="Wrap"
+                       Margin="0,4,0,0"
+                       AutomationProperties.Name="Recovery status message" />
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -61,6 +61,9 @@
             <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                 <views:SettingsView />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:RecoveryViewModel}">
+                <views:RecoveryView />
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

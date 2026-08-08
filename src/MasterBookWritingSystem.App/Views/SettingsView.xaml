@@ -20,7 +20,7 @@
                            TextWrapping="Wrap"
                            Opacity="0.9"
                            Margin="0,0,0,8" />
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                     <TextBlock Text="Active limit" VerticalAlignment="Center" Margin="0,0,8,0" />
                     <TextBox Width="80"
                              Text="{Binding SnapshotRetentionLimitText, UpdateSourceTrigger=PropertyChanged}"
@@ -29,6 +29,12 @@
                             Padding="12,6"
                             Command="{Binding SaveSnapshotRetentionCommand}" />
                 </StackPanel>
+                <Button Content="Open Recovery Centre"
+                        HorizontalAlignment="Left"
+                        Padding="12,6"
+                        Margin="0,0,0,16"
+                        Command="{Binding OpenRecoveryCentreCommand}"
+                        AutomationProperties.Name="Open Recovery Centre" />
 
                 <TextBlock Text="{Binding StatusMessage}"
                            Visibility="{Binding HasProject, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"

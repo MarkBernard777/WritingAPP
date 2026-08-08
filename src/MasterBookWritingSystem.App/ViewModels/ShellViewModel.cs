@@ -112,10 +112,11 @@ public partial class ShellViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenProjectAsync()
     {
+        string? folder = null;
         try
         {
             await FlushPendingSavesAsync().ConfigureAwait(true);
-            var folder = _dialogs.PickFolder("Select an existing book project folder (contains project.mbws)");
+            folder = _dialogs.PickFolder("Select an existing book project folder (contains project.mbws)");
             if (folder is null)
             {
                 return;
@@ -133,7 +134,18 @@ public partial class ShellViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = ex.Message;
-            _dialogs.ShowMessage(ex.Message, "Open Project Failed");
+            var openRecovery = folder is not null
+                && _dialogs.Confirm(
+                    $"{ex.Message}{Environment.NewLine}{Environment.NewLine}Open this folder in the Recovery Centre?",
+                    "Open Project Failed");
+            if (openRecovery)
+            {
+                _navigationService.NavigateToRecovery(folder);
+            }
+            else
+            {
+                _dialogs.ShowMessage(ex.Message, "Open Project Failed");
+            }
         }
     }
 

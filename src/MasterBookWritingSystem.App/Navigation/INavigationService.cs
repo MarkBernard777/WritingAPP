@@ -12,4 +12,7 @@ public interface INavigationService : System.ComponentModel.INotifyPropertyChang
 
     /// <summary>Opens Story Data on the Scenes tab and selects the given scene.</summary>
     void NavigateToStoryDataScene(Guid sceneId);
+
+    /// <summary>Opens Recovery Centre, optionally preselecting a project root.</summary>
+    void NavigateToRecovery(string? projectRootPath = null);
 }

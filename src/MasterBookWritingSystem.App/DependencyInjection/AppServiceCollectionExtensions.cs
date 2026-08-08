@@ -26,6 +26,7 @@ public static class AppServiceCollectionExtensions
         services.AddTransient<ToolsViewModel>();
         services.AddTransient<PublishingViewModel>();
         services.AddTransient<SettingsViewModel>();
+        services.AddTransient<RecoveryViewModel>();
 
         return services;
     }

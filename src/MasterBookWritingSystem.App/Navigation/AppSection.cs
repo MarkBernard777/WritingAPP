@@ -10,4 +10,5 @@ public enum AppSection
     Tools,
     Publishing,
     Settings,
+    Recovery,
 }
