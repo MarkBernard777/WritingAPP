@@ -1,26 +1,31 @@
-# Release Notes — 1.1.0
+# Release Notes — 1.2.0
 
 ## Highlights
 
-v1.1 focuses on **reliability, recovery, editor safety, accessibility, performance readiness, and release automation**. The app remains fully offline with portable per-project folders.
+v1.2 delivers the **writer’s cockpit**: manuscript hierarchy (Books/Parts/Chapters/Scenes), in-chapter scene prose association, corkboard sync, project-wide search/replace with safe rollback, lightweight manuscript versions, drafting targets/sessions, and progress views. The app remains fully offline with portable per-project folders.
 
 ## What’s new
 
-- **Chapter–scene usability** — Shared scene inventory across Story Data, Documents (Scene List), and Manuscript; chapter pickers instead of raw IDs.
-- **Safer snapshots** — Configurable retention (default 20); excess snapshots retired (not deleted); safety snapshots before migrate/import/restore/compile-export; daily automatic protection when content changes.
-- **Crash journaling & autosave** — Project-local recovery journal; debounced autosave; Clear/Saving/Saved/Save failed/Recovery available status.
-- **Recovery Centre** — Diagnose and repair damaged project roots even when the database will not open; journal recover-to-copy; confirmed snapshot restore.
-- **Undo/redo** — Native text undo for manuscript prose; bounded model undo for structured document fields; participates in autosave/journaling.
-- **Accessibility & performance** — High-contrast-friendly theme resources; accessible save-status text; performance ceilings documented for large projects.
-- **Release automation** — One-command `scripts/build-release.ps1` producing ZIP, optional Inno Setup installer, optional MSIX, SHA-256 checksums, and a JSON release manifest. Signing is optional via env/params (never committed).
+- **Manuscript hierarchy** — Books, optional Parts, Chapters, and Scenes with drag-and-drop and keyboard reordering; order persists across close/reopen.
+- **Scene prose association** — Optional `mbws:scene` markers in chapter Markdown; legacy unmarked chapters stay editable; compile/export strips markers.
+- **Corkboard + canonical sync** — One Scene inventory projected across Story Data, Documents Scene List, corkboard, and Manuscript via in-process change notifications.
+- **Global search/replace** — Scoped preview with include/exclude, safety snapshot before write, compensation on failure/cancel, one-operation rollback.
+- **Manuscript versions** — Lightweight archive file/manifest versions with readable before/after diff (separate from full project snapshots).
+- **Safe split/merge** — Caret split and adjacent merge with validation, snapshots, and compensation.
+- **Drafting progress** — Daily/weekly targets, Start/Pause/Resume/Stop timer, automatic session logging (5‑minute idle threshold), interrupted-session recovery, Progress views by date/chapter/scene/viewpoint.
+- **Schema** — Project schema **9** (`AddDraftingProgressV12`); upgrades create a pre-migration safety snapshot.
 
 ## Upgrade notes
 
 - Project folders remain user-owned portable directories; upgrading the app does not move manuscripts.
-- Application settings (including snapshot retention) stay under `%LocalAppData%\MasterBookWritingSystem\`.
+- Opening a v1.1 (schema 7) project migrates through hierarchy (v8) and drafting (v9) with a safety snapshot when migrations are pending.
+- Application settings remain under `%LocalAppData%\MasterBookWritingSystem\`.
 - Inactive traditional/self-publishing workflow progress continues to be preserved when switching routes.
-- Schema migrations run on open; a safety snapshot is created when migrations are pending.
 
 ## Signing
 
 Unsigned installers/MSIX packages may trigger SmartScreen. Signed artifacts require supplying certificate parameters or `MBWS_SIGN_*` environment variables outside source control (see `docs/BUILDING_AND_PACKAGING.md`).
+
+## Traceability
+
+See `docs/V1.2_TRACEABILITY.md` for requirement → implementation → test mapping.

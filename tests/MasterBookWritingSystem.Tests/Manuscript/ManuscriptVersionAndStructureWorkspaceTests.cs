@@ -131,6 +131,42 @@ public sealed class ManuscriptVersionAndStructureWorkspaceTests : IDisposable
     }
 
     [Fact]
+    public async Task InjectedChapterFileFailure_DuringSplit_RestoresOriginalChapter()
+    {
+        var project = await CreateAsync("SplitFail");
+        var chapter = await _chapters.CreateAsync(project.Id, "Host");
+        const string original = "LEFT SIDE\n\nRIGHT SIDE\n";
+        await _chapters.SaveContentAsync(project.Id, chapter.Id, original);
+        var root = project.RootPath;
+        var chapterId = chapter.Id;
+        await _projects.CloseAsync();
+
+        var services = new ServiceCollection();
+        services.AddInfrastructure();
+        services.AddSingleton<IWorkflowDefinitionSource>(
+            new FileWorkflowDefinitionSource(FindPath("seed", "workflow.json")));
+        var chapterFileStoreDescriptor = services.First(item => item.ServiceType == typeof(IChapterFileStore));
+        services.Remove(chapterFileStoreDescriptor);
+        // Fail only the first write that is exactly the right-hand split body so compensation can restore.
+        services.AddSingleton<IChapterFileStore>(_ => new FailOnceOnExactContentChapterFileStore(
+            new ChapterFileStore(),
+            failWhenEquals: "RIGHT SIDE\n"));
+        await using var provider = services.BuildServiceProvider();
+        var projects = provider.GetRequiredService<IProjectService>();
+        var chapters = provider.GetRequiredService<IChapterService>();
+        var structure = provider.GetRequiredService<IChapterStructureService>();
+        await projects.OpenAsync(root);
+
+        var splitAt = original.IndexOf("RIGHT SIDE", StringComparison.Ordinal);
+        await Assert.ThrowsAsync<IOException>(() =>
+            structure.SplitChapterAtAsync(project.Id, chapterId, splitAt, "Right"));
+
+        Assert.Equal(original, await chapters.LoadContentAsync(project.Id, chapterId));
+        Assert.Single(await chapters.GetAllAsync(project.Id));
+        await projects.CloseAsync();
+    }
+
+    [Fact]
     public async Task InjectedChapterFileFailure_DuringReplace_CompensatesPriorChapter()
     {
         var project = await CreateAsync("FailStore");
@@ -208,6 +244,33 @@ public sealed class ManuscriptVersionAndStructureWorkspaceTests : IDisposable
             if (markdownContent.Contains(failWhenContains, StringComparison.Ordinal))
             {
                 throw new IOException("Injected chapter file save failure.");
+            }
+
+            return inner.SaveAsync(projectRootPath, chapter, markdownContent, cancellationToken);
+        }
+
+        public Task<string> LoadAsync(
+            string projectRootPath,
+            Core.Domain.Manuscript.Chapter chapter,
+            CancellationToken cancellationToken = default)
+            => inner.LoadAsync(projectRootPath, chapter, cancellationToken);
+    }
+
+    private sealed class FailOnceOnExactContentChapterFileStore(IChapterFileStore inner, string failWhenEquals) : IChapterFileStore
+    {
+        private int _failures;
+
+        public Task SaveAsync(
+            string projectRootPath,
+            Core.Domain.Manuscript.Chapter chapter,
+            string markdownContent,
+            CancellationToken cancellationToken = default)
+        {
+            if (_failures == 0
+                && string.Equals(markdownContent, failWhenEquals, StringComparison.Ordinal))
+            {
+                _failures++;
+                throw new IOException("Injected one-shot chapter file save failure.");
             }
 
             return inner.SaveAsync(projectRootPath, chapter, markdownContent, cancellationToken);

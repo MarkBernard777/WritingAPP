@@ -2,7 +2,7 @@
 
 Master Book-Writing System ships a **self-contained win-x64** build so users do not need a machine-wide .NET runtime. Seed templates are bundled beside the executable.
 
-Current product release: **1.1.0** (see `docs/RELEASE_NOTES.md` and `docs/V1.1_TRACEABILITY.md`).
+Current product release: **1.2.0** (see `docs/RELEASE_NOTES.md` and `docs/V1.2_TRACEABILITY.md`).
 
 ## Prerequisites
 
@@ -19,13 +19,13 @@ The checked-in application version lives in:
 
 Properties: `Version`, `AssemblyVersion`, `FileVersion`, `InformationalVersion`.
 
-The release script accepts a semantic version (for example `1.1.0`) and derives:
+The release script accepts a semantic version (for example `1.2.0`) and derives:
 
-| Field | Example from `1.1.0` |
+| Field | Example from `1.2.0` |
 |-------|----------------------|
-| SemVer / InformationalVersion | `1.1.0` |
-| AssemblyVersion / FileVersion | `1.1.0.0` |
-| MSIX Identity Version | `1.1.0.0` |
+| SemVer / InformationalVersion | `1.2.0` |
+| AssemblyVersion / FileVersion | `1.2.0.0` |
+| MSIX Identity Version | `1.2.0.0` |
 
 MSBuild properties are passed for the release build only; the script does **not** rewrite the `.csproj` unless you change it yourself.
 

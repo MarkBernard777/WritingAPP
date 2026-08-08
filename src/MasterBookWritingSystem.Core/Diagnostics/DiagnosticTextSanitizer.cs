@@ -44,7 +44,10 @@ public static class DiagnosticTextSanitizer
         }
 
         if (text.Contains("SECRET_MANUSCRIPT_", StringComparison.Ordinal)
-            || text.Contains("DRAFT_PAYLOAD_", StringComparison.Ordinal))
+            || text.Contains("SECRET_SCENE_ASSOCIATED_DRAFT_", StringComparison.Ordinal)
+            || text.Contains("DRAFT_PAYLOAD_", StringComparison.Ordinal)
+            || text.Contains("mbws:scene", StringComparison.OrdinalIgnoreCase)
+            || text.Contains("<!-- /mbws:scene -->", StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
