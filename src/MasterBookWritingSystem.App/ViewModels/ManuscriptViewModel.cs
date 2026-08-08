@@ -22,6 +22,7 @@ public partial class ManuscriptViewModel : ObservableObject
     private readonly IProjectDialogService _dialogs;
     private readonly IEditorAutosaveService _autosave;
     private readonly ISaveStateService _saveState;
+    private readonly IStoryChangeNotifier _changes;
     private string _savedContent = string.Empty;
     private bool _suppressDirty;
     private bool _restoringSelection;
@@ -40,7 +41,9 @@ public partial class ManuscriptViewModel : ObservableObject
         INavigationService navigation,
         IProjectDialogService dialogs,
         IEditorAutosaveService autosave,
-        ISaveStateService saveState)
+        ISaveStateService saveState,
+        SceneCorkboardViewModel corkboard,
+        IStoryChangeNotifier changes)
     {
         _projectService = projectService;
         _chapterService = chapterService;
@@ -50,11 +53,16 @@ public partial class ManuscriptViewModel : ObservableObject
         _dialogs = dialogs;
         _autosave = autosave;
         _saveState = saveState;
+        Corkboard = corkboard;
+        _changes = changes;
         _autosave.SaveCompleted += OnAutosaveCompleted;
         _saveState.Changed += (_, _) => SyncSaveState();
+        _changes.Changed += OnStoryChanged;
         SyncSaveState();
         _ = RefreshAsync();
     }
+
+    public SceneCorkboardViewModel Corkboard { get; }
 
     public ObservableCollection<HierarchyNodeViewModel> HierarchyRoots { get; } = [];
 
@@ -133,17 +141,63 @@ public partial class ManuscriptViewModel : ObservableObject
     [ObservableProperty]
     private bool _canMoveSelectedTo;
 
+    [ObservableProperty]
+    private bool _isCorkboardMode;
+
     public int EditorSessionVersion => _editorSessionVersion;
 
     public string LeftPanelToggleLabel => IsLeftPanelCollapsed ? "Show hierarchy" : "Hide hierarchy";
 
     public string RightPanelToggleLabel => IsRightPanelCollapsed ? "Show context" : "Hide context";
 
+    public string CorkboardToggleLabel => IsCorkboardMode ? "Show editor" : "Show corkboard";
+
+    public void Detach()
+    {
+        _changes.Changed -= OnStoryChanged;
+        Corkboard.Detach();
+        _autosave.SaveCompleted -= OnAutosaveCompleted;
+        _previewDebounceCts?.Cancel();
+        _previewDebounceCts?.Dispose();
+        _refreshCts?.Cancel();
+        _refreshCts?.Dispose();
+    }
+
+    public async Task FocusChapterAsync(Guid chapterId, Guid? sceneId = null)
+    {
+        IsCorkboardMode = false;
+        if (sceneId is { } sid)
+        {
+            await ReloadHierarchyAsync(HierarchyNodeKind.Scene, sid, preserveExpansion: true)
+                .ConfigureAwait(true);
+            if (SelectedNode?.Id == sid)
+            {
+                return;
+            }
+        }
+
+        await ReloadHierarchyAsync(HierarchyNodeKind.Chapter, chapterId, preserveExpansion: true)
+            .ConfigureAwait(true);
+    }
+
+    public async Task FocusCorkboardAsync(Guid? sceneId = null)
+    {
+        IsCorkboardMode = true;
+        await Corkboard.RefreshAsync().ConfigureAwait(true);
+        if (sceneId is { } id)
+        {
+            Corkboard.SelectedCard = Corkboard.Cards.FirstOrDefault(card => card.Id == id);
+        }
+    }
+
     partial void OnIsLeftPanelCollapsedChanged(bool value)
         => OnPropertyChanged(nameof(LeftPanelToggleLabel));
 
     partial void OnIsRightPanelCollapsedChanged(bool value)
         => OnPropertyChanged(nameof(RightPanelToggleLabel));
+
+    partial void OnIsCorkboardModeChanged(bool value)
+        => OnPropertyChanged(nameof(CorkboardToggleLabel));
 
     partial void OnHierarchyFilterChanged(string value) => ApplyHierarchyFilter();
 
@@ -225,6 +279,18 @@ public partial class ManuscriptViewModel : ObservableObject
     private void ToggleRightPanel() => IsRightPanelCollapsed = !IsRightPanelCollapsed;
 
     [RelayCommand]
+    private async Task ToggleCorkboardAsync()
+    {
+        if (IsCorkboardMode)
+        {
+            IsCorkboardMode = false;
+            return;
+        }
+
+        await FocusCorkboardAsync(Corkboard.SelectedCard?.Id).ConfigureAwait(true);
+    }
+
+    [RelayCommand]
     private async Task RefreshAsync()
     {
         if (IsDirty && !ConfirmDiscard())
@@ -255,6 +321,7 @@ public partial class ManuscriptViewModel : ObservableObject
             ClearContext();
             StatusMessage = "Open or create a project to edit the manuscript.";
             UpdateMoveCommandStates();
+            await Corkboard.RefreshAsync(cancellationToken).ConfigureAwait(true);
             return;
         }
 
@@ -269,6 +336,13 @@ public partial class ManuscriptViewModel : ObservableObject
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
+            }
+
+            await Corkboard.RefreshAsync(cancellationToken).ConfigureAwait(true);
+            if (_loadedChapterId is { } chapterId)
+            {
+                await LoadLinkedScenesAsync(project.Id, chapterId).ConfigureAwait(true);
+                SelectLinkedScene(_contextSceneId);
             }
 
             StatusMessage = string.Empty;
@@ -1437,6 +1511,61 @@ public partial class ManuscriptViewModel : ObservableObject
     {
         SaveStateDisplay = SaveStateAccessibility.FormatDisplay(_saveState.State, _saveState.Message);
         SaveStateAccessibleName = SaveStateAccessibility.FormatAccessibleName(_saveState.State, _saveState.Message);
+    }
+
+    private void OnStoryChanged(object? sender, StoryChangeEventArgs e)
+    {
+        if (_projectService.ActiveProject?.Id != e.ProjectId)
+        {
+            return;
+        }
+
+        if (e.Kind is not (StoryChangeKind.SceneUpserted
+            or StoryChangeKind.SceneDeleted
+            or StoryChangeKind.HierarchyChanged))
+        {
+            return;
+        }
+
+        void Apply() => _ = SoftRefreshScenesAsync();
+
+        var dispatcher = System.Windows.Application.Current?.Dispatcher;
+        if (dispatcher is null || dispatcher.CheckAccess())
+        {
+            Apply();
+        }
+        else
+        {
+            _ = dispatcher.InvokeAsync(Apply);
+        }
+    }
+
+    private async Task SoftRefreshScenesAsync()
+    {
+        var project = _projectService.ActiveProject;
+        if (project is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await ReloadHierarchyAsync(
+                    selectKind: SelectedNode?.Kind,
+                    selectId: SelectedNode?.Id,
+                    preserveExpansion: true)
+                .ConfigureAwait(true);
+            if (_loadedChapterId is { } chapterId)
+            {
+                var keep = _contextSceneId ?? SelectedLinkedScene?.Id;
+                await LoadLinkedScenesAsync(project.Id, chapterId).ConfigureAwait(true);
+                SelectLinkedScene(keep);
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
     }
 
     private async Task LoadLinkedScenesAsync(Guid projectId, Guid chapterId)

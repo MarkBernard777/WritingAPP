@@ -42,6 +42,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddSingleton<IExportService, ExportService>();
         services.AddSingleton<ISnapshotService, SnapshotService>();
         services.AddSingleton<IPortablePackageService, PortablePackageService>();
+        services.AddSingleton<IStoryChangeNotifier, StoryChangeNotifier>();
         services.AddSingleton<IStoryDataService, StoryDataService>();
         services.AddSingleton<IPublishingService, PublishingService>();
         services.AddSingleton<IWorkflowService, WorkflowService>();

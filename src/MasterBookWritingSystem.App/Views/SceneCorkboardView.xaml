@@ -1,0 +1,209 @@
+<UserControl x:Class="MasterBookWritingSystem.App.Views.SceneCorkboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:MasterBookWritingSystem.App.ViewModels">
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+            <TextBlock DockPanel.Dock="Left"
+                       Text="Scene corkboard"
+                       FontWeight="SemiBold"
+                       FontSize="16"
+                       VerticalAlignment="Center"
+                       Margin="0,0,12,0" />
+            <WrapPanel Orientation="Horizontal">
+                <Button Content="New scene"
+                        MinWidth="88"
+                        MinHeight="32"
+                        Margin="0,0,6,4"
+                        Command="{Binding CreateSceneCommand}"
+                        AutomationProperties.Name="Create scene on corkboard" />
+                <Button Content="Edit in Story Data"
+                        MinWidth="120"
+                        MinHeight="32"
+                        Margin="0,0,6,4"
+                        Command="{Binding EditSelectedSceneCommand}"
+                        AutomationProperties.Name="Edit selected scene in Story Data" />
+                <Button Content="Delete"
+                        MinWidth="72"
+                        MinHeight="32"
+                        Margin="0,0,6,4"
+                        Command="{Binding DeleteSelectedSceneCommand}"
+                        AutomationProperties.Name="Delete selected scene" />
+                <Button Content="Move Up"
+                        MinWidth="72"
+                        MinHeight="32"
+                        Margin="0,0,6,4"
+                        Command="{Binding MoveSelectedUpCommand}"
+                        IsEnabled="{Binding CanMoveSelectedUp}"
+                        AutomationProperties.Name="Move selected scene up" />
+                <Button Content="Move Down"
+                        MinWidth="88"
+                        MinHeight="32"
+                        Margin="0,0,6,4"
+                        Command="{Binding MoveSelectedDownCommand}"
+                        IsEnabled="{Binding CanMoveSelectedDown}"
+                        AutomationProperties.Name="Move selected scene down" />
+                <Button Content="Move To…"
+                        MinWidth="80"
+                        MinHeight="32"
+                        Margin="0,0,6,4"
+                        Command="{Binding MoveSelectedToChapterCommand}"
+                        AutomationProperties.Name="Move selected scene to chapter" />
+                <Button Content="Unassign"
+                        MinWidth="80"
+                        MinHeight="32"
+                        Margin="0,0,6,4"
+                        Command="{Binding UnassignSelectedCommand}"
+                        AutomationProperties.Name="Unassign selected scene" />
+            </WrapPanel>
+        </DockPanel>
+
+        <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal" Margin="0,0,10,4">
+                <TextBlock Text="Book" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <ComboBox Width="140"
+                          ItemsSource="{Binding BookFilters}"
+                          SelectedItem="{Binding SelectedBookFilter}"
+                          DisplayMemberPath="Label"
+                          AutomationProperties.Name="Filter corkboard by book" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,10,4">
+                <TextBlock Text="Part" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <ComboBox Width="140"
+                          ItemsSource="{Binding PartFilters}"
+                          SelectedItem="{Binding SelectedPartFilter}"
+                          DisplayMemberPath="Label"
+                          AutomationProperties.Name="Filter corkboard by part" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,10,4">
+                <TextBlock Text="Chapter" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <ComboBox Width="170"
+                          ItemsSource="{Binding ChapterFilters}"
+                          SelectedItem="{Binding SelectedChapterFilter}"
+                          DisplayMemberPath="DisplayName"
+                          AutomationProperties.Name="Filter corkboard by chapter" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,10,4">
+                <TextBlock Text="Viewpoint" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <ComboBox Width="150"
+                          ItemsSource="{Binding ViewpointFilters}"
+                          SelectedItem="{Binding SelectedViewpointFilter}"
+                          DisplayMemberPath="DisplayName"
+                          AutomationProperties.Name="Filter corkboard by viewpoint" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,10,4">
+                <TextBlock Text="Status" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <ComboBox Width="130"
+                          ItemsSource="{Binding StatusFilterOptions}"
+                          SelectedItem="{Binding SelectedStatusFilter}"
+                          DisplayMemberPath="Label"
+                          AutomationProperties.Name="Filter corkboard by status" />
+            </StackPanel>
+            <Button Content="Clear filters"
+                    MinWidth="100"
+                    MinHeight="32"
+                    Margin="0,0,0,4"
+                    Command="{Binding ClearFiltersCommand}"
+                    AutomationProperties.Name="Clear corkboard filters" />
+        </WrapPanel>
+
+        <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+            <Button Content="Open chapter"
+                    MinWidth="100"
+                    MinHeight="32"
+                    Margin="0,0,6,4"
+                    Command="{Binding OpenChapterCommand}"
+                    AutomationProperties.Name="Open scene chapter in manuscript" />
+            <Button Content="Open viewpoint"
+                    MinWidth="110"
+                    MinHeight="32"
+                    Margin="0,0,6,4"
+                    Command="{Binding OpenViewpointCommand}"
+                    AutomationProperties.Name="Open viewpoint character" />
+            <Button Content="Open location…"
+                    MinWidth="110"
+                    MinHeight="32"
+                    Margin="0,0,6,4"
+                    Command="{Binding OpenLocationCommand}"
+                    ToolTip="{Binding LocationLimitationNote}"
+                    AutomationProperties.Name="Open location world entry if matched" />
+            <Button Content="Open related beat…"
+                    MinWidth="130"
+                    MinHeight="32"
+                    Margin="0,0,6,4"
+                    Command="{Binding OpenRelatedBeatCommand}"
+                    ToolTip="Beats store SceneRef as free text, not a foreign key."
+                    AutomationProperties.Name="Open related beat by free-text SceneRef" />
+        </WrapPanel>
+
+        <TextBlock DockPanel.Dock="Bottom"
+                   Margin="0,8,0,0"
+                   Text="{Binding StatusMessage}"
+                   Style="{StaticResource StatusLiveTextStyle}"
+                   AutomationProperties.Name="Corkboard status message" />
+
+        <ListBox x:Name="CardList"
+                 ItemsSource="{Binding Cards}"
+                 SelectedItem="{Binding SelectedCard}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 BorderThickness="0"
+                 Background="Transparent"
+                 PreviewMouseLeftButtonDown="CardList_OnPreviewMouseLeftButtonDown"
+                 PreviewMouseMove="CardList_OnPreviewMouseMove"
+                 DragOver="CardList_OnDragOver"
+                 Drop="CardList_OnDrop"
+                 AutomationProperties.Name="Scene corkboard cards">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0,0,10,10" />
+                    <Setter Property="MinHeight" Value="28" />
+                    <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type vm:SceneCardViewModel}">
+                    <Border Width="210"
+                            MinHeight="140"
+                            Padding="10"
+                            BorderBrush="{DynamicResource AppBorderBrush}"
+                            BorderThickness="1"
+                            Background="{DynamicResource AppPanelBackgroundBrush}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Title}"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,6" />
+                            <TextBlock Text="{Binding ChapterLabel}" TextWrapping="Wrap" Margin="0,0,0,2" />
+                            <TextBlock Margin="0,0,0,2">
+                                <Run Text="Seq " />
+                                <Run Text="{Binding SequenceNumber, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock Margin="0,0,0,2">
+                                <Run Text="POV: " />
+                                <Run Text="{Binding ViewpointName, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,0,0,2">
+                                <Run Text="Loc: " />
+                                <Run Text="{Binding Location, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock Margin="0,0,0,2">
+                                <Run Text="Status: " />
+                                <Run Text="{Binding StatusDisplay, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock>
+                                <Run Text="{Binding WordCount, Mode=OneWay}" />
+                                <Run Text=" words" />
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</UserControl>

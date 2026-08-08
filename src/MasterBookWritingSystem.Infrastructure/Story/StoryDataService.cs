@@ -11,10 +11,12 @@ namespace MasterBookWritingSystem.Infrastructure.Story;
 public sealed class StoryDataService : IStoryDataService
 {
     private readonly IProjectService _projectService;
+    private readonly IStoryChangeNotifier _changes;
 
-    public StoryDataService(IProjectService projectService)
+    public StoryDataService(IProjectService projectService, IStoryChangeNotifier changes)
     {
         _projectService = projectService;
+        _changes = changes;
     }
 
     public StoryValidationResult ValidateCharacter(Character character)
@@ -80,6 +82,7 @@ public sealed class StoryDataService : IStoryDataService
         context.Characters.Add(record);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        Publish(projectId, StoryChangeKind.CharacterChanged, record.Id);
         return ToDomain(record);
     }
 
@@ -104,6 +107,7 @@ public sealed class StoryDataService : IStoryDataService
         record.LastEditedUtc = DateTimeOffset.UtcNow;
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        Publish(projectId, StoryChangeKind.CharacterChanged, record.Id);
         return ToDomain(record);
     }
 
@@ -139,6 +143,7 @@ public sealed class StoryDataService : IStoryDataService
         context.Characters.Remove(record);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        Publish(projectId, StoryChangeKind.CharacterChanged, characterId);
     }
 
     public async Task<IReadOnlyList<WorldEntry>> GetWorldEntriesAsync(
@@ -193,6 +198,7 @@ public sealed class StoryDataService : IStoryDataService
         context.WorldEntries.Add(record);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        Publish(projectId, StoryChangeKind.WorldEntryChanged, record.Id);
         return ToDomain(record);
     }
 
@@ -217,6 +223,7 @@ public sealed class StoryDataService : IStoryDataService
         record.LastEditedUtc = DateTimeOffset.UtcNow;
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        Publish(projectId, StoryChangeKind.WorldEntryChanged, record.Id);
         return ToDomain(record);
     }
 
@@ -236,6 +243,7 @@ public sealed class StoryDataService : IStoryDataService
         context.WorldEntries.Remove(record);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        Publish(projectId, StoryChangeKind.WorldEntryChanged, entryId);
     }
 
     public async Task<IReadOnlyList<Beat>> GetBeatsAsync(
@@ -294,6 +302,7 @@ public sealed class StoryDataService : IStoryDataService
         context.Beats.Add(record);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        Publish(projectId, StoryChangeKind.BeatChanged, record.Id);
         return ToDomain(record);
     }
 
@@ -323,6 +332,7 @@ public sealed class StoryDataService : IStoryDataService
         record.LastEditedUtc = DateTimeOffset.UtcNow;
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        Publish(projectId, StoryChangeKind.BeatChanged, record.Id);
         return ToDomain(record);
     }
 
@@ -342,6 +352,7 @@ public sealed class StoryDataService : IStoryDataService
         context.Beats.Remove(record);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        Publish(projectId, StoryChangeKind.BeatChanged, beatId);
     }
 
     public async Task<IReadOnlyList<Scene>> GetScenesAsync(
@@ -410,6 +421,7 @@ public sealed class StoryDataService : IStoryDataService
         context.Scenes.Add(record);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        Publish(projectId, StoryChangeKind.SceneUpserted, record.Id);
         return ToDomain(record);
     }
 
@@ -449,6 +461,7 @@ public sealed class StoryDataService : IStoryDataService
         record.LastEditedUtc = DateTimeOffset.UtcNow;
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        Publish(projectId, StoryChangeKind.SceneUpserted, record.Id);
         return ToDomain(record);
     }
 
@@ -477,7 +490,16 @@ public sealed class StoryDataService : IStoryDataService
         context.Scenes.Remove(record);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        Publish(projectId, StoryChangeKind.SceneDeleted, sceneId);
     }
+
+    private void Publish(Guid projectId, StoryChangeKind kind, Guid? entityId)
+        => _changes.Publish(new StoryChangeEventArgs
+        {
+            ProjectId = projectId,
+            Kind = kind,
+            EntityId = entityId,
+        });
 
     private ProjectDbContext Open(Guid projectId)
     {

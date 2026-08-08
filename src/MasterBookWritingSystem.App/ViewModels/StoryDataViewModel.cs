@@ -10,26 +10,36 @@ namespace MasterBookWritingSystem.App.ViewModels;
 
 public partial class StoryDataViewModel : ObservableObject
 {
+    public const int CharactersTabIndex = 0;
+    public const int WorldTabIndex = 1;
+    public const int BeatsTabIndex = 2;
     public const int ScenesTabIndex = 3;
 
     private readonly IProjectService _projectService;
     private readonly IStoryDataService _storyData;
     private readonly IChapterService _chapters;
+    private readonly IStoryChangeNotifier _changes;
     private readonly List<Scene> _allScenes = [];
     private readonly Dictionary<Guid, Chapter> _chaptersById = [];
     private readonly Dictionary<Guid, Character> _charactersById = [];
     private bool _suppressSceneFilterReload;
+    private bool _loading;
 
     public StoryDataViewModel(
         IProjectService projectService,
         IStoryDataService storyData,
-        IChapterService chapters)
+        IChapterService chapters,
+        IStoryChangeNotifier changes)
     {
         _projectService = projectService;
         _storyData = storyData;
         _chapters = chapters;
+        _changes = changes;
+        _changes.Changed += OnStoryChanged;
         _ = RefreshAsync();
     }
+
+    public void Detach() => _changes.Changed -= OnStoryChanged;
 
     public ObservableCollection<CharacterListItemViewModel> Characters { get; } = [];
 
@@ -125,11 +135,42 @@ public partial class StoryDataViewModel : ObservableObject
             : $"Opened scene '{SelectedScene.Source.Title}'.";
     }
 
+    public async Task FocusCharacterAsync(Guid characterId)
+    {
+        await RefreshAsync().ConfigureAwait(true);
+        SelectedTabIndex = CharactersTabIndex;
+        SelectedCharacter = Characters.FirstOrDefault(item => item.Id == characterId);
+        StatusMessage = SelectedCharacter is null
+            ? "Requested character was not found."
+            : $"Opened character '{SelectedCharacter.Source.Name}'.";
+    }
+
+    public async Task FocusWorldEntryAsync(Guid worldEntryId)
+    {
+        await RefreshAsync().ConfigureAwait(true);
+        SelectedTabIndex = WorldTabIndex;
+        SelectedWorldEntry = WorldEntries.FirstOrDefault(item => item.Id == worldEntryId);
+        StatusMessage = SelectedWorldEntry is null
+            ? "Requested world entry was not found."
+            : $"Opened world entry '{SelectedWorldEntry.Source.Name}'.";
+    }
+
+    public async Task FocusBeatAsync(Guid beatId)
+    {
+        await RefreshAsync().ConfigureAwait(true);
+        SelectedTabIndex = BeatsTabIndex;
+        SelectedBeat = Beats.FirstOrDefault(item => item.Id == beatId);
+        StatusMessage = SelectedBeat is null
+            ? "Requested beat was not found."
+            : $"Opened beat '{SelectedBeat.Source.Name}'.";
+    }
+
     [RelayCommand]
     private async Task RefreshAsync()
     {
         var project = _projectService.ActiveProject;
         HasProject = project is not null;
+        _loading = true;
         Characters.Clear();
         WorldEntries.Clear();
         Beats.Clear();
@@ -148,6 +189,7 @@ public partial class StoryDataViewModel : ObservableObject
         if (project is null)
         {
             StatusMessage = "Open or create a project to edit story databases.";
+            _loading = false;
             return;
         }
 
@@ -185,6 +227,132 @@ public partial class StoryDataViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void OnStoryChanged(object? sender, StoryChangeEventArgs e)
+    {
+        if (_loading || _projectService.ActiveProject?.Id != e.ProjectId)
+        {
+            return;
+        }
+
+        if (e.Kind is not (StoryChangeKind.SceneUpserted
+            or StoryChangeKind.SceneDeleted
+            or StoryChangeKind.CharacterChanged
+            or StoryChangeKind.WorldEntryChanged
+            or StoryChangeKind.BeatChanged
+            or StoryChangeKind.HierarchyChanged))
+        {
+            return;
+        }
+
+        void Apply() => _ = SoftReloadFromCanonicalAsync(e.Kind);
+
+        var dispatcher = System.Windows.Application.Current?.Dispatcher;
+        if (dispatcher is null || dispatcher.CheckAccess())
+        {
+            Apply();
+        }
+        else
+        {
+            _ = dispatcher.InvokeAsync(Apply);
+        }
+    }
+
+    private async Task SoftReloadFromCanonicalAsync(StoryChangeKind kind)
+    {
+        var project = _projectService.ActiveProject;
+        if (project is null)
+        {
+            return;
+        }
+
+        var preserveSceneId = SelectedScene?.Id;
+        var preserveCharacterId = SelectedCharacter?.Id;
+        var preserveWorldId = SelectedWorldEntry?.Id;
+        var preserveBeatId = SelectedBeat?.Id;
+        var previousFilterChapterId = SelectedSceneChapterFilter?.ChapterId;
+        var previousFilterUnassigned = SelectedSceneChapterFilter?.IsUnassignedOnly == true;
+        var previousFilterAll = SelectedSceneChapterFilter?.IsAllChapters != false;
+        var tab = SelectedTabIndex;
+
+        try
+        {
+            _loading = true;
+            if (kind is StoryChangeKind.CharacterChanged
+                or StoryChangeKind.SceneUpserted
+                or StoryChangeKind.SceneDeleted
+                or StoryChangeKind.HierarchyChanged)
+            {
+                Characters.Clear();
+                _charactersById.Clear();
+                foreach (var character in await _storyData.GetCharactersAsync(project.Id).ConfigureAwait(true))
+                {
+                    Characters.Add(new CharacterListItemViewModel(character));
+                    _charactersById[character.Id] = character;
+                }
+
+                SelectedCharacter = Characters.FirstOrDefault(item => item.Id == preserveCharacterId)
+                    ?? Characters.FirstOrDefault();
+            }
+
+            if (kind is StoryChangeKind.WorldEntryChanged)
+            {
+                WorldEntries.Clear();
+                foreach (var entry in await _storyData.GetWorldEntriesAsync(project.Id).ConfigureAwait(true))
+                {
+                    WorldEntries.Add(new WorldEntryListItemViewModel(entry));
+                }
+
+                SelectedWorldEntry = WorldEntries.FirstOrDefault(item => item.Id == preserveWorldId)
+                    ?? WorldEntries.FirstOrDefault();
+            }
+
+            if (kind is StoryChangeKind.BeatChanged)
+            {
+                Beats.Clear();
+                foreach (var beat in await _storyData.GetBeatsAsync(project.Id).ConfigureAwait(true))
+                {
+                    Beats.Add(new BeatListItemViewModel(beat));
+                }
+
+                SelectedBeat = Beats.FirstOrDefault(item => item.Id == preserveBeatId)
+                    ?? Beats.FirstOrDefault();
+            }
+
+            if (kind is StoryChangeKind.SceneUpserted
+                or StoryChangeKind.SceneDeleted
+                or StoryChangeKind.CharacterChanged
+                or StoryChangeKind.HierarchyChanged)
+            {
+                RebuildChapterLookups(await _chapters.GetAllAsync(project.Id).ConfigureAwait(true));
+                _allScenes.Clear();
+                _allScenes.AddRange(await _storyData.GetScenesAsync(project.Id).ConfigureAwait(true));
+                _suppressSceneFilterReload = true;
+                SelectedSceneChapterFilter = previousFilterUnassigned
+                    ? SceneChapterFilters.FirstOrDefault(item => item.IsUnassignedOnly)
+                    : previousFilterAll
+                        ? SceneChapterFilters.FirstOrDefault(item => item.IsAllChapters)
+                        : SceneChapterFilters.FirstOrDefault(item => item.ChapterId == previousFilterChapterId)
+                          ?? SceneChapterFilters.FirstOrDefault(item => item.IsAllChapters);
+                _suppressSceneFilterReload = false;
+                RebuildSceneList(preserveSelectedId: preserveSceneId);
+            }
+
+            SelectedTabIndex = tab;
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
         }
     }
 
@@ -663,6 +831,9 @@ public sealed class CharacterOptionViewModel
 
     public static CharacterOptionViewModel Unassigned()
         => new(null, "(None)");
+
+    public static CharacterOptionViewModel All(string label = "All viewpoints")
+        => new(null, label);
 
     public static CharacterOptionViewModel From(Character character)
         => new(character.Id, character.Name);

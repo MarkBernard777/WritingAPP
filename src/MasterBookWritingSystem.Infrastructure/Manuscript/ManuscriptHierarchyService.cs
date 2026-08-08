@@ -12,10 +12,12 @@ namespace MasterBookWritingSystem.Infrastructure.Manuscript;
 public sealed class ManuscriptHierarchyService : IManuscriptHierarchyService
 {
     private readonly IProjectService _projectService;
+    private readonly IStoryChangeNotifier _changes;
 
-    public ManuscriptHierarchyService(IProjectService projectService)
+    public ManuscriptHierarchyService(IProjectService projectService, IStoryChangeNotifier changes)
     {
         _projectService = projectService;
+        _changes = changes;
     }
 
     public async Task<ManuscriptHierarchy> GetHierarchyAsync(
@@ -534,6 +536,7 @@ public sealed class ManuscriptHierarchyService : IManuscriptHierarchyService
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        PublishScene(projectId, scene.Id);
         return ToScene(scene);
     }
 
@@ -587,8 +590,17 @@ public sealed class ManuscriptHierarchyService : IManuscriptHierarchyService
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
         SqliteConnection.ClearAllPools();
+        PublishScene(projectId, bucket[index].Id);
         return ToScene(bucket[index]);
     }
+
+    private void PublishScene(Guid projectId, Guid sceneId)
+        => _changes.Publish(new StoryChangeEventArgs
+        {
+            ProjectId = projectId,
+            Kind = StoryChangeKind.SceneUpserted,
+            EntityId = sceneId,
+        });
 
     public async Task<Guid?> GetDefaultPartIdAsync(
         Guid projectId,

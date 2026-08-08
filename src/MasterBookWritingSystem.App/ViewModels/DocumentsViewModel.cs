@@ -23,6 +23,7 @@ public partial class DocumentsViewModel : ObservableObject
     private readonly INavigationService _navigation;
     private readonly IEditorAutosaveService _autosave;
     private readonly ISaveStateService _saveState;
+    private readonly IStoryChangeNotifier _changes;
     private readonly StructuredDocumentEditTracker _editTracker = new();
     private readonly Dictionary<Guid, Character> _charactersById = [];
     private bool _suppressAutosave;
@@ -34,7 +35,8 @@ public partial class DocumentsViewModel : ObservableObject
         IChapterService chapters,
         INavigationService navigation,
         IEditorAutosaveService autosave,
-        ISaveStateService saveState)
+        ISaveStateService saveState,
+        IStoryChangeNotifier changes)
     {
         _projectService = projectService;
         _documentService = documentService;
@@ -43,10 +45,14 @@ public partial class DocumentsViewModel : ObservableObject
         _navigation = navigation;
         _autosave = autosave;
         _saveState = saveState;
+        _changes = changes;
         _saveState.Changed += (_, _) => SyncSaveState();
+        _changes.Changed += OnStoryChanged;
         SyncSaveState();
         _ = RefreshAsync();
     }
+
+    public void Detach() => _changes.Changed -= OnStoryChanged;
 
     public ObservableCollection<DocumentListItemViewModel> Documents { get; } = [];
 
@@ -446,8 +452,10 @@ public partial class DocumentsViewModel : ObservableObject
         SaveStateAccessibleName = SaveStateAccessibility.FormatAccessibleName(_saveState.State, _saveState.Message);
     }
 
-    private async Task LoadSceneInventoryAsync(Guid projectId)
+    private async Task LoadSceneInventoryAsync(Guid projectId, Guid? preserveSelectedId = null)
     {
+        var keepId = preserveSelectedId ?? SelectedInventoryScene?.Id;
+        SceneInventory.Clear();
         _charactersById.Clear();
         foreach (var character in await _storyData.GetCharactersAsync(projectId).ConfigureAwait(true))
         {
@@ -473,7 +481,56 @@ public partial class DocumentsViewModel : ObservableObject
             SceneInventory.Add(new SceneInventoryItemViewModel(scene, chapterLabel, pov));
         }
 
-        SelectedInventoryScene = SceneInventory.FirstOrDefault();
+        SelectedInventoryScene = keepId is { } id
+            ? SceneInventory.FirstOrDefault(item => item.Id == id) ?? SceneInventory.FirstOrDefault()
+            : SceneInventory.FirstOrDefault();
+    }
+
+    private void OnStoryChanged(object? sender, StoryChangeEventArgs e)
+    {
+        if (!IsSceneListDocument || _projectService.ActiveProject?.Id != e.ProjectId)
+        {
+            return;
+        }
+
+        if (e.Kind is not (StoryChangeKind.SceneUpserted
+            or StoryChangeKind.SceneDeleted
+            or StoryChangeKind.CharacterChanged
+            or StoryChangeKind.HierarchyChanged))
+        {
+            return;
+        }
+
+        void Apply() => _ = ReloadSceneInventoryProjectionAsync();
+
+        var dispatcher = System.Windows.Application.Current?.Dispatcher;
+        if (dispatcher is null || dispatcher.CheckAccess())
+        {
+            Apply();
+        }
+        else
+        {
+            _ = dispatcher.InvokeAsync(Apply);
+        }
+    }
+
+    private async Task ReloadSceneInventoryProjectionAsync()
+    {
+        var project = _projectService.ActiveProject;
+        if (project is null || !IsSceneListDocument)
+        {
+            return;
+        }
+
+        try
+        {
+            await LoadSceneInventoryAsync(project.Id, SelectedInventoryScene?.Id).ConfigureAwait(true);
+            StatusMessage = "Scene List refreshed from canonical Story Data.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
     }
 
     private async Task RefreshValidationAsync()

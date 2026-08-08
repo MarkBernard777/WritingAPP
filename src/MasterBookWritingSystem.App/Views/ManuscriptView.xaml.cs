@@ -198,6 +198,7 @@ public partial class ManuscriptView : UserControl
         if (_boundViewModel is not null)
         {
             _boundViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+            _boundViewModel.Detach();
             _boundViewModel = null;
         }
     }
